@@ -101,6 +101,87 @@ def _ae():
     return MLPAutoEncoder(hidden=(8, 4))
 
 
+class GeneralizedESD:
+    """Rosner's Generalized Extreme Studentized Deviate test (multivariate).
+
+    Iteratively flags the most extreme studentised deviation per feature while
+    recomputing mean/sd on the surviving set (the masking correction that
+    distinguishes it from a plain z-score); a point's score is the largest
+    significant test statistic it attains across features. Order-independent, so
+    it is valid on the cross-sectional feature matrix."""
+    def __init__(self, max_frac=0.05, alpha=0.05):
+        self.max_frac = max_frac
+        self.alpha = alpha
+
+    def fit(self, X):
+        return self
+
+    def _robust_esd_score(self, x):
+        """Rosner iterative masking removal to find the non-outlier core, then
+        score every point by its studentised deviation from that robust core.
+        Returns a continuous score for all points (so quantile thresholding is
+        meaningful), unlike the raw flag which is sparse."""
+        n = len(x)
+        R = max(1, int(self.max_frac * n))
+        mask = np.ones(n, bool)
+        for i in range(R):
+            xi = x[mask]
+            m = len(xi)
+            if m < 3:
+                break
+            mean, sd = xi.mean(), xi.std(ddof=1)
+            if sd < 1e-12:
+                break
+            dev = np.abs(xi - mean)
+            j = int(np.argmax(dev))
+            Rstat = dev[j] / sd
+            p = 1.0 - self.alpha / (2.0 * m)
+            try:
+                tcrit = stats.t.ppf(p, m - 2)
+            except Exception:
+                break
+            Gcrit = (m - 1) * tcrit / np.sqrt((m - 2 + tcrit ** 2) * m)
+            if Rstat > Gcrit:
+                mask[np.where(mask)[0][j]] = False
+            else:
+                break
+        core = x[mask] if mask.sum() >= 3 else x
+        mu = core.mean()
+        sd = core.std(ddof=1)
+        sd = sd if sd > 1e-12 else 1.0
+        return np.abs(x - mu) / sd
+
+    def decision_function(self, X):
+        return np.max([self._robust_esd_score(X[:, k]) for k in range(X.shape[1])],
+                      axis=0)
+
+
+class OneClassSVMWrap:
+    """One-class SVM (RBF) anomaly score = negative distance to the learned
+    boundary. Fitted on a seeded random subsample of train to keep the O(n^2)
+    kernel solve tractable on the full record; scores are standardised before
+    the decision function."""
+    def __init__(self, cap=6000):
+        from sklearn.svm import OneClassSVM
+        self.cap = cap
+        self._cls = OneClassSVM
+
+    def fit(self, X):
+        rng = np.random.default_rng(C.SEED)
+        idx = rng.choice(len(X), size=min(self.cap, len(X)), replace=False)
+        sub = X[idx]
+        self.mu_ = sub.mean(0)
+        self.sd_ = sub.std(0, ddof=1)
+        self.sd_[self.sd_ < 1e-9] = 1.0
+        self.model = self._cls(kernel="rbf", gamma="scale",
+                               nu=C.CONTAMINATION, cache_size=512
+                               ).fit((sub - self.mu_) / self.sd_)
+        return self
+
+    def decision_function(self, X):
+        return -self.model.decision_function((X - self.mu_) / self.sd_)
+
+
 def _deepae():
     if AutoEncoder is None:
         raise RuntimeError("torch not installed")
@@ -129,6 +210,8 @@ DETECTORS = {
     "COPOD": lambda: COPOD(),
     "PCA": lambda: PCA(),
     "AutoEncoder": _ae,
+    "GeneralizedESD": lambda: GeneralizedESD(),
+    "OneClassSVM": lambda: OneClassSVMWrap(),
     "DeepAE": _deepae,
     "VAE": _vae,
 }
@@ -281,6 +364,8 @@ def main():
     years = sorted(set(te_year))
     mat = []
     for name in res.detector:
+        if name not in scores_all:      # ensemble variants share the base score;
+            continue                    # friedman.json is recomputed by _recover.py
         s = scores_all[name]
         thr = np.quantile(s, 1 - C.CONTAMINATION)
         pred = (s >= thr).astype(int)
@@ -288,7 +373,8 @@ def main():
         mat.append(row)
     mat = np.array(mat)
     stat_f, pval = stats.friedmanchisquare(*mat.T)
-    res_stat = {"friedman_chi2": float(stat_f), "friedman_p": float(pval), "years": years}
+    res_stat = {"friedman_chi2": float(stat_f), "friedman_p": float(pval),
+                "years": [int(v) for v in years]}
     import json
     (RESULTS / "friedman.json").write_text(json.dumps(res_stat, indent=2))
     np.save(RESULTS / "per_year_f1.npy", mat)
