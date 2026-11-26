@@ -133,6 +133,10 @@ detectors --- independently corroborate documented drought events
 World Bank cereal-yield series, delivering an honest two-sided finding (severe
 droughts coincide with the worst yield years, yet national-annual linkage is
 confounded) (Section~\ref{sec:agrires}).
+\item A \emph{coffee} impact extension on Uganda's signature export showing the
+confounding generalises --- the anomaly--moisture correlation \emph{reverses sign}
+between the century in-situ and modern reanalysis substrates, so a coarse national
+crop aggregate is not a climate-impact measurement (Section~\ref{sec:coffee}).
 \item A novel composite severity index, \textbf{UCASI}, that fuses intensity,
 duration, spatial spread, multivariate concurrence and frequency into a 0--100
 score with severity bands (Section~\ref{sec:ucasi}).
@@ -609,6 +613,38 @@ occurred in a year of \emph{above}-trend national cereal output
 ``drought\,$\Rightarrow$\,yield-loss'' claims from coarse data, and it pinpoints
 the next required step: sub-national yield to match the sub-national climate.
 
+\subsection{Coffee: the confounding generalises to the signature export}
+\label{sec:coffee}
+We extend the impact layer from the cereal staple to Uganda's defining cash
+crop, coffee (\textasciitilde1.7M smallholders; robusta in the central belt,
+arabica on Mt\ Elgon and the south-western highlands). Green-coffee production
+(tonnes, 1961--2024) is a real FAOSTAT series compiled by Our World in
+Data~\cite{owid2025}. Harvested area is not available on any endpoint reachable
+from this environment, so --- unlike cereals --- we detrend \emph{log-production}
+rather than yield; the residual anomaly therefore mixes the weather response
+with area and price cycles and is, if anything, more confounded. Production grew
+$+1.24\%$/yr (94{,}100\,tonnes in 1961 to a record 507{,}000 in 2022).
+
+The coffee result is a sharper version of the cereal caution, and we report it
+without smoothing the contradiction. Against the century in-situ substrate
+(Meteostat SPI$_3$, 1961--86, $n{=}26$) the anomaly--moisture correlation is weak
+and \emph{positive} but insignificant (long-rains $r=0.12$, $p=0.57$; bimodal
+$r=0.22$, $p=0.27$; annual $r=0.19$, $p=0.36$). Against the modern ERA5 substrate
+(2008--23, $n{=}15$--16) the sign \emph{flips negative} and is marginally
+significant in the widest windows (bimodal $r=-0.47$, $p=0.07$; annual
+$r=-0.58$, $p=0.024$; annual SPEI$_3$ $r=-0.62$, $p=0.013$) --- i.e.\ wetter
+seasons line up with \emph{higher} detrended output. That sign is physically
+implausible for a moisture-limited perennial and is a textbook confounding
+artifact, not a finding: robusta's biennial bearing, 2009--11 price-driven area
+expansion, and the fact that the register's ``drought'' years 2018 and 2020 were
+in fact record coffee harvests ($+11\%$ and $+32\%$ anomaly) all break the naive
+link. A correlation that reverses sign between two independent observation
+substrates carries no stable climate signal at all. The takeaway generalises the
+cereal result: a single coarse national crop aggregate --- even for the crop most
+often narrated as climate-vulnerable --- cannot be read as a climate-impact
+measurement, and the same sub-national outcome data identified above as the next
+required step is a fortiori needed for coffee (Figure~\ref{fig:coffee}).
+
 \subsection{RQ5 --- Correspondence with documented events}
 \label{sec:rq5}
 At the \emph{event-window} level the ensemble flags at least one day inside 68.8\%
@@ -765,13 +801,15 @@ with exposure and hydrological state to move from monitoring to prediction.
 \section*{Data and code availability}
 All inputs are openly licensed: ERA5 reanalysis via the Open-Meteo Archive API
 (CC-BY 4.0), Meteostat station records (CC-BY 4.0), the NASA POWER / MERRA-2
-gap-fill reanalysis (open, no-key JSON), and World Bank / FAOSTAT
-cereal production series (CC BY 4.0). The disaster register is
+gap-fill reanalysis (open, no-key JSON), World Bank / FAOSTAT
+cereal production series (CC BY 4.0), and FAOSTAT green-coffee production
+compiled by Our World in Data (CC BY 4.0). The disaster register is
 compiled from public relief records (UN-OCHA/UNMA, EM-DAT, FAO, FEWS NET) with
 per-event citations. The complete pipeline --- \texttt{fetch\_era5.py},
 \texttt{fetch\_meteostat.py}, \texttt{preprocess.py}, \texttt{detect.py},
 \texttt{spatial.py}, \texttt{temporal.py}, \texttt{meteostat\_instrumental.py},
 \texttt{drought\_indices.py}, \texttt{fetch\_agriculture.py}, \texttt{ag\_linkage.py},
+\texttt{fetch\_coffee.py}, \texttt{coffee\_linkage.py}, \texttt{figures\_coffee.py},
 \texttt{fetch\_power.py}, \texttt{power\_climate.py}, \texttt{figures\_power.py},
 \texttt{ucasi.py}, \texttt{explain.py},
 \texttt{figures.py}, \texttt{collect\_results.py} --- reproduces every figure
@@ -851,6 +889,18 @@ SPEI$_3$ 2008--23, most-negative growing-season value per year, with the
 growing-season drought index, showing significant drought--yield years but a
 weak national-linear link. (Drought $\rightarrow$ impact)}
 \label{fig:droughtyield}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_coffee.png}
+\caption{Uganda coffee --- the confounding generalises to the signature export.
+Left: green-coffee production (t) 1961--2024 with the fitted log-linear trend
+($+1.24\%$/yr), worst detrended-anomaly years banded, and documented drought
+years annotated (2018 and 2020 are record harvests, not losses). Right: Pearson
+$r$ of the production anomaly against seasonal SPI$_3$ on two independent
+substrates --- weak-positive on the century in-situ record, negative (and
+marginally significant, $*$) on modern ERA5. The sign flip shows a coarse
+national crop aggregate carries no stable climate signal. (Coffee impact)}
+\label{fig:coffee}
 \end{figure}
 \begin{figure}[h]\centering
 \includegraphics[width=\linewidth]{figures/fig_ews_architecture.png}

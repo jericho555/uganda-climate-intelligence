@@ -1,0 +1,163 @@
+{
+  "outcome": "national coffee production (tonnes), FAOSTAT/OWID",
+  "yield_note": "per-ha yield unavailable (area not on a reachable OWID slug); anomaly is of LOG-PRODUCTION, so it mixes weather with area/price cycles and is more confounded than yield",
+  "prod_trend_pct_per_year": 1.24,
+  "prod_years": [
+    1961,
+    2024
+  ],
+  "prod_range_t": [
+    94100.0,
+    507000.0
+  ],
+  "meteostat_century_linkage": {
+    "long_rains:SPI3": {
+      "n": 26,
+      "years": "1961-1986",
+      "pearson_r": 0.117,
+      "pearson_p": 0.569,
+      "spearman_r": 0.048,
+      "spearman_p": 0.818,
+      "slope_pct_per_sd": 5.39,
+      "wet_minus_dry_yieldgap_pct": 10.79
+    },
+    "bimodal:SPI3": {
+      "n": 26,
+      "years": "1961-1986",
+      "pearson_r": 0.224,
+      "pearson_p": 0.27,
+      "spearman_r": 0.29,
+      "spearman_p": 0.15,
+      "slope_pct_per_sd": 14.03,
+      "wet_minus_dry_yieldgap_pct": 28.06
+    },
+    "annual:SPI3": {
+      "n": 26,
+      "years": "1961-1986",
+      "pearson_r": 0.187,
+      "pearson_p": 0.361,
+      "spearman_r": 0.216,
+      "spearman_p": 0.288,
+      "slope_pct_per_sd": 13.07,
+      "wet_minus_dry_yieldgap_pct": 26.14
+    }
+  },
+  "era5_modern_linkage": {
+    "long_rains:SPI3": {
+      "n": 16,
+      "years": "2008-2023",
+      "pearson_r": -0.382,
+      "pearson_p": 0.144,
+      "spearman_r": -0.376,
+      "spearman_p": 0.151,
+      "slope_pct_per_sd": -14.51,
+      "wet_minus_dry_yieldgap_pct": -29.03
+    },
+    "long_rains:SPEI3": {
+      "n": 16,
+      "years": "2008-2023",
+      "pearson_r": -0.334,
+      "pearson_p": 0.206,
+      "spearman_r": -0.332,
+      "spearman_p": 0.208,
+      "slope_pct_per_sd": -11.3,
+      "wet_minus_dry_yieldgap_pct": -22.6
+    },
+    "bimodal:SPI3": {
+      "n": 16,
+      "years": "2008-2023",
+      "pearson_r": -0.47,
+      "pearson_p": 0.0662,
+      "spearman_r": -0.526,
+      "spearman_p": 0.0362,
+      "slope_pct_per_sd": -27.78,
+      "wet_minus_dry_yieldgap_pct": -55.56
+    },
+    "bimodal:SPEI3": {
+      "n": 16,
+      "years": "2008-2023",
+      "pearson_r": -0.495,
+      "pearson_p": 0.0513,
+      "spearman_r": -0.588,
+      "spearman_p": 0.0165,
+      "slope_pct_per_sd": -27.09,
+      "wet_minus_dry_yieldgap_pct": -54.19
+    },
+    "annual:SPI3": {
+      "n": 15,
+      "years": "2009-2023",
+      "pearson_r": -0.579,
+      "pearson_p": 0.0236,
+      "spearman_r": -0.614,
+      "spearman_p": 0.0148,
+      "slope_pct_per_sd": -35.85,
+      "wet_minus_dry_yieldgap_pct": -71.69
+    },
+    "annual:SPEI3": {
+      "n": 15,
+      "years": "2009-2023",
+      "pearson_r": -0.624,
+      "pearson_p": 0.013,
+      "spearman_r": -0.668,
+      "spearman_p": 0.00651,
+      "slope_pct_per_sd": -36.04,
+      "wet_minus_dry_yieldgap_pct": -72.08
+    }
+  },
+  "drought_events_coffee_anomaly": [
+    {
+      "event": "UG-003",
+      "year": 2010,
+      "coffee_anom_pct": -32.0,
+      "regions": "Northern"
+    },
+    {
+      "event": "UG-013",
+      "year": 2016,
+      "coffee_anom_pct": -1.9,
+      "regions": "Northern"
+    },
+    {
+      "event": "UG-015",
+      "year": 2018,
+      "coffee_anom_pct": 11.3,
+      "regions": "Northern;Eastern"
+    },
+    {
+      "event": "UG-022",
+      "year": 2020,
+      "coffee_anom_pct": 32.5,
+      "regions": "Northern"
+    }
+  ],
+  "worst_coffee_years": [
+    {
+      "year": 1992,
+      "coffee_anom_pct": -51.2,
+      "prod_t": 110334.0,
+      "era_bimodal_SPI3": null,
+      "era_bimodal_SPEI3": null
+    },
+    {
+      "year": 1981,
+      "coffee_anom_pct": -49.9,
+      "prod_t": 97500.0,
+      "era_bimodal_SPI3": null,
+      "era_bimodal_SPEI3": null
+    },
+    {
+      "year": 2006,
+      "coffee_anom_pct": -49.6,
+      "prod_t": 133310.0,
+      "era_bimodal_SPI3": null,
+      "era_bimodal_SPEI3": null
+    },
+    {
+      "year": 1979,
+      "coffee_anom_pct": -42.0,
+      "prod_t": 103000.0,
+      "era_bimodal_SPI3": null,
+      "era_bimodal_SPEI3": null
+    }
+  ]
+}
