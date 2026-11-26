@@ -13,9 +13,13 @@ validated detection + spatial-risk + century-climatology + drought-index +
 impact + severity + early-warning framework.
 
 **Core, deliberately uncomfortable finding:** against real disaster ground-truth,
-*no* generic unsupervised anomaly detector beats chance (held-out ROC-AUC
-0.49–0.51; best F1 = 0.083; best PR-AUC = 0.117 vs a 0.1115 base rate), and the
-apparent 68.8% event coverage is fully explained by a size-matched random null.
+*no cross-sectional* unsupervised anomaly detector beats chance (held-out ROC-AUC
+0.49–0.53; best cross-sectional F1 = 0.084; PR-AUC ≤ 0.121 vs a 0.1115 base rate).
+Across the full benchmark of 24 detectors, only two deep **sequence** autoencoders
+(LSTM-AE, Transformer-AE — torch, vendored CPU build) rise above the size-matched
+random null, and then only marginally (F1 0.13–0.14, precision 0.20–0.22, yet
+ROC-AUC still 0.51–0.53 and <10% of disaster days captured). The apparent 68.8%
+event coverage is fully explained by a size-matched random null.
 Physically-interpreted derived indices (SPI/SPEI), by contrast, *do* corroborate
 documented droughts. Every number in the paper is computed by this pipeline —
 **nothing is fabricated**.
