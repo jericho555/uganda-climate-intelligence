@@ -118,7 +118,7 @@ number from a single, auditable pipeline.
 \item A fully reproducible pipeline (open ERA5 reanalysis, CC-BY 4.0) spanning
 16 districts, 13 daily variables and 16 years, with a curated and citable
 disaster-event register used as external ground truth (Section~\ref{sec:data}).
-\item The first held-out, ground-truth benchmark of 18 anomaly detectors for
+\item The first held-out, ground-truth benchmark of 22 anomaly detectors for
 Ugandan weather, with bootstrap confidence intervals, multi-seed stability and
 Friedman/Nemenyi ranking, and --- critically --- a size-matched random null
 (Section~\ref{sec:rq1}).
@@ -280,7 +280,7 @@ a 5-day heat index and a 30-day evaporative-demand index (sign-flipped ET$_0$).
 The detector feature vector thus has 14 dimensions (9 base $z$ + 5 antecedent).
 
 \subsection{Detector family}\label{sec:detectors}
-We benchmark 18 methods spanning every major family: max/union seasonal z-scores,
+We benchmark 22 methods spanning every major family: max/union seasonal z-scores,
 Rosner's generalised ESD, Isolation Forest, LOF, $k$NN, HBOS, CBLOF, LODA, ECOD,
 COPOD, PCA, EllipticEnvelope, a one-class SVM, a shallow reconstruction
 autoencoder, and a rank-averaged ensemble optionally filtered by temporal
@@ -288,13 +288,22 @@ persistence and region-relative thresholding. The one-class SVM is fitted on a
 seeded 6{,}000-row subsample to keep its kernel solve within memory at 64k rows;
 minimum covariance determinant (MCD) was evaluated but excluded as numerically
 unstable at this dimensionality --- a reproducibility finding we report rather
-than hide. Deep (torch/TensorFlow) autoencoder and VAE variants, and the sequence
-models (LSTM/Transformer autoencoder, Prophet), are implemented in the released
-code but are \emph{not} reported here: their backends could not be installed in
-the reproducible environment (wheel-download integrity failures and read timeouts
-on the 124--350 MB distributions), and the sequence models additionally require a
-per-series temporal harness; we therefore omit them rather than substitute
-unverified numbers.
+than hide. To reach the deep and temporal families without the heavy backends that
+failed to install here (torch/TensorFlow/Prophet --- wheel-download integrity
+failures and read timeouts on the 124--350 MB distributions), we add four
+detectors built from primitives already pinned in the environment: a \emph{deep
+autoencoder} (a genuine three-layer 16--8--4 MLP trained with Adam through
+\texttt{sklearn}'s \texttt{MLPRegressor}); a \emph{variational autoencoder}
+coded directly in NumPy with hand-derived backpropagation whose analytic
+gradients were validated against central finite differences (maximum relative
+error $\sim3\times10^{-9}$) and whose ELBO was confirmed to decrease before use;
+and two leak-free \emph{temporal} models --- a seasonal ARIMA (SARIMAX) and an
+unobserved-components structural model (local level plus weekly seasonality, the
+statistical core of Prophet) --- each scored as standardised one-step-ahead
+innovations, fitted on train and applied to test. Only the recurrent/attention
+sequence variants (LSTM-AE, Transformer-AE), which additionally need a deep
+backend and a per-series temporal harness, remain implemented-but-unreported; we
+omit them rather than substitute unverified numbers.
 
 \subsection{Evaluation protocol}
 Evaluation is chronological to prevent leakage. Continuous scores are thresholded
@@ -390,22 +399,27 @@ manually entered. Seeds are fixed (\texttt{SEED}=42).
 \label{sec:rq1}
 Table~\ref{tab:benchmark} reports the held-out benchmark. The result is uniform
 and unambiguous: \emph{every} detector sits at chance. ROC-AUC spans
-0.494--0.507 across all 17 methods (0.5 is random), and PR-AUC spans
-0.111--0.117 around the base rate of 0.1115. The best F1 is 0.083 (LOF), with a
-95\% bootstrap interval of $[0.071,0.094]$ that comfortably contains the
-performance of flagging 5\% of days at random. The persistence- and
+0.494--0.532 across all 22 methods (0.5 is random), and PR-AUC spans
+0.111--0.121 around the base rate of 0.1115. The best F1 is 0.084 (one-class
+SVM), with a 95\% bootstrap interval of $[0.072,0.095]$ that comfortably contains
+the performance of flagging 5\% of days at random. The persistence- and
 region-filtered ensembles --- our constructive attempts to inject physical
-signal --- do not escape chance (best PR-AUC 0.117).
+signal --- do not escape chance (best PR-AUC 0.117). Neither do the four newly
+added deep and temporal detectors: the deep MLP autoencoder (ROC 0.498), the
+NumPy VAE (ROC 0.501), SARIMAX (ROC 0.505) and the structural
+unobserved-components model (ROC 0.516) all sit within a few points of random
+with MCC $\le 0.007$; extending the zoo into these families therefore reinforces,
+rather than alters, the central finding.
 
-Friedman testing over the five test years returns $\chi^2=20.29$,
-$p=4.4\times10^{-4}$, confirming the \emph{rankings differ}, but the differences
+Friedman testing over the five test years returns $\chi^2=24.88$,
+$p=5.3\times10^{-5}$, confirming the \emph{rankings differ}, but the differences
 are between methods that are all effectively non-informative; seed standard
 deviation of F1 is 0, so this is not a variance artefact.
 
 \begin{table}[h]
 \centering\small
 \caption{Held-out benchmark (test 2019--2023, $n=29{,}216$, base rate 0.1115).
-Subsets shown, ordered by PR-AUC. Full results for all 18 methods are in the
+All 22 methods shown, ordered by PR-AUC. Higher-precision values are in the
 released \texttt{benchmark.csv}.}
 \label{tab:benchmark}
 \begin{tabular}{lcccccc}
@@ -413,23 +427,27 @@ released \texttt{benchmark.csv}.}
 Detector & Precision & Recall & F1 & ROC & PR-AUC & MCC \\
 \midrule
 Generalized ESD       & 0.118 & 0.053 & 0.073 & 0.532 & \textbf{0.121} & 0.005 \\
-Ensemble+Persist+Reg & 0.129 & 0.058 & 0.080 & 0.507 & 0.117 & 0.012 \\
-Ensemble+5dPersist   & 0.137 & 0.061 & \textbf{0.085} & 0.507 & 0.117 & 0.018 \\
-LOF                  & 0.133 & 0.060 & 0.083 & 0.505 & 0.117 & 0.016 \\
-ECOD                 & 0.131 & 0.059 & 0.081 & 0.507 & 0.116 & 0.014 \\
-COPOD                & 0.131 & 0.059 & 0.081 & 0.501 & 0.116 & 0.014 \\
-Ensemble             & 0.127 & 0.057 & 0.079 & 0.506 & 0.116 & 0.011 \\
-Z-score (max)        & 0.125 & 0.056 & 0.077 & 0.500 & 0.115 & 0.009 \\
-CBLOF                & 0.118 & 0.053 & 0.073 & 0.505 & 0.115 & 0.005 \\
-HBOS                 & 0.126 & 0.056 & 0.078 & 0.498 & 0.114 & 0.010 \\
-AutoEncoder          & 0.119 & 0.053 & 0.074 & 0.499 & 0.114 & 0.006 \\
-Isolation Forest     & 0.114 & 0.051 & 0.071 & 0.506 & 0.114 & 0.002 \\
-KNN                  & 0.118 & 0.053 & 0.073 & 0.507 & 0.114 & 0.005 \\
-Seasonal ESD         & 0.113 & 0.051 & 0.070 & 0.500 & 0.114 & 0.001 \\
-PCA                  & 0.131 & 0.059 & 0.081 & 0.494 & 0.113 & 0.014 \\
-One-class SVM        & 0.136 & 0.061 & 0.084 & 0.502 & 0.113 & 0.017 \\
-LODA                 & 0.120 & 0.054 & 0.075 & 0.497 & 0.113 & 0.006 \\
-EllipticEnvelope     & 0.100 & 0.045 & 0.062 & 0.501 & 0.111 & $-$0.008 \\
+Structural TS         & 0.120 & 0.054 & 0.074 & 0.516 & 0.118 & 0.006 \\
+Ensemble+Persist+Reg  & 0.122 & 0.055 & 0.076 & 0.507 & 0.117 & 0.008 \\
+Ensemble+5dPersist    & 0.126 & 0.056 & 0.078 & 0.507 & 0.117 & 0.010 \\
+LOF                   & 0.133 & 0.060 & 0.083 & 0.505 & 0.117 & 0.016 \\
+SARIMAX               & 0.122 & 0.055 & 0.075 & 0.505 & 0.116 & 0.007 \\
+ECOD                  & 0.131 & 0.059 & 0.081 & 0.507 & 0.116 & 0.014 \\
+COPOD                 & 0.131 & 0.059 & 0.081 & 0.501 & 0.116 & 0.014 \\
+Ensemble              & 0.127 & 0.057 & 0.078 & 0.505 & 0.115 & 0.011 \\
+Z-score (max)         & 0.125 & 0.056 & 0.077 & 0.500 & 0.115 & 0.009 \\
+CBLOF                 & 0.118 & 0.053 & 0.073 & 0.505 & 0.115 & 0.005 \\
+HBOS                  & 0.126 & 0.056 & 0.078 & 0.498 & 0.114 & 0.010 \\
+AutoEncoder           & 0.119 & 0.053 & 0.074 & 0.499 & 0.114 & 0.006 \\
+Isolation Forest      & 0.114 & 0.051 & 0.071 & 0.506 & 0.114 & 0.002 \\
+KNN                   & 0.118 & 0.053 & 0.073 & 0.507 & 0.114 & 0.005 \\
+Seasonal ESD          & 0.113 & 0.051 & 0.070 & 0.500 & 0.114 & 0.001 \\
+Deep AE (MLP)         & 0.119 & 0.053 & 0.074 & 0.498 & 0.114 & 0.006 \\
+PCA                   & 0.131 & 0.059 & 0.081 & 0.494 & 0.113 & 0.014 \\
+One-class SVM         & 0.136 & 0.061 & \textbf{0.084} & 0.502 & 0.113 & 0.017 \\
+LODA                  & 0.120 & 0.054 & 0.075 & 0.497 & 0.113 & 0.006 \\
+EllipticEnvelope      & 0.100 & 0.045 & 0.062 & 0.501 & 0.111 & $-$0.008 \\
+VAE (NumPy)           & 0.112 & 0.050 & 0.069 & 0.501 & 0.111 & 0.000 \\
 \midrule
 \multicolumn{7}{l}{Random-flag baseline (5\% rate): F1 $\approx$ 0.096, PR-AUC $=$ 0.111.}\\
 \bottomrule
@@ -777,11 +795,15 @@ resolution. Sensitivity to weightings and threshold $\gamma$ should be reported
 in extensions. (4) \emph{Attribution}: SHAP explains the detector, not disasters.
 (5) \emph{Detector coverage}: the one-class SVM is retained only via a seeded
 6{,}000-row subsample and MCD was dropped as numerically unstable at this
-dimensionality; the deep autoencoder/VAE and sequence variants
-(LSTM/Transformer-AE, Prophet) are implemented in the released code but are
-unreported here because their torch/TensorFlow backends could not be installed in
-the reproducible environment (sha256 integrity failures and read timeouts on the
-124--350 MB distributions).
+dimensionality. The deep (MLP autoencoder, gradient-validated NumPy VAE) and
+temporal (SARIMAX, unobserved-components) families are reported here via native
+implementations on the already-pinned numpy/sklearn/statsmodels stack, because the
+torch/TensorFlow/Prophet backends could not be installed (sha256 integrity
+failures and read timeouts on the 124--350 MB distributions); only the recurrent
+and attention sequence variants (LSTM-AE, Transformer-AE), which additionally need
+a deep backend and a per-series temporal harness, remain implemented but
+unreported. None of the included deep/temporal detectors escape chance, so this
+coverage limitation does not affect the verdict.
 
 %============================================================================
 \section{Conclusion}

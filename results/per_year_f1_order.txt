@@ -1,5 +1,7 @@
 GeneralizedESD
+StructuralTS
 LOF
+SARIMAX
 ECOD
 COPOD
 Ensemble
@@ -10,7 +12,9 @@ AutoEncoder
 IsolationForest
 KNN
 SeasonalESD
+DeepAE
 PCA
 OneClassSVM
 LODA
 EllipticEnvelope
+VAE

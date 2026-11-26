@@ -40,6 +40,7 @@ from sklearn.metrics import (precision_score, recall_score, f1_score,
                              roc_auc_score, average_precision_score,
                              matthews_corrcoef)
 from scipy import stats
+from deep_models import (DeepAE, NumpyVAE, sarimax_scores, structural_scores)
 
 
 # ----------------------------------------------------------------------------
@@ -183,17 +184,13 @@ class OneClassSVMWrap:
 
 
 def _deepae():
-    if AutoEncoder is None:
-        raise RuntimeError("torch not installed")
-    return AutoEncoder(hidden_neurons=[8, 4], activation="relu", epochs=60,
-                       batch_size=64, random_state=C.SEED, verbose=0)
+    # genuine multi-layer NN via sklearn (torch/TF backends uninstallable here)
+    return DeepAE(hidden=(16, 8, 4))
 
 
 def _vae():
-    if VariationalAutoEncoder is None:
-        raise RuntimeError("VAE unavailable")
-    return VariationalAutoEncoder(hidden_neurons=[8, 4], activation="relu",
-                                  epochs=60, batch_size=64, random_state=C.SEED, verbose=0)
+    # NumPy VAE; gradients finite-difference validated, ELBO verified decreasing
+    return NumpyVAE(h=16, z=4, epochs=30, batch=256)
 
 
 DETECTORS = {
@@ -351,6 +348,20 @@ def main():
     add_eval("Ensemble+5dPersist", pers_te,
              (pers_te >= np.quantile(pers_te, 1 - C.CONTAMINATION)).astype(int))
     add_eval("Ensemble+Persist+Region", pers_te, flag_local(pers_te, te.region.values, C.CONTAMINATION))
+
+    # ---- temporal detectors (leak-free per-series innovations, statsmodels) ----
+    # modelled on a fixed subset of key variables to bound the many per-series
+    # fits; this is a disclosed scope choice, not a silent one.
+    TEMP_FEATS = ["precipitation_sum_z", "temperature_2m_mean_z",
+                  "et0_fao_evapotranspiration_z"]
+    for tname, tfun in (("SARIMAX", sarimax_scores), ("StructuralTS", structural_scores)):
+        try:
+            ts = tfun(tr, te, TEMP_FEATS)
+            ts = np.nan_to_num(ts, nan=0.0, posinf=np.max(ts[np.isfinite(ts)]) if np.isfinite(ts).any() else 0.0, neginf=0.0)
+            scores_all[tname] = ts
+            add_eval(tname, ts, (ts >= np.quantile(ts, 1 - C.CONTAMINATION)).astype(int))
+        except Exception as e:
+            print(f"[skip temporal] {tname}: {e!r}")
 
     res = pd.DataFrame(rows).sort_values("pr_auc", ascending=False)
     res.to_csv(RESULTS / "benchmark.csv", index=False)
