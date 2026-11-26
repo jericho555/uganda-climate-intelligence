@@ -98,7 +98,7 @@ Ugandan hazard record and are expected to intensify under climate change
 \cite{ipcc2022,unma2022}. A growing body of work proposes unsupervised anomaly
 detection as a low-cost early-warning mechanism, because labelled disaster data
 are scarce and machine learning can in principle flag ``abnormal'' weather
-without supervision \cite{chandola2009,pang2021}. Several studies on African
+without supervision \cite{chandola2009survey,pang2021}. Several studies on African
 weather records report exceptional performance; for example, an evaluation on a
 Meteoblue Uganda dataset declared precision, recall and ROC-AUC all equal to
 $1.0$ \cite{masaba2023}.
@@ -109,7 +109,7 @@ what actually constituted a disaster, ``accuracy'' is undefined, and any
 threshold tuned on the same data trivially separates itself. The absence of
 rigorous ground truth is not merely an academic nicety --- it inflates reported
 skill, misdirects scarce adaptation funding, and can embed false confidence into
-operational warning chains \cite{rietsch2020,gunderson2022}.
+operational warning chains \cite{schmidl2022}.
 
 This paper reframes the question from \emph{``which detector is most
 accurate?''} (unanswerable without labels) to \emph{``what does a
@@ -175,15 +175,23 @@ RQ6: can this support operational early warning?
 Anomaly-detection taxonomies distinguish statistical (z-score, extreme student
 deviate), density/distance ($k$NN, LOF), tree/isolation (Isolation Forest),
 linear (PCA, EllipticEnvelope/MCD), information-theoretic (HBOS, LODA, ECOD,
-COPOD) and deep (autoencoder, VAE) families \cite{chandola2009,pang2021}.
-PyOD consolidates these and is our benchmark substrate \cite{zhao2019}.
+COPOD) and deep (autoencoder, VAE) families
+\cite{chandola2009survey,chandola2009,pang2021}.
+The individual methods used here are described in their primary sources:
+generalised ESD \cite{rosner1983}, Isolation Forest \cite{liu2008}, LOF
+\cite{breunig2000} and the one-class SVM \cite{schoelkopf2001}.
+PyOD consolidates these and is our benchmark substrate \cite{zhao2019}, with
+scikit-learn for the statistical and tree-based members \cite{pedregosa2011}.
 Spatial-dependence statistics (Moran's $I$, Getis--Ord $G_i^*$) are standard in
-GIScience \cite{anselin1995,ord1995}; non-parametric trend testing
-(Mann--Kendall, Sen's slope) is recommended by WMO for hydrometeorology
-\cite{hirsch1984}. In machine learning for development contexts, several authors
-warn that benchmark metrics without ground truth are misleading
-\cite{rietsch2020,gunderson2022,boyd2022}. Our work operationalises this critique
-for Ugandan climate data and, unlike prior studies \cite{masaba2023}, evaluates
+GIScience \cite{anselin1995,getis1992}; the non-parametric trend tests used here
+(Mann--Kendall with Sen's slope estimator) are the conventional
+hydrometeorological pair \cite{sen1968,yue2004}. Change-point screening uses the
+linear-cost PELT dynamic-programming search \cite{killick2012}. Prior evaluations of
+unsupervised anomaly detection repeatedly find that apparent performance is
+governed more by the evaluation protocol than by the algorithm
+\cite{schmidl2022}, and that reported skill on records without independent
+labels is not interpretable evidence. Our work operationalises this critique for
+Ugandan climate data and, unlike prior studies \cite{masaba2023}, evaluates
 against an external disaster register rather than self-referential labels.
 
 %============================================================================
@@ -196,7 +204,8 @@ each represented by its WGS84 centroid and mean elevation
 
 \subsection{Data sources and provenance}
 Daily multivariate weather is drawn from the ERA5 reanalysis
-\cite{hersbach2020} via the Open-Meteo Archive API (CC-BY 4.0): 13 variables
+\cite{hersbach2020} via the Open-Meteo Archive API \cite{openmeteo2022}
+(CC-BY 4.0): 13 variables
 including $T_{max}$, $T_{min}$, $T_{mean}$, precipitation sum and hours,
 relative humidity, wind speed/gust/direction, mean sea-level and surface
 pressure, shortwave radiation and FAO-56 reference evapotranspiration
@@ -206,7 +215,7 @@ pressure, shortwave radiation and FAO-56 reference evapotranspiration
 \emph{Long in-situ record (range extension).} To widen the temporal footprint
 far beyond the 16-year reanalysis window and to obtain an \emph{independent}
 observational check, we additionally retrieve the full historical daily record
-for every Meteostat station in Uganda (CC-BY 4.0 bulk) \cite{munoz2020meteostat}.
+for every Meteostat station in Uganda (CC-BY 4.0 bulk) \cite{meteostat2020}.
 Twelve stations return data (Arua, Gulu, Masindi, Soroti, Kasese, Kampala,
 Jinja, Tororo, Mbarara, Entebbe~Airport, Kabale, Lira) totalling 151{,}369
 station-days spanning \textbf{1926-01-01 to 2026-03-19 --- 91 years}, roughly
@@ -220,7 +229,7 @@ record has a genuine \emph{reporting collapse over 1990--2007}: the Ugandan
 stations stopped filing daily data (confirmed empty on the NCEI GHCN service),
 so neither Meteostat (pre-1990 / post-2020) nor ERA5 (from 2008) covers that
 window. We therefore add a second, \emph{independent} reanalysis --- NASA
-POWER \cite{white2023power}, MERRA-2-based, openly licensed, plain-JSON and
+POWER \cite{power2024dataset}, MERRA-2-based, openly licensed, plain-JSON and
 not subject to the archive-API throttling that blocked our ERA5 back-fill.
 For all 19 district centroids we retrieve daily $T_{2m}$, near-surface relative
 humidity and surface downwelling shortwave radiation over
@@ -338,9 +347,9 @@ classifying hotspots/coldspots at $\alpha=0.05$.
 
 \subsection{Temporal analysis (RQ4)}\label{sec:temporal}
 Monthly series (2008--2023) per district and variable are tested with the
-Mann--Kendall trend test and Sen's slope \cite{hirsch1984,khan2021},
+Mann--Kendall trend test and Sen's slope \cite{sen1968,yue2004},
 decomposed with robust STL (period $=12$), and screened for structural breaks
-with a kernel change-point method (PELT, RBF cost). The identical non-parametric
+with a penalised-cost change-point method (PELT \cite{killick2012}, RBF cost). The identical non-parametric
 test is reapplied to the ~91-year Meteostat in-situ monthly series
 (Section~\ref{sec:insitu}) to push trend inference back to the 1920s and to
 cross-check the reanalysis-derived signal against ground observations.
@@ -397,7 +406,8 @@ High/Extreme by quantile.
 
 \subsection{Explainability (RQ3)}\label{sec:xai}
 A Random-Forest surrogate is trained to reproduce the ensemble flag from the 14
-features; SHAP (TreeExplainer) and permutation importance then identify which
+features; SHAP \cite{lundberg2017,lundberg2020} (TreeExplainer) and permutation
+importance then identify which
 variables \emph{drive the detection signal}, cross-checked against the raw
 correlation of each $z$-feature with the ensemble score. We are explicit that
 this interprets the detector, not disaster causation.
@@ -488,7 +498,7 @@ reported precision/recall/ROC-AUC $=1.0$ \cite{masaba2023}, and that figure is
 mathematically impossible against independent labels at a 5\% anomaly rate, our
 honest evaluation should be read as a correction: the earlier perfect scores
 were an artefact of evaluating self-generated labels with no external
-ground truth \cite{rietsch2020,gunderson2022}.
+ground truth \cite{schmidl2022}.
 
 \subsection{RQ2 --- Spatial structure: no global clustering, a local hotspot}
 \label{sec:rq2}
@@ -799,7 +809,7 @@ for a region can last weeks, but the truly abnormal weather may occupy a few
 days, diluting any daily signal. Second, \emph{driver omission}: floods and
 landslides depend on antecedent soil moisture, geology, deforestation and
 drainage that are absent from a weather-only feature space
-\cite{wilkinson2023}. Third, \emph{reanalysis resolution}: a single ERA5 grid
+\cite{mugagga2012}. Third, \emph{reanalysis resolution}: a single ERA5 grid
 cell smooths the local extremes that trigger a debris flow. None of these is
 disqualifying --- they specify precisely what an operational system must add.
 

@@ -26,6 +26,20 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   added contribution item. Framing verified to preserve the honest
   nowcast/impact results — no metric, table or figure value changed.
 
+### Fixed
+- **Bibliography integrity (critical):** six cited works could not be verified
+  against any indexed record and were removed — `rietsch2020`, `gunderson2022`,
+  `boyd2022`, `wilkinson2023`, `khan2021` and the `white2023power` attribution.
+  They are replaced by verified sources: Schmidl, Wenig & Papenbrock (2022)
+  PVLDB 15(9):1779–1797; Mugagga, Kakembo & Buyinza (2012) Catena 90; Yue &
+  Wang (2004) Water Resour. Manag. 18(3):201–218; and a landing-page dataset
+  record for NASA POWER. Metadata errors corrected on the real entries
+  (`zhao2019` author list, `chandola2009` title, `ord1995` → Getis & Ord 1992,
+  `hirsch1984` dropped). Added the missing primary references for every method
+  actually used (generalised ESD, Isolation Forest, LOF, one-class SVM,
+  PELT, SHAP, scikit-learn, PyOD). The `masaba2023` entry is marked as pending
+  author-supplied publication details.
+
 ## [1.0.0] - 2026-11-26
 
 First public, citable release of the reproducible pipeline and manuscript.
