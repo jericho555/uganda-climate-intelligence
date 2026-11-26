@@ -39,15 +39,21 @@ focus on responsible modelling and software practice.
 The system nonetheless produces defensible environmental intelligence: a
 significant, near-universal warming signal (e.g., Kampala T_max τ = 0.42,
 p < 1e-16) with a coherent warming–drying–rising-evapotranspiration contrast at
-a detected Getis–Ord hotspot (Mbale, G_i* = 3.50), and a novel composite severity
+a detected Getis–Ord hotspot (Mbale, G_i* = 3.50), and a composite severity
 index (UCASI) whose extreme tail independently coincides with the documented
 2010 eastern floods, 2022 central landslide and 2018 drought. SHAP explains the
 detection signal, and we give a candid operational assessment of feasibility, exposed
 through an interactive, read-only decision-support dashboard released with the code.
 
 Every figure and table is generated programmatically from the released code and
-artefacts; no value is hard-coded. The work is original, unpublished, not under
-consideration elsewhere, and the author declares no competing interest.
+artefacts; no value is hard-coded. The related-work section positions the work
+against two literatures rather than only against machine-learning methods: the
+landslide early-warning reviews, which note that no accepted standard exists for
+verifying a warning system's skill, and this journal's own evidence on code
+sharing and on decision support built around a single implicit user. We adopt the
+second as a requirement and state plainly where our dashboard does not yet meet
+it. The work is original, unpublished, not under consideration elsewhere, and the
+author declares no competing interest.
 
 Thank you for considering our manuscript.
 

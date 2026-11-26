@@ -27,6 +27,29 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   `python dashboard/run_dashboard.py` with a vendored `._webpkgs` install.
 
 ### Changed
+- **Related work rebuilt around the threads that carried no evidence:** the
+  section grew from 763 to about 1,490 words and gained four new paragraphs
+  (operational warning practice and the missing verification standard, applied
+  machine learning for hazard monitoring, disaster registers as data products,
+  reproducible environmental software and decision support) plus an explicit
+  "gap and position" close. Eleven verified sources were added (58 bib entries,
+  30 from 2020+), including two from the target journal (Janssen et al. 2020 on
+  code sharing; Zulkafli et al. 2017 on user-driven decision support), Guzzetti
+  et al. 2020 on geographical landslide early warning, a companion Bududa
+  assessment (Namwano et al. 2026), two applied hazard-ML studies (Hadi et al.
+  2024; Alemu and Zimale 2025), EM-DAT methodology and geocoding critiques
+  (Delforge et al. 2025; Teber et al. 2025), and the verification/value anchors
+  (Gneiting et al. 2007; Thompson and Brier 1955; Reichstein et al. 2019).
+  Every statement about a cited study is grounded in its Crossref record or
+  published abstract; nothing was written from memory.
+- **Unearned novelty claims scoped:** the Introduction no longer says "the first
+  such national system", and the benchmark contribution is now qualified "to our
+  knowledge". A Discussion paragraph adds the comparison the protocol invites but
+  could not honestly run (a rainfall-threshold baseline), naming the missing
+  inventory as the reason. The cover letter gained the same positioning, and
+  "a novel composite severity index" lost the word "novel". No table was added:
+  a new table before the data table would renumber Table 1, which is referenced
+  inside a generated figure caption that cannot be regenerated here.
 - **Retitled around the evidence, not the capability list (EMS):**
   *A ground-truth-honest climate-anomaly detection system for Uganda: a
   24-detector held-out benchmark, district risk nowcasting, and century-scale

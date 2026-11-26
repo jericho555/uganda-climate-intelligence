@@ -113,7 +113,7 @@ inside warning chains.
 We therefore replace the question \emph{which detector is most accurate?},
 which is unanswerable without labels, with \emph{what does a reproducible,
 ground-truth-honest system reveal about Uganda's weather anomalies, and where
-does unsupervised detection actually help?} We assemble the first such national
+does unsupervised detection actually help?} We assemble a national
 system for Uganda around six capabilities: anomaly detection, GIS spatial
 intelligence, district risk nowcast mapping, agricultural impact analysis,
 explainable AI, and an interactive decision-support dashboard that states
@@ -127,9 +127,9 @@ Every number reported here comes from a single auditable pipeline.
 \item A fully reproducible pipeline (open ERA5 reanalysis, CC-BY 4.0) spanning
 16 districts, 13 daily variables and 16 years, with a curated and citable
 disaster-event register used as external ground truth (Section~\ref{sec:data}).
-\item The first held-out, ground-truth benchmark of 24 anomaly detectors for
-Ugandan weather, with bootstrap confidence intervals, multi-seed stability,
-Friedman/Nemenyi ranking and a size-matched random null
+\item To our knowledge, the first held-out, ground-truth benchmark of 24
+anomaly detectors for Ugandan weather, with bootstrap confidence intervals,
+multi-seed stability, Friedman/Nemenyi ranking and a size-matched random null
 (Section~\ref{sec:rq1}).
 \item GIS spatial intelligence (Global/Local Moran's $I$, Getis--Ord $G_i^*$)
 and temporal intelligence (Mann--Kendall, Sen's slope, STL, change points)
@@ -189,30 +189,32 @@ LODA, ECOD, COPOD) and deep models such as autoencoders and variational
 autoencoders \cite{chandola2009survey,chandola2009,pang2021}. Discrete and
 sequence-form detection is treated separately in the time-series outlier
 literature \cite{chandola2009,blazquez2021}, which motivates our inclusion of
-recurrent and attention autoencoders alongside cross-sectional scorers. PyOD supplies a common
-implementation of these families \cite{zhao2019} and scikit-learn the
-statistical and tree-based members \cite{pedregosa2011}; together they are the
-substrate of our benchmark.
+recurrent and attention autoencoders alongside cross-sectional scorers. PyOD
+supplies a common implementation of these families \cite{zhao2019} and
+scikit-learn the statistical and tree-based members \cite{pedregosa2011}.
+Together they are the substrate of our benchmark.
 The recurring lesson from large evaluations is that measured performance in
 this task is governed more by the protocol than by the algorithm: results move
 with how thresholds are chosen, whether the same labels are reused for tuning
 and testing, and whether a method is compared against a null of equal alert
-budget \cite{schmidl2022}. We treat that as a design requirement. Every
-reported event-level score is therefore accompanied by a size-matched random
-null.
+budget \cite{schmidl2022}. Forecast verification states the same requirement
+in other terms: a predictive distribution is judged for calibration before
+sharpness, and calibration is a joint property of the forecasts and the
+outcomes that materialise \cite{gneiting2007}. We treat both as design
+requirements. Every reported event-level score is therefore accompanied by a
+size-matched random null.
 
 \paragraph{Spatial and temporal statistics for climate records.}
-Analysis of district-level rates follows the standard spatial framework:
-Global Moran's $I$ for overall dependence \cite{anselin1995} and Getis--Ord
-$G_i^*$ for local hotspot identification \cite{getis1992}, both with permutation
-inference rather than distributional assumptions. Trend detection uses the
-Mann--Kendall rank test with the Sen slope estimator, the conventional
-non-parametric pairing in hydrometeorological series
-\cite{sen1968,yue2004}. Serial correlation is a recognised source of inflated
-significance in rank-based trend tests \cite{yue2004}; we do not apply a
-variance correction here and flag the consequence in
-Section~\ref{sec:threats}. Structural breaks are located with the penalised
-dynamic-programming change-point search (PELT) \cite{killick2012}.
+The spatial and temporal analysis is deliberately conventional. Global
+Moran's $I$ measures overall dependence \cite{anselin1995} and Getis--Ord
+$G_i^*$ identifies local hotspots \cite{getis1992}, both with permutation
+inference rather than distributional assumptions. Trends use the Mann--Kendall
+rank test with the Sen slope estimator, the conventional pairing in
+hydrometeorological series \cite{sen1968,yue2004}, and structural breaks are
+located with the penalised dynamic-programming change-point search PELT
+\cite{killick2012}. Serial correlation inflates the significance of rank-based
+trend tests \cite{hamed1998,yue2004}; no variance correction is applied here,
+and Section~\ref{sec:threats} states what that costs.
 
 \paragraph{Drought indices and agricultural impact.}
 The Standardised Precipitation Index maps accumulated precipitation through a
@@ -222,10 +224,48 @@ so that drought frequency and duration become comparable between climates
 applies the same construction to the moisture balance
 $P-\mathrm{ET}_0$, which makes it responsive to rising evaporative demand
 \cite{vicente2010}. Both are interpretable in physical terms, which is precisely
-what a generic daily anomaly score is not, and this property drives the central
-contrast in Section~\ref{sec:droughtres}. We couple these indices to national
+what a generic daily anomaly score is not, and that difference drives the
+central contrast in Section~\ref{sec:droughtres}: data-driven scoring is most
+defensible where it is tied to a quantity a specialist can argue about
+\cite{reichstein2019}. We couple these indices to national
 cereal and coffee production series \cite{worldbank2024,owid2025} to test whether
 climate signal survives into a production outcome.
+
+%----------------------------------------------------------------------------
+\paragraph{Operational warning practice, and the standard it lacks.}
+Operational practice rather than the machine-learning literature defines what a
+usable alert looks like, and there the record is thin. A review of 26 regional,
+national and global landslide early warning systems found that only five
+countries, 13 regions and four metropolitan areas had one, that most combine
+empirical rainfall thresholds with susceptibility zonation, and that although
+most had undergone some verification, no accepted standard exists for judging
+their skill \cite{guzzetti2020}. Uganda falls outside that map, and the Ugandan
+evidence is direct: in Bududa District, technology-based warning was judged
+unreliable and rainfall-only systems too narrow for a multi-causal hazard, with
+detection coverage, risk communication and community trust named as the binding
+constraints \cite{namwano2024,namwano2026}. Two consequences shaped this paper.
+A threshold model can be scored against an inventory of mapped landslides, while
+a label-free national anomaly score has no such inventory, so its honest test is
+a disaster register held out from fitting rather than a head-to-head with an
+operational threshold rule. And the worth of a warning is set by the decision it
+changes, not by its score \cite{thompson1955}, so Section~\ref{sec:ews} reports
+alert tiers, a measured persistence horizon and skill against a matched null
+rather than a claimed benefit.
+
+%----------------------------------------------------------------------------
+\paragraph{Machine learning for hazard monitoring in data-scarce regions.}
+Applied work is plentiful and local. Remote sensing coupled to machine learning
+has produced an agricultural drought early-warning product for the Genale Dawa
+basin in Ethiopia \cite{alemu2025}. A flood-forecasting study on Malaysia's
+Dungun River reports aggregate classification accuracy between 49\% and 91\%
+across seven algorithms, with a neural network best, measured against flood
+events derived from the same 1986--2000 gauge record and then read forward to
+describe flooding between 2020 and 2030, a period outside the data
+\cite{hadi2024}. Our own baseline study on a Ugandan weather record reported
+precision, recall and ROC-AUC all equal to 1.0 \cite{masaba2023}. In the last
+two cases the labels used to judge performance come from the same record the
+model was built on, so nothing external could contradict a strong result. The
+gap is one of measurement practice rather than model capability.
 
 %----------------------------------------------------------------------------
 \paragraph{Reanalysis products and national warning capacity in East Africa.}
@@ -240,33 +280,68 @@ CHIRPS were built for exactly this region and for exactly this purpose
 here; we state that limitation rather than imply a wider data inventory than we
 actually hold. On the demand side, the Early Warnings for All action plan asks
 national desks for tools that prioritise where and when to act, including where
-forecast skill is not yet available \cite{wmo2023}, and country-level
-assessments of Ugandan landslide warning conclude that detection coverage, not
-alert formatting, is the binding constraint \cite{namwano2024}. Wider reviews of
-climate-service demand and delivery across the Greater Horn of Africa document a
+forecast skill is not yet available \cite{wmo2023}, and reviews of
+climate-service delivery across the Greater Horn of Africa document a
 persistent mismatch between the products national services generate and the
-decisions users need them for, with the gap widest at the local, impact-based end
-\cite{venning2025}. A systematic review of East African attribution studies finds
-that anthropogenic warming has intensified roughly half of the events examined,
-while sparse observations and limited institutional capacity constrain how far
-such conclusions can be pushed \cite{baumgart2026}. The system built
-here occupies that intermediate position deliberately: it is a monitoring,
-nowcasting and prioritisation stack whose predictive limits are measured rather
-than assumed.
+decisions users need them for, with the gap widest at the local, impact-based
+end \cite{venning2025}. A systematic review of East African attribution studies
+finds that anthropogenic warming has intensified roughly half of the events
+examined, while sparse observations and limited institutional capacity
+constrain how far such conclusions can be pushed \cite{baumgart2026}. The
+system built here occupies that intermediate position deliberately: it is a
+monitoring, nowcasting and prioritisation stack whose predictive limits are
+measured rather than assumed.
 
 %----------------------------------------------------------------------------
-\paragraph{Ground truth and the position of this study.}
+\paragraph{Ground truth and the register that supplies it.}
 The methodological requirement that distinguishes our design is an external
 label source. Uganda's recorded disaster history is retrievable from public
-relief reporting \cite{unma2022,emdat2023,fewsnet2021}, but these registers are
-compiled from secondary reporting and undercount unreported local events by
-construction, as their own documentation acknowledges \cite{emdatdoc}. We therefore use the
-register only for held-out validation, never for fitting, and read every
-event-level number against a matched random baseline. This separates the present
-work from our earlier baseline study on the same weather record
-\cite{masaba2023}, which reported perfect metrics without an external oracle,
-and from benchmark studies in which labels are reused for tuning and testing
-\cite{schmidl2022}.
+relief reporting \cite{unma2022,emdat2023,fewsnet2021}, but that history is
+itself a data product. EM-DAT is the only freely available global record of
+humanitarian disasters, assembled from secondary reporting under documented
+collection criteria \cite{delforge2025,emdatdoc}, and its location field is
+imprecise enough that a dedicated re-geocoding effort was required before the
+database could be joined to spatial climate data \cite{teber2025}. Both
+weaknesses propagate into our labels: events attach to affected regions rather
+than to district polygons, and small unreported events are absent by
+construction, which depresses apparent precision and inflates apparent recall.
+Ratios survive that distortion, absolute levels do not, which is why no
+coverage figure in this paper is quoted without its matched baseline. We
+therefore use the register only for held-out validation, never for fitting.
+
+%----------------------------------------------------------------------------
+\paragraph{Reproducible environmental software and decision support.}
+Two expectations come from this journal's own literature. Code sharing and model
+documentation are not yet the norm: an audit of roughly 7{,}500 publications on
+individual and agent-based models found code availability reaching only 18\% by
+2018, with model descriptions still omitting the equations and flow charts that
+make a model inspectable \cite{janssen2020}. And an interface built around one
+implicit user is a recognised design failure, since environmental decision
+support is usually science-driven and assumes a single decision-maker, which is
+why user-driven and participatory design is proposed as the remedy
+\cite{zulkafli2017}. Our pipeline meets the first expectation literally: one
+command regenerates every number in this paper from openly licensed inputs. The
+dashboard meets the second only halfway, and we say so plainly. It is a
+read-only view over persisted result artifacts, not co-designed with, or
+evaluated by, the district desks it is written for. Claiming decision-support
+value without that evaluation would repeat, in a different place, the error this
+paper documents.
+
+%----------------------------------------------------------------------------
+\paragraph{Gap and position of this study.}
+These threads leave one specific hole. To our knowledge no published evaluation
+for Uganda or a neighbouring country tests unsupervised weather-anomaly
+detection against disaster events held out from model fitting, at national
+scale, with the alert budget fixed in advance and a size-matched random baseline
+supplied. The contribution is that protocol and what it measures, not the
+detectors, which are standard, and not the dashboard, which has no user
+evaluation behind it. Three things follow. The benchmark supplies a reference
+number for what label-free daily detection is currently worth on this record,
+against which threshold-based designs can later be compared \cite{guzzetti2020}.
+The century-scale in-situ and gap-filled climatology stands independent of any
+detector. The register, the null construction and the pipeline are reusable on
+other national records. What we do not claim is equally deliberate: no forecast
+skill, and no validated decision-support value.
 
 %============================================================================
 \section{Study area and data}\label{sec:data}
@@ -675,27 +750,30 @@ Only two districts depart from it: Jinja at 2.1\% sits clearly below, and Mbale
 ensemble score in the panel (0.553 against 0.486--0.511 elsewhere).
 
 Getis--Ord $G_i^*$ flags Mbale as the single significant hotspot
-($z=3.50$); no coldspot is significant. That hit is not an artefact of testing 16
-districts at $\alpha=0.05$: $z=3.50$ corresponds to a two-sided $p\approx5\times10^{-4}$,
-which survives Bonferroni correction across the panel. What the hotspot is \emph{not},
-however, is a neighbourhood. Local Moran's $I_i$ at Mbale is $-25.6$, by far the most
-negative value in the series (next closest Tororo, $-8.4$), and the signature of a
-district whose own rate is extreme while its neighbours' rates are below average. The
-only district with a positive local statistic, Mukono ($I_i=+1.91$), is not flagged by
-$G_i^*$ at all. Read together, the two diagnostics say that Uganda's anomaly structure
-is \emph{point-like}: an isolated elevated district rather than a regional belt. A
-monitoring service that ran only the global statistic, or only $G_i^*$, would describe
-this pattern incorrectly in opposite directions.
+($z=3.50$); no coldspot is significant. That hit is not an artefact of
+testing 16 districts at $\alpha=0.05$: $z=3.50$ corresponds to a two-sided
+$p\approx5\times10^{-4}$, which survives Bonferroni correction across the
+panel. What the hotspot is \emph{not}, however, is a neighbourhood. Local
+Moran's $I_i$ at Mbale is $-25.6$, by far the most negative value in the
+series (next closest Tororo, $-8.4$), and the signature of a district whose
+own rate is extreme while its neighbours' rates are below average. The only
+district with a positive local statistic, Mukono ($I_i=+1.91$), is not
+flagged by $G_i^*$ at all. Read together, the two diagnostics say that
+Uganda's anomaly structure is \emph{point-like}: an isolated elevated
+district rather than a regional belt. A monitoring service that ran only the
+global statistic, or only $G_i^*$, would describe this pattern incorrectly
+in opposite directions.
 
 Two further checks keep the finding honest. First, the elevated Mbale rate is not
-carried over into disaster correspondence: its event precision is 0.135, below Kumi
-(0.255) and Soroti (0.167), so a high anomaly rate and a high coincidence with
-recorded events are separate axes in this data. Second, the anomaly is climatologically
-traceable. Mbale lies on the Elgon escarpment, the same district group that carries the
-steepest precipitation decline and the rising ET$_0$ of Section~\ref{sec:rq4}, and its
-robust STL residual dispersion for precipitation is 4.74 against 0.78--2.39 at every
-other district. Once the annual cycle is removed, Mbale's rainfall is roughly twice as
-irregular as the next most irregular station and six times as irregular as the calmest.
+carried over into disaster correspondence: its event precision is 0.135, below
+Kumi (0.255) and Soroti (0.167), so a high anomaly rate and a high coincidence
+with recorded events are separate axes in this data. Second, the anomaly is
+climatologically traceable. Mbale lies on the Elgon escarpment, the same district
+group that carries the steepest precipitation decline and the rising ET$_0$ of
+Section~\ref{sec:rq4}, and its robust STL residual dispersion for precipitation
+is 4.74 against 0.78--2.39 at every other district. Once the annual cycle is
+removed, Mbale's rainfall is roughly twice as irregular as the next most
+irregular station and six times as irregular as the calmest.
 That is a measurable property of the weather record, and it explains the flag rate
 without any reference to disasters. Mbale and the Elgon flank are also where Ugandan
 landslide and flash-flood reporting is densest \cite{mugagga2012,namwano2024}, so the
@@ -754,8 +832,9 @@ The 91-year Meteostat record (Section~\ref{sec:data}) extends the trend
 analysis $\sim5.7\times$ beyond the reanalysis window and provides an
 \emph{independent} observational check on ERA5. Applying Mann--Kendall/Sen to
 monthly station series with $\geq$120 months, 10 of 12 testable station$\times$-
-variable series carry a significant trend ($p<0.05$; Table~\ref{tab:insitu}). The most striking result is
-a consistent, near-century \emph{precipitation decline}: $\tau=-0.39$ at Mbarara and
+variable series carry a significant trend ($p<0.05$; Table~\ref{tab:insitu}). The
+most striking result is a consistent, near-century \emph{precipitation decline}:
+$\tau=-0.39$ at Mbarara and
 Gulu, $-0.38$ at Tororo, $-0.36$ at Masindi and $-0.35$ at Kabale (each
 $p<10^{-3}$, records spanning 89--100 years), i.e. the drying tendency seen at
 Mbale in ERA5 (Section~\ref{sec:rq4}) is not an artefact of a 16-year window but
@@ -788,7 +867,8 @@ station in a different catchment.
 \begin{table}[h]
 \centering\small
 \caption{Century-scale in-situ Mann--Kendall trends (left) and ERA5-vs-station
-monthly cross-correlation (right); all values from \texttt{meteostat\_instrumental.py}.}
+monthly cross-correlation (right); all values from
+\texttt{meteostat\_instrumental.py}.}
 \label{tab:insitu}
 \begin{tabular}{llcrllc}
 \toprule
@@ -1032,10 +1112,11 @@ punished: a detector that finds the right three days still flags hundreds of
 district-days outside the window. The second is \emph{driver omission}. Flood and
 landslide occurrence depends on antecedent soil moisture, geology, infiltration
 capacity, land cover and drainage condition, none of which exists in a
-weather-only feature space \cite{mugagga2012}. Our own attribution result makes
-the same point from the inside: the features that drive the detector are thermal
-and moisture variables, not the failure-state variables that determine whether a
-wet slope actually moves. The third is \emph{representative resolution}. A
+weather-only feature space \cite{mugagga2012,namwano2026}. Our own attribution
+result makes the same point from the inside: the features that drive the
+detector are thermal and moisture variables, not the failure-state variables
+that determine whether a wet slope actually moves. The third is
+\emph{representative resolution}. A
 $\sim$25\,km ERA5 cell is a poor description of the Elgon escarpment or the
 Rwenzori flank, and East African evaluations report exactly this residual
 weakness in precipitation over complex terrain \cite{gleixner2020}. Our own
@@ -1092,10 +1173,18 @@ Uganda study \cite{masaba2023}, which reported precision, recall and ROC-AUC of
 $1.0$. The discrepancy is methodological, not a disagreement about weather: that
 evaluation scored self-generated labels against themselves, with no external
 oracle, and a threshold tuned on the same data separates them trivially
-\cite{schmidl2022}. Under a leakage-free protocol with an independent register and
-an equal-budget null, the strongest detector in a panel of 24 reaches ROC-AUC
-0.532. We consider that number, not the 1.0, the starting point for any Ugandan
-weather-anomaly system.
+\cite{schmidl2022}. Under a leakage-free protocol with an independent register
+and an equal-budget null, the strongest detector in a panel of 24 reaches
+ROC-AUC 0.532. We consider that number, not the 1.0, the starting point for any
+Ugandan weather-anomaly system. The comparison reviewers will ask for next is
+against the empirical rainfall thresholds that operational landslide warning
+actually uses \cite{guzzetti2020}. We could not run it honestly here: a
+threshold rule is calibrated on inventoried slope failures paired with storm
+records, and neither an inventory nor storm-level attribution was reachable
+from the open sources used here, which is itself part of the coverage deficit
+the Ugandan assessments report \cite{namwano2024,namwano2026}. Assembling one,
+and then scoring a detector ensemble and a threshold rule against the same
+held-out events, is the next experiment this protocol invites.
 
 %============================================================================
 \section{Threats to validity}\label{sec:threats}
@@ -1225,9 +1314,10 @@ compiled by Our World in Data (CC BY 4.0). The disaster register is
 compiled from public relief records (UN-OCHA/UNMA, EM-DAT, FAO, FEWS NET) with
 per-event citations. The complete pipeline (\texttt{fetch\_era5.py},
 \texttt{fetch\_meteostat.py}, \texttt{preprocess.py}, \texttt{detect.py},
-\texttt{spatial.py}, \texttt{temporal.py}, \texttt{meteostat\_instrumental.py},
-\texttt{drought\_indices.py}, \texttt{fetch\_agriculture.py}, \texttt{ag\_linkage.py},
-\texttt{fetch\_coffee.py}, \texttt{coffee\_linkage.py}, \texttt{figures\_coffee.py},
+\texttt{spatial.py}, \texttt{temporal.py},
+\texttt{meteostat\_instrumental.py}, \texttt{drought\_indices.py},
+\texttt{fetch\_agriculture.py}, \texttt{ag\_linkage.py}, \texttt{fetch\_coffee.py},
+\texttt{coffee\_linkage.py}, \texttt{figures\_coffee.py},
 \texttt{fetch\_power.py}, \texttt{power\_climate.py}, \texttt{figures\_power.py},
 \texttt{ucasi.py}, \texttt{explain.py}, \texttt{random\_null.py},
 \texttt{figures.py}, \texttt{figures\_maps.py}, \texttt{collect\_results.py})
