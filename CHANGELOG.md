@@ -8,10 +8,19 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
 - **Torch sequence detectors (RQ1, benchmark now 24):** a CPU-only `torch 2.4.1`
   distribution is now vendored into the workspace (`pip --target=._torchpkgs`),
   enabling a genuine LSTM encoder–decoder autoencoder and a Transformer encoder
-  autoencoder over 14-day windows. These are the first detectors to exceed the
-  size-matched random null (F1 0.13–0.14, precision ≈2× base rate), though global
-  ranking stays near chance (ROC-AUC 0.51–0.53) — an honest refinement of the
-  central claim.
+  autoencoder over 14-day windows. These are the first detectors to roughly
+  double the size-matched random null (F1 0.13–0.14, precision ≈2× base rate),
+  though global ranking stays near chance (ROC-AUC 0.51–0.53): an honest
+  refinement of the central claim.
+- **Measured random null (`src/random_null.py`):** the size-matched random-flag
+  baseline is now computed from `results/test_scores.npz` (20,000 Monte-Carlo
+  draws at the 5% alert budget, plus per-year nulls, a PR-AUC null and
+  Benjamini–Hochberg-controlled one-sided tests) and released as
+  `results/random_null.json`. Wired into `run_all.py` after `detect`.
+- **Map figures (`src/figures_maps.py`):** study-area reference map, district
+  risk map panel (anomaly rate with Gi* hotspot, precipitation trend, UCASI
+  nowcast), gap-fill trend maps and a null-comparison panel. All are drawn from
+  persisted artefacts and plot district centroids as points, not areal units.
 - **Interactive dashboard:** a Streamlit app (`dashboard/`) exposing the
   benchmark, daily anomaly stream, spatial hotspots, UCASI severity, trends and
   risk nowcast, bound to the persisted artefacts. Launched via
@@ -39,6 +48,25 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   actually used (generalised ESD, Isolation Forest, LOF, one-class SVM,
   PELT, SHAP, scikit-learn, PyOD). The `masaba2023` entry is marked as pending
   author-supplied publication details.
+- **Unsupported random-null value (critical):** the previously quoted
+  size-matched random null of F1 ≈ 0.096 had no generating script anywhere in the
+  repository. Recomputed from the held-out labels it is **0.069 [0.059, 0.079]**
+  (analytic check 0.0690 at base rate 0.11155 and γ = 0.05; PR-AUC null 0.112
+  [0.109, 0.116]). Consequence for the wording of the central claim, now applied
+  consistently in `manuscript/main.tex`, `README.md`, `dashboard/` and the cover
+  letter: five cross-sectional detectors remain nominally above the equal-budget
+  null but by at most 1.22× (BH-significant: OneClassSVM, LOF, ECOD, COPOD, PCA),
+  and only the two sequence autoencoders roughly double it. The dashboard reads
+  the value from the artefact instead of hard-coding it, and the manuscript
+  discloses that the 68.8% event coverage comes from the transductive
+  operational surface and is therefore an upper bound.
+- **Citation recency:** the reference list now favours current sources where the
+  claim is not foundational (Blázquez-García 2021; Schmidl 2022; Gleixner 2020;
+  Namwano 2024; WMO EW4All 2023; EM-DAT documentation; Venning 2025; Lam 2023),
+  retaining older citations only for the methods themselves (STL, Sen, Mann–Kendall,
+  LOF, PCA, SPI/SPEI, Getis–Ord, PELT, SHAP). All newly added entries were checked
+  against the publisher record; unverifiable candidates were rejected rather than
+  cited approximately.
 
 ## [1.0.0] - 2026-11-26
 

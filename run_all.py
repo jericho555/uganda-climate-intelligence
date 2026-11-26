@@ -1,8 +1,9 @@
 """One-command reproduction of the Uganda Climate Intelligence pipeline.
 
 Usage:  python run_all.py
-Order:  fetch -> disaster register -> preprocess -> detect ->
-        spatial -> temporal -> ucasi -> explain -> figures
+Order:  see STAGES below -- fetch -> preprocess -> detect -> random-null
+        reference -> spatial/temporal -> climate layers -> impact layers ->
+        UCASI -> early warning -> explainability -> figures -> digest.
 """
 import sys
 import time
@@ -22,6 +23,7 @@ STAGES = [
     ("preprocess", "Seasonal anomalies + labels"),
     ("detect", "Detector benchmark + evaluation"),
     ("_recover", "Friedman + full-period ensemble map (idempotent fallback)"),
+    ("random_null", "Size-matched random-flag null + BH-controlled Monte-Carlo tests"),
     ("spatial", "Moran's I / Getis-Ord hotspots"),
     ("temporal", "STL / Mann-Kendall / change points"),
     ("meteostat_instrumental", "Century in-situ trends + ERA5 cross-validation"),
@@ -35,6 +37,7 @@ STAGES = [
     ("_explain_fast", "SHAP / feature importance (lightweight, deterministic)"),
     ("figures", "Publication figures"),
     ("figures_power", "Gap-fill + drought/yield figures"),
+    ("figures_maps", "Study-area, risk, gap-fill and null-comparison maps"),
     ("figures_coffee", "Coffee production + sign-flip correlation figure"),
     ("figures_early_warning", "EWS architecture + risk-nowcast figures"),
     ("collect_results", "Results digest + event-recall/lead-time (RQ5)"),

@@ -53,9 +53,12 @@ not in the view).
 
 ## Integrity notes
 
-- The benchmark tab marks the **size-matched random-flag null (F1 ≈ 0.096)**
-  and the **base rate (0.1115)** on every relevant chart. Only the two torch
-  sequence autoencoders (LSTM-AE, Transformer-AE) sit above the null, and only
-  marginally; every cross-sectional detector sits at chance.
+- The benchmark tab marks the **size-matched random-flag null (F1 = 0.069,
+  Monte-Carlo band 0.059-0.079)** and the **base rate (0.1115)** on every
+  relevant chart. Both are read from `results/random_null.json`, written by
+  `src/random_null.py`; nothing is typed in by hand. Against that reference the
+  two torch sequence autoencoders (LSTM-AE, Transformer-AE) roughly double the
+  alert-level F1, five cross-sectional detectors stay within 1.22x of it, and
+  every detector ranks at chance on ROC-AUC.
 - The Risk Nowcast tab reports the **measured** forward skill against the
   register, not a promotional framing (see `early_warning_summary.json`).

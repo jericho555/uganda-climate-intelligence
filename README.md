@@ -14,13 +14,15 @@ impact + severity + nowcasting system with an interactive decision-support
 dashboard.
 
 **Core, deliberately uncomfortable finding:** against real disaster ground-truth,
-*no cross-sectional* unsupervised anomaly detector beats chance (held-out ROC-AUC
+*no cross-sectional* unsupervised anomaly detector ranks above chance (held-out ROC-AUC
 0.49–0.53; best cross-sectional F1 = 0.084; PR-AUC ≤ 0.121 vs a 0.1115 base rate).
-Across the full benchmark of 24 detectors, only two deep **sequence** autoencoders
-(LSTM-AE, Transformer-AE — torch, vendored CPU build) rise above the size-matched
-random null, and then only marginally (F1 0.13–0.14, precision 0.20–0.22, yet
+Scored against a measured size-matched random alert budget (F1 = 0.069 [0.059, 0.079],
+`results/random_null.json`), five cross-sectional detectors stay within 1.22× of it
+while only two deep **sequence** autoencoders (LSTM-AE, Transformer-AE — torch,
+vendored CPU build) roughly double it (F1 0.13–0.14, precision 0.20–0.22, yet
 ROC-AUC still 0.51–0.53 and <10% of disaster days captured). The apparent 68.8%
-event coverage is fully explained by a size-matched random null.
+event coverage comes from the transductive operational surface and is reproduced by a
+size-matched random null at 100%.
 Physically-interpreted derived indices (SPI/SPEI), by contrast, *do* corroborate
 documented droughts. Every number in the paper is computed by this pipeline —
 **nothing is fabricated**.
@@ -81,12 +83,14 @@ python dashboard/run_dashboard.py      # -> http://localhost:8501
 See [`dashboard/README.md`](dashboard/README.md) for the tab-by-tab mapping to
 artefacts. The dashboard is optional; it is not needed to reproduce the paper.
 
-Stages run in order: `fetch_era5` → `fetch_meteostat` → `fetch_agriculture` →
-`fetch_power` → `disaster_register` → `preprocess` → `detect` → `_recover` →
+Stages run in the order declared in `run_all.py`: `fetch_era5` →
+`fetch_meteostat` → `fetch_agriculture` → `fetch_coffee` → `fetch_power` →
+`disaster_register` → `preprocess` → `detect` → `_recover` → `random_null` →
 `spatial` → `temporal` → `meteostat_instrumental` → `power_climate` →
-`drought_indices` → `ag_linkage` → `ucasi` → `_typematch` → `_explain_fast` →
-`figures` → `figures_power` → `collect_results`. Each stage caches to disk and
-is idempotent; re-running skips cached fetches.
+`drought_indices` → `ag_linkage` → `coffee_linkage` → `ucasi` → `early_warning` →
+`_typematch` → `_explain_fast` → `figures` → `figures_power` → `figures_maps` →
+`figures_coffee` → `figures_early_warning` → `collect_results`. Each stage caches to
+disk and is idempotent; re-running skips cached fetches.
 
 ## What the pipeline computes
 

@@ -46,8 +46,27 @@ DATA = _ROOT / "data"
 RESULTS = _ROOT / "results"
 TABLES = RESULTS / "tables"
 
-RANDOM_NULL_F1 = 0.096
-BASE_RATE = 0.1115
+# The size-matched random-flag null is read from the artefact written by
+# ``src/random_null.py`` (``results/random_null.json``).  An earlier revision of
+# this dashboard hard-coded 0.096, a value no script produced; the audited
+# measurement is 0.069 [0.059, 0.079].  The constant below is therefore a
+# fallback only, and the fallback is the measured value.
+NULL_JSON = RESULTS / "random_null.json"
+try:
+    _NULL = json.loads(NULL_JSON.read_text(encoding="utf-8"))
+except Exception:
+    _NULL = None
+
+if _NULL is not None:
+    RANDOM_NULL_F1 = float(_NULL["pooled"]["mean"])
+    RANDOM_NULL_CI = (float(_NULL["pooled"]["lo"]), float(_NULL["pooled"]["hi"]))
+    RANDOM_NULL_PRAUC = float(_NULL["pooled"]["pr_auc_mean"])
+    BASE_RATE = float(_NULL["base_rate"])
+else:
+    RANDOM_NULL_F1 = 0.069
+    RANDOM_NULL_CI = (0.059, 0.079)
+    RANDOM_NULL_PRAUC = 0.112
+    BASE_RATE = 0.1115
 EVAL_TEST_YEARS = [2019, 2020, 2021, 2022, 2023]
 
 # --------------------------------------------------------------------------- #
@@ -157,7 +176,7 @@ with st.sidebar:
         f"- **Benchmark:** 24 detectors, held-out test 2019–2023\n"
         f"- **Register:** 32 curated disasters (ground truth)\n"
         f"- **Base rate:** {BASE_RATE:.4f} · **Random-flag F1 null:** "
-        f"≈{RANDOM_NULL_F1:.3f}\n"
+        f"{RANDOM_NULL_F1:.3f} [{RANDOM_NULL_CI[0]:.3f}, {RANDOM_NULL_CI[1]:.3f}]\n"
         f"- **Friedman χ²(23) over 5 test years**"
     )
     st.divider()
@@ -209,12 +228,14 @@ with tab_over:
         ])
         st.subheader("Central finding, in one line")
         st.info(
-            f"**No cross-sectional detector beats chance** on held-out "
-            f"disaster windows (best cross-sectional F1 = {best_f1_cross:.3f}, "
-            f"ROC-AUC span {roc_min:.2f}–{roc_max:.2f}). Only the two torch "
-            f"sequence autoencoders (LSTM-AE, Transformer-AE) rise above the "
-            f"size-matched random null — marginally (best F1 = "
-            f"{best_f1_overall:.3f}) and with global ranking still near chance."
+            f"**No cross-sectional detector ranks above chance** on held-out "
+            f"disaster windows (ROC-AUC span {roc_min:.2f}–{roc_max:.2f}; best "
+            f"cross-sectional F1 = {best_f1_cross:.3f}). Measured against the "
+            f"size-matched random alert budget (F1 {RANDOM_NULL_F1:.3f}), five "
+            f"cross-sectional methods stay within 1.22× of it, while only the "
+            f"two torch sequence autoencoders (LSTM-AE, Transformer-AE) roughly "
+            f"double it (best F1 = {best_f1_overall:.3f}), still with global "
+            f"ranking near chance."
         )
         st.markdown("### Headline table (top 5 by PR-AUC)")
         show = ["detector", "precision", "recall", "f1", "roc_auc", "pr_auc",
@@ -289,9 +310,12 @@ with tab_bench:
         ).encode(x="x:Q"))
     st.altair_chart(alt.layer(*layers), width="stretch")
     st.caption("Vertical dashed red = random-flag F1 null "
-               f"({RANDOM_NULL_F1:.3f}). Solid grey = base rate "
-               f"({BASE_RATE:.4f}). Only the two red sequence points lie "
-               "right of the null.")
+               f"({RANDOM_NULL_F1:.3f}, Monte-Carlo band "
+               f"{RANDOM_NULL_CI[0]:.3f}–{RANDOM_NULL_CI[1]:.3f}). Solid grey = "
+               "base rate "
+               f"({BASE_RATE:.4f}). Several cross-sectional points sit "
+               "marginally right of the null (at most 1.22×); only the two red "
+               "sequence points roughly double it.")
 
     st.subheader("Per-year F1 stability across the five test years")
     pyf = load_per_year_f1()
