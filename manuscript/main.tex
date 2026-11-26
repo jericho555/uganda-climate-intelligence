@@ -875,8 +875,10 @@ editing, Visualization.
 \section*{Figures}
 \begin{figure}[h]\centering
 \includegraphics[width=\linewidth]{figures/fig_benchmark.png}
-\caption{Held-out detector benchmark. All methods cluster at chance;
-F1 error bars are 95\% bootstrap intervals. (RQ1)}
+\caption{Held-out detector benchmark. The cross-sectional methods cluster at
+chance; only the two torch sequence autoencoders (LSTM-AE, Transformer-AE) rise
+slightly above the size-matched random null on F1/PR-AUC while still ranking near
+chance on ROC-AUC. F1 error bars are 95\% bootstrap intervals. (RQ1)}
 \label{fig:benchmark}
 \end{figure}
 \begin{figure}[h]\centering
