@@ -2,15 +2,16 @@
 
 Reproducible research package behind the manuscript:
 
-> **A Climate Intelligence Framework for Detecting, Validating and Assessing
-> Weather Anomalies in Uganda**
+> **A National Climate Anomaly Intelligence System for Uganda: Detection,
+> Spatial Risk Nowcasting, Impact Analysis and Explainability**
 > Jeremiah Masaba — Department of Computer Science, Makerere University, Kampala, Uganda
 > ([ORCID 0009-0004-5620-996X](https://orcid.org/0009-0004-5620-996X))
 
 This converts the baseline study *"Evaluation of Anomaly Detection Techniques
 Using Uganda Weather Dataset"* from a single-source algorithm comparison into a
 validated detection + spatial-risk + century-climatology + drought-index +
-impact + severity + early-warning framework.
+impact + severity + nowcasting system with an interactive decision-support
+dashboard.
 
 **Core, deliberately uncomfortable finding:** against real disaster ground-truth,
 *no cross-sectional* unsupervised anomaly detector beats chance (held-out ROC-AUC

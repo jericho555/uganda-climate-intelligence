@@ -17,6 +17,15 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   risk nowcast, bound to the persisted artefacts. Launched via
   `python dashboard/run_dashboard.py` with a vendored `._webpkgs` install.
 
+### Changed
+- **Manuscript reframed as a national system (EMS positioning):** retitled to
+  *A National Climate Anomaly Intelligence System for Uganda*; the six
+  capabilities (anomaly detection, spatial intelligence, district risk nowcast,
+  agricultural impact, explainability, interactive dashboard) are now stated
+  explicitly, with a new subsection on the decision-support dashboard and an
+  added contribution item. Framing verified to preserve the honest
+  nowcast/impact results — no metric, table or figure value changed.
+
 ## [1.0.0] - 2026-11-26
 
 First public, citable release of the reproducible pipeline and manuscript.

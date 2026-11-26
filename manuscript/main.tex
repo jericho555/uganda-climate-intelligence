@@ -1,5 +1,5 @@
-%% A Climate Intelligence Framework for Detecting, Validating and Assessing
-%% Weather Anomalies in Uganda
+%% A National Climate Anomaly Intelligence System for Uganda:
+%% Detection, Spatial Risk Nowcasting, Impact Analysis and Explainability
 %% Target venue: Environmental Modelling & Software (Elsevier)
 %% Class: elsarticle. Compile: pdflatex main; bibtex main; pdflatex x2
 \documentclass[preprint,12pt]{elsarticle}
@@ -20,8 +20,8 @@
 
 \begin{frontmatter}
 
-\title{A Climate Intelligence Framework for Detecting, Validating and
-Assessing Weather Anomalies in Uganda}
+\title{A National Climate Anomaly Intelligence System for Uganda:
+Detection, Spatial Risk Nowcasting, Impact Analysis and Explainability}
 
 \author[inst1]{Jeremiah Masaba\corref{cor1}}
 \ead{masabjericho@gmail.com}
@@ -36,7 +36,7 @@ Unsupervised anomaly detection is widely proposed as an early-warning tool for
 weather-related disasters, yet most published evaluations on African climate
 records report near-perfect scores obtained without any independent
 ground-truth against which to validate. We build a fully reproducible
-\emph{climate intelligence framework} for Uganda that integrates (i) 16 years of
+\emph{national climate-anomaly intelligence system} for Uganda that integrates (i) 16 years of
 open, reanalysis-based daily weather (ERA5, 16 districts, 93{,}504
 district-days, 13 variables), (ii) a curated register of 32 documented
 climate disasters used as held-out ground truth, (iii) a benchmark of 24
@@ -56,7 +56,7 @@ $0.20$--$0.22$, F1 $0.13$--$0.14$), yet even these rank near chance (ROC-AUC
 $0.51$--$0.53$) and capture under $10\%$ of disaster days. Apparent event
 coverage (68.8\%) is still fully explained by a size-matched
 random null (100\%). This directly refutes earlier reports of AUC $=1.0$ on the
-same record and shows why ground-truth-honest evaluation matters. The framework
+same record and shows why ground-truth-honest evaluation matters. The system
 nevertheless yields defensible climate intelligence over a widened record that
 spans from a 16-year ERA5 detection window to a \textbf{91-year in-situ series}
 (12 Meteostat stations, 1926--2026): a significant warming signal (22 of 48
@@ -77,13 +77,14 @@ stays insignificant (regional droughts are masked by aggregation). A UCASI
 severity ranking places its top events on the 2010 eastern floods, the 2022 central
 landslide and the 2018 northern/eastern drought. We conclude that weather-only
 daily anomaly detection is insufficient for operational event-level early
-warning, and we release the pipeline, register and index as reusable building
-blocks.
+warning, and we release the pipeline, register, index and an interactive
+decision-support dashboard as reusable building blocks.
 \end{abstract}
 
 \begin{keyword}
-climate intelligence \sep anomaly detection \sep early warning \sep Uganda \sep
-ERA5 \sep UCASI \sep reproducible evaluation
+climate intelligence \sep anomaly detection \sep decision support system \sep
+interactive dashboard \sep early warning \sep Uganda \sep ERA5 \sep UCASI \sep
+reproducible evaluation
 \end{keyword}
 
 \end{frontmatter}
@@ -112,10 +113,14 @@ operational warning chains \cite{rietsch2020,gunderson2022}.
 
 This paper reframes the question from \emph{``which detector is most
 accurate?''} (unanswerable without labels) to \emph{``what does a
-reproducible, ground-truth-honest climate intelligence framework reveal about
+reproducible, ground-truth-honest climate intelligence system reveal about
 Uganda's weather anomalies, and where does unsupervised detection genuinely
-help?''}. We assemble the first such framework for Uganda and report every
-number from a single, auditable pipeline.
+help?''}. We assemble the first such national system for Uganda, organised
+around six capabilities --- (1) anomaly detection, (2) GIS spatial
+intelligence, (3) district risk nowcast maps, (4) agricultural-impact analysis,
+(5) explainable AI, and (6) an interactive decision-support dashboard for
+early-warning readiness --- and report every number from a single, auditable
+pipeline.
 
 \paragraph{Contributions.}
 \begin{enumerate}
@@ -149,6 +154,12 @@ climate early-warning framework: UCASI recast as a district-month risk nowcast
 with a persistence-based forward carry and a concrete deployment architecture,
 evaluated honestly against the register
 (Sections~\ref{sec:rq3}--\ref{sec:ews}).
+\item An \emph{interactive decision-support dashboard} (Streamlit) that
+operationalises the system: nine panels, read-only over the versioned result
+artifacts, exposing the 24-detector benchmark, spatial and trend analytics,
+district risk nowcast maps, agricultural-impact evidence, SHAP explanations and
+the UCASI ranking (Section~\ref{sec:dashboard}); released with the repository for
+reproducibility.
 \end{enumerate}
 
 \paragraph{Research questions.}
@@ -763,6 +774,22 @@ box marking the exposure/soil-moisture/impact coupling a weather-only feature
 space omits. The deliverable is thus a reproducible risk-surfacing and
 prioritisation system whose limits are quantified, converting RQ6 from an
 assessment of feasibility into a working framework with a measured horizon.
+
+\subsection{Interactive decision-support dashboard}\label{sec:dashboard}
+To make the system usable by non-specialist disaster and agriculture desks, we
+deliver an interactive web dashboard (Streamlit/Altair) that renders every
+reported result directly from the persisted, version-stamped artifacts under
+\texttt{results/} and \texttt{data/}. The dashboard is strictly \emph{read-only}: it
+re-fits nothing on the page, so it cannot introduce numbers that do not appear in
+the manuscript, and each artifact carries the \texttt{git} commit that produced it.
+Nine panels map to the six capabilities --- overview, the 24-detector benchmark with
+bootstrap intervals and the size-matched random null, GIS spatial intelligence,
+temporal trends, drought indices, agricultural and coffee impact (shown with its
+confounded, two-sided finding), UCASI severity ranking, SHAP explainability, and
+the district-month risk nowcast --- with the architecture of
+Figure~\ref{fig:architecture} as the ingestion-to-decision-support backbone. The
+application, its launcher and pinned optional dependencies ship in
+\texttt{dashboard/} of the release repository.
 
 %============================================================================
 \section{Discussion}\label{sec:discussion}
