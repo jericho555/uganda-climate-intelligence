@@ -1,7 +1,9 @@
+LSTMAE
+TransformerAE
 GeneralizedESD
 StructuralTS
-Ensemble+Persist+Region
 Ensemble+5dPersist
+Ensemble+Persist+Region
 LOF
 SARIMAX
 ECOD

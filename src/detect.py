@@ -40,7 +40,8 @@ from sklearn.metrics import (precision_score, recall_score, f1_score,
                              roc_auc_score, average_precision_score,
                              matthews_corrcoef)
 from scipy import stats
-from deep_models import (DeepAE, NumpyVAE, sarimax_scores, structural_scores)
+from deep_models import (DeepAE, NumpyVAE, sarimax_scores, structural_scores,
+                         ensure_torch, seq_ae_scores)
 
 
 # ----------------------------------------------------------------------------
@@ -365,6 +366,25 @@ def main():
             add_eval(tname, ts, (ts >= np.quantile(ts, 1 - C.CONTAMINATION)).astype(int))
         except Exception as e:
             print(f"[skip temporal] {tname}: {e!r}")
+
+    # ---- deep SEQUENCE autoencoders (torch LSTM-AE / Transformer-AE) ----
+    # The torch backend now works (CPU wheel vendored in ._torchpkgs), so these
+    # genuine recurrent/attention autoencoders are included, not omitted.
+    if ensure_torch():
+        for sname, kind in (("LSTMAE", "lstm"), ("TransformerAE", "transformer")):
+            try:
+                ss, rmse = seq_ae_scores(tr, te, TEMP_FEATS, kind=kind)
+                ss = np.nan_to_num(
+                    ss, nan=0.0,
+                    posinf=np.max(ss[np.isfinite(ss)]) if np.isfinite(ss).any() else 0.0,
+                    neginf=0.0)
+                scores_all[sname] = ss
+                add_eval(sname, ss, (ss >= np.quantile(ss, 1 - C.CONTAMINATION)).astype(int))
+                print(f"  [{sname}] train_window_rmse={rmse:.4f}")
+            except Exception as e:
+                print(f"[skip seq] {sname}: {e!r}")
+    else:
+        print("[warn] torch unavailable; LSTM/Transformer AE skipped")
 
     res = pd.DataFrame(rows).sort_values("pr_auc", ascending=False)
     res.to_csv(RESULTS / "benchmark.csv", index=False)

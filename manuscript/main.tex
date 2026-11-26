@@ -39,18 +39,22 @@ ground-truth against which to validate. We build a fully reproducible
 \emph{climate intelligence framework} for Uganda that integrates (i) 16 years of
 open, reanalysis-based daily weather (ERA5, 16 districts, 93{,}504
 district-days, 13 variables), (ii) a curated register of 32 documented
-climate disasters used as held-out ground truth, (iii) a benchmark of 17
+climate disasters used as held-out ground truth, (iii) a benchmark of 24
 anomaly detectors under chronological (train $\leq$2018 / test 2019--2023)
 evaluation with bootstrap confidence intervals and Friedman/Nemenyi testing,
 (iv) GIS hotspot analysis (Global/Local Moran's $I$, Getis--Ord $G_i^*$),
 (v) long-term trend testing (Mann--Kendall, Sen's slope, change points), and
 (vi) a novel composite severity index, the \textbf{Uganda Climate Anomaly
 Severity Index (UCASI)}, with SHAP-based explainability. Our central, and
-deliberately uncomfortable, finding is that \emph{no} generic unsupervised
-detector --- statistical, isolation/nearest-neighbour, or autoencoder ---
-beats chance against real disaster windows (held-out ROC-AUC 0.49--0.51;
-best F1 $=0.083$; best PR-AUC $=0.117$ against a base rate of $0.1115$), and
-that apparent event coverage (68.8\%) is fully explained by a size-matched
+deliberately uncomfortable, finding is that \emph{no cross-sectional}
+unsupervised detector --- statistical, isolation/nearest-neighbour, or
+feed-forward autoencoder --- beats chance against real disaster windows
+(held-out ROC-AUC 0.49--0.53; F1 $\le0.084$; PR-AUC $\le0.121$ against a base
+rate of $0.1115$); the only methods to exceed the size-matched random null are
+two deep \emph{sequence} autoencoders (LSTM-AE, Transformer-AE: precision
+$0.20$--$0.22$, F1 $0.13$--$0.14$), yet even these rank near chance (ROC-AUC
+$0.51$--$0.53$) and capture under $10\%$ of disaster days. Apparent event
+coverage (68.8\%) is still fully explained by a size-matched
 random null (100\%). This directly refutes earlier reports of AUC $=1.0$ on the
 same record and shows why ground-truth-honest evaluation matters. The framework
 nevertheless yields defensible climate intelligence over a widened record that
@@ -118,7 +122,7 @@ number from a single, auditable pipeline.
 \item A fully reproducible pipeline (open ERA5 reanalysis, CC-BY 4.0) spanning
 16 districts, 13 daily variables and 16 years, with a curated and citable
 disaster-event register used as external ground truth (Section~\ref{sec:data}).
-\item The first held-out, ground-truth benchmark of 22 anomaly detectors for
+\item The first held-out, ground-truth benchmark of 24 anomaly detectors for
 Ugandan weather, with bootstrap confidence intervals, multi-seed stability and
 Friedman/Nemenyi ranking, and --- critically --- a size-matched random null
 (Section~\ref{sec:rq1}).
@@ -280,7 +284,7 @@ a 5-day heat index and a 30-day evaporative-demand index (sign-flipped ET$_0$).
 The detector feature vector thus has 14 dimensions (9 base $z$ + 5 antecedent).
 
 \subsection{Detector family}\label{sec:detectors}
-We benchmark 22 methods spanning every major family: max/union seasonal z-scores,
+We benchmark 24 methods spanning every major family: max/union seasonal z-scores,
 Rosner's generalised ESD, Isolation Forest, LOF, $k$NN, HBOS, CBLOF, LODA, ECOD,
 COPOD, PCA, EllipticEnvelope, a one-class SVM, a shallow reconstruction
 autoencoder, and a rank-averaged ensemble optionally filtered by temporal
@@ -288,22 +292,22 @@ persistence and region-relative thresholding. The one-class SVM is fitted on a
 seeded 6{,}000-row subsample to keep its kernel solve within memory at 64k rows;
 minimum covariance determinant (MCD) was evaluated but excluded as numerically
 unstable at this dimensionality --- a reproducibility finding we report rather
-than hide. To reach the deep and temporal families without the heavy backends that
-failed to install here (torch/TensorFlow/Prophet --- wheel-download integrity
-failures and read timeouts on the 124--350 MB distributions), we add four
-detectors built from primitives already pinned in the environment: a \emph{deep
-autoencoder} (a genuine three-layer 16--8--4 MLP trained with Adam through
-\texttt{sklearn}'s \texttt{MLPRegressor}); a \emph{variational autoencoder}
-coded directly in NumPy with hand-derived backpropagation whose analytic
-gradients were validated against central finite differences (maximum relative
-error $\sim3\times10^{-9}$) and whose ELBO was confirmed to decrease before use;
-and two leak-free \emph{temporal} models --- a seasonal ARIMA (SARIMAX) and an
-unobserved-components structural model (local level plus weekly seasonality, the
-statistical core of Prophet) --- each scored as standardised one-step-ahead
-innovations, fitted on train and applied to test. Only the recurrent/attention
-sequence variants (LSTM-AE, Transformer-AE), which additionally need a deep
-backend and a per-series temporal harness, remain implemented-but-unreported; we
-omit them rather than substitute unverified numbers.
+than hide. To reach the deep and temporal families, we add four detectors built
+from primitives already pinned in the environment: a \emph{deep autoencoder} (a
+genuine three-layer 16--8--4 MLP trained with Adam through \texttt{sklearn}'s
+\texttt{MLPRegressor}); a \emph{variational autoencoder} coded directly in NumPy
+with hand-derived backpropagation whose analytic gradients were validated against
+central finite differences (maximum relative error $\sim3\times10^{-9}$) and whose
+ELBO was confirmed to decrease before use; and two leak-free \emph{temporal}
+models --- a seasonal ARIMA (SARIMAX) and an unobserved-components structural
+model (local level plus weekly seasonality, the statistical core of Prophet) ---
+each scored as standardised one-step-ahead innovations, fitted on train and
+applied to test. Finally, a CPU-only \texttt{torch} distribution (2.4.1) is now
+vendored into the environment (installed with pip's \texttt{--target} into a
+workspace directory), so we also include two genuine \emph{sequence} autoencoders
+--- an LSTM encoder--decoder and a Transformer encoder autoencoder --- trained
+over 14-day windows and scored by per-window reconstruction error. With these, no
+detector family named in Section~\ref{sec:related} is left unreported.
 
 \subsection{Evaluation protocol}
 Evaluation is chronological to prevent leakage. Continuous scores are thresholded
@@ -397,37 +401,50 @@ manually entered. Seeds are fixed (\texttt{SEED}=42).
 
 \subsection{RQ1 --- Detection does not generalise to real disasters}
 \label{sec:rq1}
-Table~\ref{tab:benchmark} reports the held-out benchmark. The result is uniform
-and unambiguous: \emph{every} detector sits at chance. ROC-AUC spans
-0.494--0.532 across all 22 methods (0.5 is random), and PR-AUC spans
-0.111--0.121 around the base rate of 0.1115. The best F1 is 0.084 (one-class
-SVM), with a 95\% bootstrap interval of $[0.072,0.095]$ that comfortably contains
-the performance of flagging 5\% of days at random. The persistence- and
-region-filtered ensembles --- our constructive attempts to inject physical
-signal --- do not escape chance (best PR-AUC 0.117). Neither do the four newly
-added deep and temporal detectors: the deep MLP autoencoder (ROC 0.498), the
-NumPy VAE (ROC 0.501), SARIMAX (ROC 0.505) and the structural
-unobserved-components model (ROC 0.516) all sit within a few points of random
-with MCC $\le 0.007$; extending the zoo into these families therefore reinforces,
-rather than alters, the central finding.
+Table~\ref{tab:benchmark} reports the held-out benchmark over 24 detectors. The
+cross-sectional result is uniform: \emph{every} point detector sits at chance.
+ROC-AUC spans 0.494--0.532 across the 22 non-sequence methods (0.5 is random),
+PR-AUC spans 0.111--0.121 around the base rate of 0.1115, and the best F1 is
+0.084 (one-class SVM) with a 95\% bootstrap interval of $[0.072,0.095]$ that
+comfortably contains the performance of flagging 5\% of days at random. The
+persistence- and region-filtered ensembles --- our constructive attempts to
+inject physical signal --- do not escape chance (best PR-AUC 0.117), and neither
+do the shallow-deep and innovation-temporal detectors: the MLP autoencoder (ROC
+0.498), NumPy VAE (ROC 0.501), SARIMAX (ROC 0.505) and structural
+unobserved-components model (ROC 0.516) all lie within a few points of random
+with MCC $\le 0.007$.
 
-Friedman testing over the five test years and all 22 detectors (using each
-method's actual held-out predictions) returns $\chi^2=29.38$,
-$p=6.5\times10^{-6}$, confirming the \emph{rankings differ}, but the differences
+The one exception is genuinely informative. The two torch \emph{sequence}
+autoencoders are the only methods whose top-5\% flag rises above the size-matched
+random null (F1 $\approx$ 0.096): LSTM-AE reaches F1 0.125 $[0.112,0.138]$ and
+Transformer-AE 0.138 $[0.124,0.150]$, with precision 0.20--0.22 ($\approx$2$\times$
+the base rate) and MCC 0.066/0.081. The lift is real but narrow: their \emph{global
+ranking} stays near chance (ROC-AUC 0.513--0.525) and they still flag under 10\%
+of disaster days. The honest reading is that temporal context carries a small
+anomaly signal that cross-sectional scoring discards --- but no detector, sequence
+models included, is reliable enough for stand-alone operational early warning.
+
+Friedman testing over the five test years and all 24 detectors (using each
+method's actual held-out predictions) returns $\chi^2=28.77$,
+$p=8.7\times10^{-6}$, confirming the \emph{rankings differ}, but the differences
 are between methods that are all effectively non-informative; seed standard
 deviation of F1 is 0, so this is not a variance artefact.
 
 \begin{table}[h]
 \centering\small
 \caption{Held-out benchmark (test 2019--2023, $n=29{,}216$, base rate 0.1115).
-All 22 methods shown, ordered by PR-AUC. Higher-precision values are in the
-released \texttt{benchmark.csv}.}
+All 24 methods shown, ordered by PR-AUC. The two torch sequence autoencoders
+(LSTM-AE, Transformer-AE) are the only detectors whose top-5\% flag exceeds the
+size-matched random null; their ROC-AUC nevertheless stays near chance.
+Higher-precision values are in the released \texttt{benchmark.csv}.}
 \label{tab:benchmark}
 \begin{tabular}{lcccccc}
 \toprule
 Detector & Precision & Recall & F1 & ROC & PR-AUC & MCC \\
 \midrule
-Generalized ESD       & 0.118 & 0.053 & 0.073 & 0.532 & \textbf{0.121} & 0.005 \\
+LSTM-AE             & 0.203 & 0.091 & 0.125 & 0.525 & \textbf{0.135} & 0.066 \\
+Transformer-AE      & 0.222 & 0.100 & \textbf{0.138} & 0.513 & 0.129 & 0.081 \\
+Generalized ESD       & 0.118 & 0.053 & 0.073 & 0.532 & 0.121 & 0.005 \\
 Structural TS         & 0.120 & 0.054 & 0.074 & 0.516 & 0.118 & 0.006 \\
 Ensemble+Persist+Reg  & 0.122 & 0.055 & 0.076 & 0.507 & 0.117 & 0.008 \\
 Ensemble+5dPersist    & 0.126 & 0.056 & 0.078 & 0.507 & 0.117 & 0.010 \\
@@ -445,7 +462,7 @@ KNN                   & 0.118 & 0.053 & 0.073 & 0.507 & 0.114 & 0.005 \\
 Seasonal ESD          & 0.113 & 0.051 & 0.070 & 0.500 & 0.114 & 0.001 \\
 Deep AE (MLP)         & 0.119 & 0.053 & 0.074 & 0.498 & 0.114 & 0.006 \\
 PCA                   & 0.131 & 0.059 & 0.081 & 0.494 & 0.113 & 0.014 \\
-One-class SVM         & 0.136 & 0.061 & \textbf{0.084} & 0.502 & 0.113 & 0.017 \\
+One-class SVM         & 0.136 & 0.061 & 0.084 & 0.502 & 0.113 & 0.017 \\
 LODA                  & 0.120 & 0.054 & 0.075 & 0.497 & 0.113 & 0.006 \\
 EllipticEnvelope      & 0.100 & 0.045 & 0.062 & 0.501 & 0.111 & $-$0.008 \\
 VAE (NumPy)           & 0.112 & 0.050 & 0.069 & 0.501 & 0.111 & 0.000 \\
@@ -762,7 +779,10 @@ disqualifying --- they specify precisely what an operational system must add.
 \paragraph{Value of the negative result.} Reporting chance-level skill is more
 useful than a fabricated 1.0. It re-anchors claims to measurable evidence and
 redirects effort from detector shopping (which our Friedman test shows matters
-little in absolute terms) toward better features, finer data and impact coupling.
+little in absolute terms) toward better features --- our LSTM/Transformer-AE
+result shows temporal context is exactly such a feature, lifting the top-5\%
+flag above the random null where no cross-sectional method can --- finer data
+and impact coupling.
 
 \paragraph{Climate-intelligence signal that does emerge.} The durable findings
 are climatological, not algorithmic: robust, near-universal warming; a coherent
@@ -796,22 +816,26 @@ resolution. Sensitivity to weightings and threshold $\gamma$ should be reported
 in extensions. (4) \emph{Attribution}: SHAP explains the detector, not disasters.
 (5) \emph{Detector coverage}: the one-class SVM is retained only via a seeded
 6{,}000-row subsample and MCD was dropped as numerically unstable at this
-dimensionality. The deep (MLP autoencoder, gradient-validated NumPy VAE) and
-temporal (SARIMAX, unobserved-components) families are reported here via native
-implementations on the already-pinned numpy/sklearn/statsmodels stack, because the
-torch/TensorFlow/Prophet backends could not be installed (sha256 integrity
-failures and read timeouts on the 124--350 MB distributions); only the recurrent
-and attention sequence variants (LSTM-AE, Transformer-AE), which additionally need
-a deep backend and a per-series temporal harness, remain implemented but
-unreported. None of the included deep/temporal detectors escape chance, so this
-coverage limitation does not affect the verdict.
+dimensionality. All detector families are now reported: the deep (MLP
+autoencoder, gradient-validated NumPy VAE) and innovation-temporal (SARIMAX,
+unobserved-components) models run on the pinned numpy/sklearn/statsmodels stack,
+and --- after vendoring a CPU-only \texttt{torch} 2.4.1 wheel via pip's
+\texttt{--target} into the workspace --- the recurrent and attention sequence
+models (LSTM-AE, Transformer-AE) are included as well. The cross-sectional
+families sit at chance; only the two sequence autoencoders modestly exceed the
+size-matched random null (F1 0.13--0.14, precision $\approx$2$\times$ base rate)
+while still ranking near chance on ROC-AUC. Heavier backends that became
+unnecessary once CPU \texttt{torch} worked (TensorFlow, Meta Prophet) and larger
+sequence architectures (deeper/multi-layer Transformers, attention pooling)
+remain future work; none is expected to overturn the central verdict.
 
 %============================================================================
 \section{Conclusion}
 We presented a reproducible climate intelligence framework for Uganda and used
 it to deliver a ground-truth-honest verdict on unsupervised weather-anomaly
-detection: against real disaster records, no generic detector beats chance, and
-apparent coverage is a window-size artefact. The framework's lasting contribution
+detection: against real disaster records, no cross-sectional detector beats
+chance --- only deep sequence autoencoders exceed the random null, and then only
+marginally --- and apparent coverage is a window-size artefact. The framework's lasting contribution
 is its evidence base --- a Mbale hotspot, a warming/eastern-drying trend that we
 confirm on a ~91-year in-situ record and use to validate ERA5 against ground
 stations, and --- recovered from an independent reanalysis that fills the

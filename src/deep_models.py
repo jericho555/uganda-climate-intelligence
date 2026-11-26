@@ -1,9 +1,9 @@
-"""Deep + temporal anomaly detectors with NO heavy backend dependency.
+"""Deep + temporal anomaly detectors for the benchmark.
 
-Motivation: torch / TensorFlow / Prophet could not be installed in the
+History: torch / TensorFlow / Prophet initially could not be installed in the
 reproducible environment (large-wheel sha256 integrity failures + read timeouts),
 and pyod's AutoEncoder/VAE require torch. Rather than omit the deep/temporal
-families, we implement them from validated primitives:
+families, we first implemented them from validated primitives:
 
   DeepAE   : a genuine multi-layer autoencoder via sklearn's MLPRegressor
              (real gradient-trained NN; CPU-only, no GPU backend needed).
@@ -16,11 +16,24 @@ families, we implement them from validated primitives:
   Structural: statsmodels UnobservedComponents (local level + weekly seasonal),
              the statistical core of Prophet, scored the same way.
 
-All expose the pipeline's fit/decision_function interface (DeepAE, NumpyVAE) or
-a *_scores(tr, te, feats) helper returning test-aligned scores (temporal).
+Update: a CPU-only torch (2.4.1) is now vendored into the workspace via pip's
+``--target`` (directory ``._torchpkgs``), so the previously-omitted recurrent and
+attention families are included as real torch models:
+
+  ensure_torch   : bootstraps the vendored ``._torchpkgs`` onto sys.path.
+  _SeqAE         : an LSTM encoder--decoder and a Transformer encoder
+                   autoencoder (kind="lstm"/"transformer"), Adam-trained to
+                   reconstruct input windows, scored by per-window recon MSE.
+  seq_ae_scores  : leak-free windowing (14-day, past+current only), train-only
+                   standardisation, one pooled model per kind, test-aligned scores.
+
+DeepAE/NumpyVAE expose the pipeline's fit/decision_function interface; the
+temporal and sequence helpers expose *_scores(tr, te, feats, ...) returning
+test-aligned scores.
 """
 import warnings
 import numpy as np
+import pandas as pd
 from sklearn.neural_network import MLPRegressor
 
 warnings.filterwarnings("ignore")
@@ -194,3 +207,148 @@ def structural_scores(tr, te, feats):
         mod = UnobservedComponents(ytr, level="local level", seasonal=7)
         return mod.fit(method="lbfgs", maxiter=50, disp=0)
     return _innovations(tr, te, feats, build)
+
+
+# --------------------------------------------------------------------------- #
+# Deep SEQUENCE autoencoders (torch) -- LSTM-AE and Transformer-AE
+# --------------------------------------------------------------------------- #
+def ensure_torch():
+    """Return True if torch is importable, bootstrapping the workspace-local
+    vendored CPU wheel directory (._torchpkgs) onto sys.path if torch is not
+    already on the default path."""
+    import sys
+    from pathlib import Path
+    try:
+        import torch  # noqa: F401
+        return True
+    except Exception:
+        vend = Path(__file__).resolve().parent.parent / "._torchpkgs"
+        if vend.exists() and str(vend) not in sys.path:
+            sys.path.insert(0, str(vend))
+        try:
+            import torch  # noqa: F401
+            return True
+        except Exception:
+            return False
+
+
+class _SeqAE:
+    """Autoencoder over daily feature windows: encoder -> context -> decoder,
+    scored by per-window reconstruction MSE. kind in {'lstm','transformer'}."""
+
+    def __init__(self, n_feat, window, kind="lstm", hidden=16, layers=1,
+                 heads=2, epochs=8, batch=256, lr=3e-3, seed=0):
+        import torch
+        import torch.nn as nn
+        self.torch, self.kind = torch, kind
+        self.n_feat, self.window = n_feat, window
+        self.hidden, self.layers, self.heads = hidden, layers, heads
+        self.epochs, self.batch, self.lr = epochs, batch, lr
+        torch.manual_seed(seed)
+        w, h, L = window, hidden, layers
+
+        if kind == "lstm":
+            class Net(nn.Module):
+                def __init__(self):
+                    super().__init__()
+                    self.h, self.L, self.w = h, L, w
+                    self.enc = nn.LSTM(n_feat, h, L, batch_first=True)
+                    self.dec = nn.LSTM(h, h, L, batch_first=True)
+                    self.out = nn.Linear(h, n_feat)
+
+                def forward(self, x):
+                    _, (hc, _) = self.enc(x)
+                    seed = hc[-1].unsqueeze(1).repeat(1, self.w, 1)
+                    d, _ = self.dec(seed)
+                    return self.out(d)
+        else:  # transformer
+            class Net(nn.Module):
+                def __init__(self):
+                    super().__init__()
+                    self.inp = nn.Linear(n_feat, h)
+                    self.pe = nn.Parameter(torch.randn(1, w, h) * 0.02)
+                    layer = nn.TransformerEncoderLayer(
+                        h, heads, h * 2, batch_first=True, dropout=0.0)
+                    self.enc = nn.TransformerEncoder(layer, L)
+                    self.out = nn.Linear(h, n_feat)
+
+                def forward(self, x):
+                    return self.out(self.enc(self.inp(x) + self.pe))
+
+        self.net = Net()
+        self.opt = torch.optim.Adam(self.net.parameters(), lr=lr)
+
+    def fit(self, X):
+        t = self.torch
+        Xt = t.tensor(X, dtype=t.float32)
+        n = len(Xt)
+        for _ in range(self.epochs):
+            perm = t.randperm(n)
+            tot = 0.0
+            for s in range(0, n, self.batch):
+                b = Xt[perm[s:s + self.batch]]
+                self.opt.zero_grad()
+                loss = t.nn.functional.mse_loss(self.net(b), b)
+                loss.backward()
+                self.opt.step()
+                tot += float(loss) * len(b)
+        self.train_rmse = (tot / max(n, 1)) ** 0.5
+        return self
+
+    def score(self, X):
+        t = self.torch
+        self.net.eval()
+        Xt = t.tensor(X, dtype=t.float32)
+        with t.no_grad():
+            err = ((self.net(Xt) - Xt) ** 2).mean(dim=(1, 2))
+        self.net.train()
+        return err.numpy()
+
+
+def _build_windows(series, window):
+    """series:(T,F) -> (T,window,F) where row i is the window ENDING at i,
+    left-padded by repeating the first observed row."""
+    T = len(series)
+    pad = np.repeat(series[:1], window - 1, axis=0)
+    ap = np.concatenate([pad, series], axis=0)
+    return np.stack([ap[i:i + window] for i in range(T)], axis=0)
+
+
+def seq_ae_scores(tr, te, feats, kind="lstm", window=14,
+                  max_train_windows=6000, epochs=8, seed=None, hidden=16):
+    """Leak-free sequence autoencoder: standardise on TRAIN, train ONE model on
+    train windows pooled across districts, score each TEST row by the
+    reconstruction error of the window ending at that row. Returns
+    (test-aligned scores, train_rmse)."""
+    import config as C
+    seed = C.SEED if seed is None else seed
+    mu = tr[feats].mean().values
+    sd = tr[feats].std().values + 1e-9
+    idxpos = pd.Series(np.arange(len(te)), index=te.index)
+    tr_w, te_w, te_pos = [], [], []
+    for loc in te.location.unique():
+        trL = tr[tr.location == loc].sort_values("date")
+        teL = te[te.location == loc].sort_values("date")
+        comb = pd.concat([trL, teL], axis=0).sort_values("date")
+        A = np.nan_to_num((comb[feats].values - mu) / sd,
+                          nan=0.0, posinf=0.0, neginf=0.0).astype(np.float32)
+        wins = _build_windows(A, window)
+        is_te = comb.index.isin(teL.index)
+        te_w.append(wins[is_te])
+        te_pos.append(idxpos.loc[comb.index[is_te]].values)
+        trw = wins[~is_te]
+        if len(trw) > max_train_windows:
+            trw = trw[::int(np.ceil(len(trw) / max_train_windows))]
+        tr_w.append(trw)
+    Xtr = np.concatenate(tr_w, axis=0).astype(np.float32)
+    if len(Xtr) > max_train_windows:
+        rng = np.random.default_rng(0)
+        Xtr = Xtr[rng.choice(len(Xtr), max_train_windows, replace=False)]
+    model = _SeqAE(len(feats), window, kind=kind, epochs=epochs,
+                   seed=seed, hidden=hidden)
+    model.fit(Xtr)
+    out = np.zeros(len(te))
+    for blk, pos in zip(te_w, te_pos):
+        if len(blk):
+            out[pos] = model.score(blk.astype(np.float32))
+    return out, float(model.train_rmse)
