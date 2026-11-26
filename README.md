@@ -52,6 +52,7 @@ uganda-climate-intelligence/
   results/    metrics, statistical tests, UCASI tables, JSON summaries (committed)
   figures/    publication figures (PNG)
   manuscript/ Elsevier elsarticle LaTeX built around the real results
+  dashboard/  Streamlit interactive view of the persisted artefacts
   run_all.py  one-command reproduction
   requirements.txt
   CITATION.cff / .zenodo.json / LICENSE / CHANGELOG.md
@@ -63,6 +64,21 @@ uganda-climate-intelligence/
 pip install -r requirements.txt
 python run_all.py
 ```
+
+## Interactive dashboard
+
+A read-only Streamlit view of the benchmark, daily anomaly stream, spatial
+hotspots, UCASI severity, trends and the risk nowcast — bound entirely to the
+artefacts under `results/` and `data/` (nothing is re-fitted on the page).
+
+```bash
+# one-time vendored install (works when system site-packages is not writable):
+python -m pip install --target=._webpkgs --no-cache-dir streamlit
+python dashboard/run_dashboard.py      # -> http://localhost:8501
+```
+
+See [`dashboard/README.md`](dashboard/README.md) for the tab-by-tab mapping to
+artefacts. The dashboard is optional; it is not needed to reproduce the paper.
 
 Stages run in order: `fetch_era5` → `fetch_meteostat` → `fetch_agriculture` →
 `fetch_power` → `disaster_register` → `preprocess` → `detect` → `_recover` →

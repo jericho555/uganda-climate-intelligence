@@ -2,6 +2,21 @@
 
 All notable changes to the Uganda Climate Intelligence Framework (UCIF).
 
+## [Unreleased]
+
+### Added
+- **Torch sequence detectors (RQ1, benchmark now 24):** a CPU-only `torch 2.4.1`
+  distribution is now vendored into the workspace (`pip --target=._torchpkgs`),
+  enabling a genuine LSTM encoder–decoder autoencoder and a Transformer encoder
+  autoencoder over 14-day windows. These are the first detectors to exceed the
+  size-matched random null (F1 0.13–0.14, precision ≈2× base rate), though global
+  ranking stays near chance (ROC-AUC 0.51–0.53) — an honest refinement of the
+  central claim.
+- **Interactive dashboard:** a Streamlit app (`dashboard/`) exposing the
+  benchmark, daily anomaly stream, spatial hotspots, UCASI severity, trends and
+  risk nowcast, bound to the persisted artefacts. Launched via
+  `python dashboard/run_dashboard.py` with a vendored `._webpkgs` install.
+
 ## [1.0.0] - 2026-11-26
 
 First public, citable release of the reproducible pipeline and manuscript.

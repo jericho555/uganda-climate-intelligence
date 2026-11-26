@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 .venv-deep/
 ._torchpkgs/
+._webpkgs/
 venv/
 .ipynb_checkpoints/
 
@@ -46,4 +47,15 @@ Thumbs.db
 # --- Local scratch ---
 _sizes.py
 _install_deep*.bat
+_install_torch.bat
+_install_webpkgs.bat
+_probe*.py
+_probe*.bat
+_check*.py
+_smoke_*.py
+_regen.py
+_mkzip.bat
+_cm.txt
+uganda_ems_overleaf.zip
 results/*.log
+*.tmp

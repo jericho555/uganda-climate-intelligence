@@ -1,0 +1,11 @@
+# Optional extras for the interactive dashboard (dashboard/app.py).
+# Not required to run the scientific pipeline (run_all.py).
+#
+# Install into a workspace-local directory so it works in sandboxes where
+# system site-packages is not writable:
+#   python -m pip install --target=._webpkgs -r dashboard/requirements.txt
+#
+streamlit>=1.30
+altair>=5.0
+pandas>=2.0
+numpy>=1.26
