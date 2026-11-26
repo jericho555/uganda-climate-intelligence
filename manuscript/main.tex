@@ -33,52 +33,38 @@ city={Kampala}, country={Uganda}}
 
 \begin{abstract}
 Unsupervised anomaly detection is widely proposed as an early-warning tool for
-weather-related disasters, yet most published evaluations on African climate
-records report near-perfect scores obtained without any independent
-ground-truth against which to validate. We build a fully reproducible
-\emph{national climate-anomaly intelligence system} for Uganda that integrates (i) 16 years of
-open, reanalysis-based daily weather (ERA5, 16 districts, 93{,}504
-district-days, 13 variables), (ii) a curated register of 32 documented
-climate disasters used as held-out ground truth, (iii) a benchmark of 24
-anomaly detectors under chronological (train $\leq$2018 / test 2019--2023)
-evaluation with bootstrap confidence intervals and Friedman/Nemenyi testing,
-(iv) GIS hotspot analysis (Global/Local Moran's $I$, Getis--Ord $G_i^*$),
-(v) long-term trend testing (Mann--Kendall, Sen's slope, change points), and
-(vi) a novel composite severity index, the \textbf{Uganda Climate Anomaly
-Severity Index (UCASI)}, with SHAP-based explainability. Our central, and
-deliberately uncomfortable, finding is that \emph{no cross-sectional}
-unsupervised detector --- statistical, isolation/nearest-neighbour, or
-feed-forward autoencoder --- beats chance against real disaster windows
-(held-out ROC-AUC 0.49--0.53; F1 $\le0.084$; PR-AUC $\le0.121$ against a base
-rate of $0.1115$); the only methods to exceed the size-matched random null are
-two deep \emph{sequence} autoencoders (LSTM-AE, Transformer-AE: precision
-$0.20$--$0.22$, F1 $0.13$--$0.14$), yet even these rank near chance (ROC-AUC
-$0.51$--$0.53$) and capture under $10\%$ of disaster days. Apparent event
-coverage (68.8\%) is still fully explained by a size-matched
-random null (100\%). This directly refutes earlier reports of AUC $=1.0$ on the
-same record and shows why ground-truth-honest evaluation matters. The system
-nevertheless yields defensible climate intelligence over a widened record that
-spans from a 16-year ERA5 detection window to a \textbf{91-year in-situ series}
-(12 Meteostat stations, 1926--2026): a significant warming signal (22 of 48
-series rising; Kampala $T_{max}$ $\tau=0.42$, $p<10^{-16}$) corroborated
-in-situ (Entebbe $T_{min}$ $\tau=0.47$) alongside a near-century precipitation
-decline ($\tau\approx-0.39$ at Mbarara/Gulu), a coherent east-African
-drying/warming contrast at the detected Mbale hotspot ($G_i^*=3.50$), and ERA5
-validated against collocated stations ($r=0.95$--$0.999$). An \emph{independent}
-second reanalysis (NASA POWER, MERRA-2) closes the 1990--2007 in-situ reporting
-collapse for temperature, humidity and radiation, showing \emph{all 19 districts}
-warm significantly through the dark period and \emph{15 of 19} dry in near-surface
-humidity. Standardised
-drought indices (SPI/SPEI) built from these data independently confirm 3 of 4
-documented register droughts --- signal that the raw daily detectors miss --- and
-a 64-year cereal-yield series shows the 2018 drought (min SPEI$_3=-4.75$) was
-the worst detrended yield year on record, while a national-annual linear link
-stays insignificant (regional droughts are masked by aggregation). A UCASI
-severity ranking places its top events on the 2010 eastern floods, the 2022 central
-landslide and the 2018 northern/eastern drought. We conclude that weather-only
-daily anomaly detection is insufficient for operational event-level early
-warning, and we release the pipeline, register, index and an interactive
-decision-support dashboard as reusable building blocks.
+weather-related disasters, yet published evaluations on African climate records
+often report near-perfect scores without any independent ground truth. We built
+a reproducible national climate-anomaly intelligence system for Uganda. It
+combines 16 years of ERA5 daily reanalysis (16 districts, 13 variables,
+93{,}504 district-days) with a curated register of 32 documented climate
+disasters used only as held-out validation, and spans four analytic layers: a
+benchmark of 24 detectors under chronological evaluation (train to 2018, test
+2019--2023) with bootstrap intervals and Friedman/Nemenyi testing; GIS hotspot
+statistics; century-scale trend testing; and a composite severity index (UCASI)
+with SHAP explanations and an interactive dashboard.
+
+Against real disaster windows the detection result is negative. No
+cross-sectional detector beats chance (held-out ROC-AUC 0.49--0.53; F1 at most
+0.084; PR-AUC at most 0.121 against a base rate of 0.1115). Only two sequence
+autoencoders, LSTM-AE and Transformer-AE, exceed the size-matched random null,
+and only marginally (precision 0.20--0.22, F1 0.13--0.14, ROC-AUC 0.51--0.53),
+capturing under 10\% of disaster days. Apparent event coverage of 68.8\% is
+reproduced by a random null at 100\%. This refutes earlier reports of
+AUC $=1.0$ on the same record.
+
+What is defensible is climatological. A 91-year in-situ series (12 Meteostat
+stations) shows widespread warming (Kampala $T_{max}$ $\tau=0.42$,
+$p<10^{-16}$; Entebbe $T_{min}$ $\tau=0.47$) and a near-century precipitation
+decline ($\tau\approx-0.39$), with ERA5 matching collocated stations at
+$r=0.95$--$0.999$. NASA POWER fills the 1990--2007 observing gap and shows all
+19 districts warming and 15 of 19 drying. Physically interpreted SPI/SPEI
+indices corroborate 3 of 4 documented droughts, and a 64-year cereal series
+makes 2018 (minimum SPEI$_3=-4.75$) the worst detrended yield year on record,
+although the national-annual linkage remains insignificant because regional
+droughts are masked by aggregation. Weather-only daily detection is therefore
+insufficient for operational event-level early warning. The pipeline, register,
+severity index and dashboard are released as reusable building blocks.
 \end{abstract}
 
 \begin{keyword}
@@ -93,34 +79,39 @@ reproducible evaluation
 
 %============================================================================
 \section{Introduction}
-Weather-related disasters --- flood, landslide and drought --- dominate the
-Ugandan hazard record and are expected to intensify under climate change
-\cite{ipcc2022,unma2022}. A growing body of work proposes unsupervised anomaly
-detection as a low-cost early-warning mechanism, because labelled disaster data
-are scarce and machine learning can in principle flag ``abnormal'' weather
-without supervision \cite{chandola2009survey,pang2021}. Several studies on African
-weather records report exceptional performance; for example, an evaluation on a
-Meteoblue Uganda dataset declared precision, recall and ROC-AUC all equal to
-$1.0$ \cite{masaba2023}.
+Weather-related disasters, principally flood, landslide and drought, dominate
+the Ugandan hazard record, and regional projections indicate continued
+pressure on rain-fed agriculture \cite{ipcc2022,unma2022}. Rainfall over
+equatorial East Africa has been notably variable over the past half century,
+with reported declines in the long-rains season \cite{lyon2012,cattani2018},
+while on the slopes of Mount Elgon land-cover change has compounded the
+landslide hazard \cite{mugagga2012}. Because systematically recorded disaster
+labels are scarce, unsupervised anomaly detection is frequently proposed as a
+low-cost early-warning mechanism: in principle a model can flag abnormal
+weather without supervision \cite{chandola2009survey,pang2021}. Some
+evaluations on African weather records report exceptional performance; an
+earlier study on a Meteoblue Uganda dataset declared precision, recall and
+ROC-AUC all equal to $1.0$ \cite{masaba2023}.
 
-Such perfect scores are a statistical red flag. Anomaly detection is
-unsupervised by construction: without an \emph{independent, held-out} record of
-what actually constituted a disaster, ``accuracy'' is undefined, and any
-threshold tuned on the same data trivially separates itself. The absence of
-rigorous ground truth is not merely an academic nicety --- it inflates reported
-skill, misdirects scarce adaptation funding, and can embed false confidence into
-operational warning chains \cite{schmidl2022}.
+Scores of this kind are diagnostic rather than reassuring. Unsupervised
+detection supplies no label to score against: unless an independent, held-out
+record establishes what actually constituted a disaster, accuracy is undefined,
+and any threshold tuned on the same data separates itself trivially. Broader
+evaluations of anomaly detection find that measured performance depends more on
+the testing protocol than on the algorithm \cite{schmidl2022}. In a disaster
+context the consequences are practical rather than academic: inflated skill
+estimates misdirect scarce adaptation funding and can place false confidence
+inside warning chains.
 
-This paper reframes the question from \emph{``which detector is most
-accurate?''} (unanswerable without labels) to \emph{``what does a
-reproducible, ground-truth-honest climate intelligence system reveal about
-Uganda's weather anomalies, and where does unsupervised detection genuinely
-help?''}. We assemble the first such national system for Uganda, organised
-around six capabilities --- (1) anomaly detection, (2) GIS spatial
-intelligence, (3) district risk nowcast maps, (4) agricultural-impact analysis,
-(5) explainable AI, and (6) an interactive decision-support dashboard for
-early-warning readiness --- and report every number from a single, auditable
-pipeline.
+We therefore replace the question \emph{which detector is most accurate?},
+which is unanswerable without labels, with \emph{what does a reproducible,
+ground-truth-honest system reveal about Uganda's weather anomalies, and where
+does unsupervised detection actually help?} We assemble the first such national
+system for Uganda around six capabilities: anomaly detection, GIS spatial
+intelligence, district risk nowcast mapping, agricultural impact analysis,
+explainable AI, and an interactive decision-support dashboard that states
+early-warning readiness honestly. Every number reported below comes from a
+single auditable pipeline.
 
 \paragraph{Contributions.}
 \begin{enumerate}
@@ -128,8 +119,8 @@ pipeline.
 16 districts, 13 daily variables and 16 years, with a curated and citable
 disaster-event register used as external ground truth (Section~\ref{sec:data}).
 \item The first held-out, ground-truth benchmark of 24 anomaly detectors for
-Ugandan weather, with bootstrap confidence intervals, multi-seed stability and
-Friedman/Nemenyi ranking, and --- critically --- a size-matched random null
+Ugandan weather, with bootstrap confidence intervals, multi-seed stability,
+Friedman/Nemenyi ranking and a size-matched random null
 (Section~\ref{sec:rq1}).
 \item GIS spatial intelligence (Global/Local Moran's $I$, Getis--Ord $G_i^*$)
 and temporal intelligence (Mann--Kendall, Sen's slope, STL, change points)
@@ -146,7 +137,7 @@ confounded) (Section~\ref{sec:agrires}).
 confounding generalises --- the anomaly--moisture correlation \emph{reverses sign}
 between the century in-situ and modern reanalysis substrates, so a coarse national
 crop aggregate is not a climate-impact measurement (Section~\ref{sec:coffee}).
-\item A novel composite severity index, \textbf{UCASI}, that fuses intensity,
+\item A composite severity index, UCASI, that fuses intensity,
 duration, spatial spread, multivariate concurrence and frequency into a 0--100
 score with severity bands (Section~\ref{sec:ucasi}).
 \item SHAP-based explainability of the detection signal, and a \emph{delivered}
@@ -172,27 +163,66 @@ RQ6: can this support operational early warning?
 
 %============================================================================
 \section{Related work}\label{sec:related}
-Anomaly-detection taxonomies distinguish statistical (z-score, extreme student
-deviate), density/distance ($k$NN, LOF), tree/isolation (Isolation Forest),
-linear (PCA, EllipticEnvelope/MCD), information-theoretic (HBOS, LODA, ECOD,
-COPOD) and deep (autoencoder, VAE) families
-\cite{chandola2009survey,chandola2009,pang2021}.
-The individual methods used here are described in their primary sources:
-generalised ESD \cite{rosner1983}, Isolation Forest \cite{liu2008}, LOF
-\cite{breunig2000} and the one-class SVM \cite{schoelkopf2001}.
-PyOD consolidates these and is our benchmark substrate \cite{zhao2019}, with
-scikit-learn for the statistical and tree-based members \cite{pedregosa2011}.
-Spatial-dependence statistics (Moran's $I$, Getis--Ord $G_i^*$) are standard in
-GIScience \cite{anselin1995,getis1992}; the non-parametric trend tests used here
-(Mann--Kendall with Sen's slope estimator) are the conventional
-hydrometeorological pair \cite{sen1968,yue2004}. Change-point screening uses the
-linear-cost PELT dynamic-programming search \cite{killick2012}. Prior evaluations of
-unsupervised anomaly detection repeatedly find that apparent performance is
-governed more by the evaluation protocol than by the algorithm
-\cite{schmidl2022}, and that reported skill on records without independent
-labels is not interpretable evidence. Our work operationalises this critique for
-Ugandan climate data and, unlike prior studies \cite{masaba2023}, evaluates
-against an external disaster register rather than self-referential labels.
+
+\paragraph{Outlier detection methods and how they are evaluated.}
+Existing taxonomies separate statistical procedures (z-score, generalised
+extreme student deviate \cite{rosner1983}), density- and distance-based methods
+($k$NN, LOF \cite{breunig2000}), tree and isolation ensembles (Isolation Forest
+\cite{liu2008}), linear and covariance-based models (PCA, elliptic envelopes,
+the one-class SVM \cite{schoelkopf2001}), information-theoretic scores (HBOS,
+LODA, ECOD, COPOD) and deep models such as autoencoders and variational
+autoencoders \cite{chandola2009survey,chandola2009,pang2021}. Discrete and
+sequence-form detection is treated separately in the sequence literature
+\cite{chandola2009}, which motivates our inclusion of recurrent and attention
+autoencoders alongside cross-sectional scorers. PyOD supplies a common
+implementation of these families \cite{zhao2019} and scikit-learn the
+statistical and tree-based members \cite{pedregosa2011}; together they are the
+substrate of our benchmark.
+The recurring lesson from large evaluations is that measured performance in
+this task is governed more by the protocol than by the algorithm: results move
+with how thresholds are chosen, whether the same labels are reused for tuning
+and testing, and whether a method is compared against a null of equal alert
+budget \cite{schmidl2022}. We treat that as a design requirement. Every
+reported event-level score is therefore accompanied by a size-matched random
+null.
+
+\paragraph{Spatial and temporal statistics for climate records.}
+Analysis of district-level rates follows the standard spatial framework:
+Global Moran's $I$ for overall dependence \cite{anselin1995} and Getis--Ord
+$G_i^*$ for local hotspot identification \cite{getis1992}, both with permutation
+inference rather than distributional assumptions. Trend detection uses the
+Mann--Kendall rank test with the Sen slope estimator, the conventional
+non-parametric pairing in hydrometeorological series
+\cite{sen1968,yue2004}. Serial correlation is a recognised source of inflated
+significance in rank-based trend tests \cite{yue2004}; we do not apply a
+variance correction here and flag the consequence in
+Section~\ref{sec:threats}. Structural breaks are located with the penalised
+dynamic-programming change-point search (PELT) \cite{killick2012}.
+
+\paragraph{Drought indices and agricultural impact.}
+The Standardised Precipitation Index maps accumulated precipitation through a
+fitted distribution to a unit-normal quantile at several accumulation lengths,
+so that drought frequency and duration become comparable between climates
+\cite{mckee1993}. The Standardised Precipitation--Evapotranspiration Index
+applies the same construction to the moisture balance
+$P-\mathrm{ET}_0$, which makes it responsive to rising evaporative demand
+\cite{vicente2010}. Both are interpretable in physical terms, which is precisely
+what a generic daily anomaly score is not, and this property drives the central
+contrast in Section~\ref{sec:droughtres}. We couple these indices to national
+cereal and coffee production series \cite{worldbank2024,owid2025} to test whether
+climate signal survives into a production outcome.
+
+\paragraph{Ground truth and the position of this study.}
+The methodological requirement that distinguishes our design is an external
+label source. Uganda's recorded disaster history is retrievable from public
+relief reporting \cite{unma2022,emdat2023,fewsnet2021}, though such registers
+undercount unreported local events by construction. We therefore use the
+register only for held-out validation, never for fitting, and read every
+event-level number against a matched random baseline. This separates the present
+work from our earlier baseline study on the same weather record
+\cite{masaba2023}, which reported perfect metrics without an external oracle,
+and from benchmark studies in which labels are reused for tuning and testing
+\cite{schmidl2022}.
 
 %============================================================================
 \section{Study area and data}\label{sec:data}
@@ -865,6 +895,12 @@ while still ranking near chance on ROC-AUC. Heavier backends that became
 unnecessary once CPU \texttt{torch} worked (TensorFlow, Meta Prophet) and larger
 sequence architectures (deeper/multi-layer Transformers, attention pooling)
 remain future work; none is expected to overturn the central verdict.
+(6) \emph{Autocorrelation in trend tests}: monthly climate series are serially
+correlated, and no variance correction was applied to the Mann--Kendall tests,
+so the reported $p$-values are optimistic as absolute evidence
+\cite{yue2004}. The $\tau$ magnitudes and the agreement between independent
+substrates (in-situ, ERA5, POWER) are the parts of Section~\ref{sec:insitu} and
+Section~\ref{sec:powerres} that do not depend on nominal significance.
 
 %============================================================================
 \section{Conclusion}
