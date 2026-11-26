@@ -1,5 +1,7 @@
 GeneralizedESD
 StructuralTS
+Ensemble+Persist+Region
+Ensemble+5dPersist
 LOF
 SARIMAX
 ECOD

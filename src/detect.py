@@ -273,6 +273,7 @@ def main():
     seeds = [C.SEED, C.SEED + 1, C.SEED + 2]
     rows = []
     scores_all = {}
+    pred_all = {}          # per-detector held-out predictions (for Friedman)
     for name in DETECTORS:
         try:
             s = score(name, Xtr, Xte)
@@ -284,6 +285,7 @@ def main():
         scores_all[name] = s
         thr = np.quantile(s, 1 - C.CONTAMINATION)
         pred = (s >= thr).astype(int)
+        pred_all[name] = pred
         m = {
             "precision": precision_score(y, pred, zero_division=0),
             "recall": recall_score(y, pred, zero_division=0),
@@ -323,6 +325,7 @@ def main():
         return pred
 
     def add_eval(name, s, pred):
+        pred_all[name] = np.asarray(pred)
         m = {
             "precision": precision_score(y, pred, zero_division=0),
             "recall": recall_score(y, pred, zero_division=0),
@@ -368,30 +371,43 @@ def main():
     # persist held-out scores for ROC/PR figure generation
     np.savez_compressed(RESULTS / "test_scores.npz",
                         y=y, year=te.year.values,
-                        **{k: v for k, v in scores_all.items()})
+                        **{k: v for k, v in scores_all.items()},
+                        **{f"pred__{k}": np.asarray(v, dtype=np.int8)
+                           for k, v in pred_all.items()})
 
     # ---- per-year F1 for Friedman/Nemenyi ----
+    # Uses each detector's ACTUAL held-out predictions (pred_all) so that the two
+    # thresholding variants of the persistence ensemble -- global-quantile
+    # ("Ensemble+5dPersist") and region-relative ("Ensemble+Persist+Region") --
+    # are both represented even though they share one continuous score.
     te_year = te.year.values
     years = sorted(set(te_year))
-    mat = []
+    mat, used = [], []
     for name in res.detector:
-        if name not in scores_all:      # ensemble variants share the base score;
-            continue                    # friedman.json is recomputed by _recover.py
-        s = scores_all[name]
-        thr = np.quantile(s, 1 - C.CONTAMINATION)
-        pred = (s >= thr).astype(int)
-        row = [f1_score(y[te_year == yr], pred[te_year == yr]) for yr in years]
+        if name not in pred_all:
+            continue
+        pred = np.asarray(pred_all[name])
+        row = []
+        for yr in years:
+            m = te_year == yr
+            if y[m].sum() == 0 or y[m].sum() == m.sum():
+                row.append(np.nan)
+            else:
+                row.append(f1_score(y[m], pred[m]))
         mat.append(row)
-    mat = np.array(mat)
-    stat_f, pval = stats.friedmanchisquare(*mat.T)
+        used.append(name)
+    mat = np.array(mat, dtype=float)
+    cols = [mat[:, j][~np.isnan(mat[:, j])] for j in range(mat.shape[1])]
+    kmin = min(len(c) for c in cols)
+    cols = [c[:kmin] for c in cols]
+    stat_f, pval = stats.friedmanchisquare(*cols)
     res_stat = {"friedman_chi2": float(stat_f), "friedman_p": float(pval),
-                "years": [int(v) for v in years]}
+                "years": [int(v) for v in years], "n_detectors": len(used)}
     import json
     (RESULTS / "friedman.json").write_text(json.dumps(res_stat, indent=2))
     np.save(RESULTS / "per_year_f1.npy", mat)
-    list(RESULTS.glob("*"))
-    (RESULTS / "per_year_f1_order.txt").write_text("\n".join(res.detector.tolist()))
-    print(f"\nFriedman chi2={stat_f:.3f} p={pval:.4g}")
+    (RESULTS / "per_year_f1_order.txt").write_text("\n".join(used))
+    print(f"\nFriedman chi2={stat_f:.3f} p={pval:.4g} over {len(years)} years, {len(used)} detectors")
 
     # ---- full-period ensemble score for downstream modules ----
     raw = pd.read_csv(C.DATA / "era5_daily.csv", parse_dates=["date"])

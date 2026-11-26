@@ -47,11 +47,15 @@ def friedman():
     years = sorted(set(year.tolist()))
     mat, names = [], []
     for name in order:
-        if name not in z.files:
+        pk = "pred__" + name
+        if pk in z.files:
+            pred = np.asarray(z[pk])
+        elif name in z.files:
+            s = z[name]
+            thr = np.quantile(s, 1 - C.CONTAMINATION)
+            pred = (s >= thr).astype(int)
+        else:
             continue
-        s = z[name]
-        thr = np.quantile(s, 1 - C.CONTAMINATION)
-        pred = (s >= thr).astype(int)
         row = []
         for yr in years:
             m = year == yr
