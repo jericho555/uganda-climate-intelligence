@@ -2,8 +2,9 @@
 
 Reproducible research package behind the manuscript:
 
-> **A National Climate Anomaly Intelligence System for Uganda: Detection,
-> Spatial Risk Nowcasting, Impact Analysis and Explainability**
+> **A ground-truth-honest climate-anomaly detection system for Uganda: a
+> 24-detector held-out benchmark, district risk nowcasting, and century-scale
+> climatology from three observation substrates**
 > Jeremiah Masaba — Department of Computer Science, Makerere University, Kampala, Uganda
 > ([ORCID 0009-0004-5620-996X](https://orcid.org/0009-0004-5620-996X))
 

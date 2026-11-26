@@ -5,13 +5,15 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "Uganda Climate Intelligence Framework (UCIF)"
 abstract: >-
-  Reproducible pipeline and manuscript behind "A Climate Intelligence Framework
-  for Detecting, Validating and Assessing Weather Anomalies in Uganda". Builds a
-  ground-truth-honest benchmark of unsupervised anomaly detectors against a
-  curated disaster register, adds century-scale in-situ trends, an independent
-  NASA POWER gap-fill of the 1990-2007 observing collapse, derived SPI/SPEI
-  drought indices, a cereal-yield impact linkage, the UCASI severity index and
-  SHAP-based explainability. Every reported number is computed by the pipeline.
+  Reproducible pipeline and manuscript behind "A ground-truth-honest
+  climate-anomaly detection system for Uganda: a 24-detector held-out benchmark,
+  district risk nowcasting, and century-scale climatology from three observation
+  substrates". Builds a ground-truth-honest benchmark of unsupervised anomaly
+  detectors against a curated disaster register, adds century-scale in-situ
+  trends, an independent NASA POWER gap-fill of the 1990-2007 observing collapse,
+  derived SPI/SPEI drought indices, a cereal-yield impact linkage, the UCASI
+  severity index and SHAP-based explainability. Every reported number is
+  computed by the pipeline.
 authors:
   - family-names: Masaba
     given-names: Jeremiah

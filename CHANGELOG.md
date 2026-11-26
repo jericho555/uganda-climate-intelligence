@@ -27,6 +27,16 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   `python dashboard/run_dashboard.py` with a vendored `._webpkgs` install.
 
 ### Changed
+- **Retitled around the evidence, not the capability list (EMS):**
+  *A ground-truth-honest climate-anomaly detection system for Uganda: a
+  24-detector held-out benchmark, district risk nowcasting, and century-scale
+  climatology from three observation substrates*. The previous title advertised
+  "Detection ... Impact Analysis and Explainability", which are the three
+  components whose measured verdict is chance-level ranking, confounded impact
+  linkage and detector-only attribution, and its four-noun subtitle carried no
+  finding. Propagated to `manuscript/main.tex` (title, header comment and the
+  abstract's opening claim), `COVER_LETTER.md`, `README.md` and the
+  `references.bib` header. No metric, table or figure value changed.
 - **Manuscript reframed as a national system (EMS positioning):** retitled to
   *A National Climate Anomaly Intelligence System for Uganda*; the six
   capabilities (anomaly detection, spatial intelligence, district risk nowcast,
@@ -36,6 +46,11 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   nowcast/impact results — no metric, table or figure value changed.
 
 ### Fixed
+- **Packaging metadata out of sync:** `CITATION.cff` and `.zenodo.json` still
+  quoted the original conference-paper title ("A Climate Intelligence Framework
+  for Detecting, Validating and Assessing Weather Anomalies in Uganda") while
+  shipping the retitled manuscript. Both now quote the current manuscript title;
+  the Zenodo keyword list gains `early warning` and `risk nowcasting`.
 - **Bibliography integrity (critical):** six cited works could not be verified
   against any indexed record and were removed — `rietsch2020`, `gunderson2022`,
   `boyd2022`, `wilkinson2023`, `khan2021` and the `white2023power` attribution.

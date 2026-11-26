@@ -2,14 +2,14 @@
 
 **To:** The Editors, *Environmental Modelling & Software* (Elsevier)
 **From:** Jeremiah Masaba, Department of Computer Science, Makerere University, Kampala, Uganda (masabjericho@gmail.com)
-**Manuscript title:** *A National Climate Anomaly Intelligence System for Uganda: Detection, Spatial Risk Nowcasting, Impact Analysis and Explainability*
+**Manuscript title:** *A ground-truth-honest climate-anomaly detection system for Uganda: a 24-detector held-out benchmark, district risk nowcasting, and century-scale climatology from three observation substrates*
 
 Dear Editors,
 
 We submit an original research article that we believe fits the aims of
-*Environmental Modelling & Software*: it delivers an open, reproducible
-national climate-anomaly intelligence system: a leakage-safe pipeline plus an
-interactive decision-support dashboard. In doing so it confronts a widespread
+*Environmental Modelling & Software*: it delivers an open, reproducible national
+climate-anomaly system: a leakage-safe pipeline plus an interactive
+decision-support dashboard. In doing so it confronts a widespread
 evaluation failure in the climate machine-learning literature.
 
 Unsupervised weather-anomaly detection is frequently marketed as a disaster
