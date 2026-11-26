@@ -28,10 +28,12 @@ STAGES = [
     ("drought_indices", "SPI / SPEI derived drought indices + register validation"),
     ("ag_linkage", "Growing-season drought vs detrended cereal yield (impact novel finding)"),
     ("ucasi", "Uganda Climate Anomaly Severity Index"),
+    ("early_warning", "UCASI forward risk nowcast + honest skill (RQ6)"),
     ("_typematch", "Type-matched early-warning + size-matched random null"),
     ("_explain_fast", "SHAP / feature importance (lightweight, deterministic)"),
     ("figures", "Publication figures"),
     ("figures_power", "Gap-fill + drought/yield figures"),
+    ("figures_early_warning", "EWS architecture + risk-nowcast figures"),
     ("collect_results", "Results digest + event-recall/lead-time (RQ5)"),
 ]
 

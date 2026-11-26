@@ -136,8 +136,11 @@ confounded) (Section~\ref{sec:agrires}).
 \item A novel composite severity index, \textbf{UCASI}, that fuses intensity,
 duration, spatial spread, multivariate concurrence and frequency into a 0--100
 score with severity bands (Section~\ref{sec:ucasi}).
-\item SHAP-based explainability of the detection signal and an honest assessment
-of operational early-warning feasibility (Sections~\ref{sec:rq3}--\ref{sec:rq6}).
+\item SHAP-based explainability of the detection signal, and a \emph{delivered}
+climate early-warning framework: UCASI recast as a district-month risk nowcast
+with a persistence-based forward carry and a concrete deployment architecture,
+evaluated honestly against the register
+(Sections~\ref{sec:rq3}--\ref{sec:ews}).
 \end{enumerate}
 
 \paragraph{Research questions.}
@@ -648,6 +651,36 @@ warming/drying trends as adaptation targets, and (iii) UCASI for ranking where
 and when to intervene --- while predictive skill requires coupling weather
 anomalies with exposure, soil-moisture and impact data (Section~\ref{sec:discussion}).
 
+\subsection{Forward risk nowcast and deployment architecture (RQ6)}\label{sec:ews}
+To turn the assessment into an operational deliverable we recast UCASI as a
+\emph{nowcast}: the validated daily anomaly stream is aggregated to one
+risk score per district-month (16 districts, 3{072} cells, 378 of them falling in
+documented event windows), recombining the same five dimensions --- intensity,
+persistence, spatial coherence with neighbours, multi-variable concurrence and
+frequency --- under the identical UCASI weights. The surface bands into Low
+(1{467}), Moderate (704), High (593) and Extreme (308) cells, and the most recent
+month (2023-12; Figure~\ref{fig:nowcast}a) ranks Mbale (78, High) first
+with a Moderate northern belt (Gulu 50, Lira 47), reproducing the hotspot and
+trend findings as a live watch-list rather than a post-hoc summary.
+
+Crucially, we \emph{measure} rather than assume the forward skill. A
+size-matched random null shows the district-month score is at chance for
+capturing event months (ROC-AUC $0.55$ vs $0.50$; recall@TopK $0.11$ vs $0.12$;
+Figure~\ref{fig:nowcast}c) --- the same conclusion the daily benchmark reached,
+now confirmed at coarser aggregation. What does carry forward is
+\emph{persistence}: the month-to-month autocorrelation of the score is positive
+but modest (lag-1 pooled $r=0.35$), so the week/month/season nowcast is a
+persistence extrapolation of current conditions, not a causal forecast. We
+therefore present the framework honestly: Figure~\ref{fig:architecture} gives the
+six-stage deployment architecture (multi-source ingest $\rightarrow$ leakage-safe
+pre-processing $\rightarrow$ validated detection ensemble $\rightarrow$ UCASI risk
+nowcast $\rightarrow$ persistence carry with alert tiers $\rightarrow$ decision
+support), with a ground-truth re-calibration loop and an explicit skill-ceiling
+box marking the exposure/soil-moisture/impact coupling a weather-only feature
+space omits. The deliverable is thus a reproducible risk-surfacing and
+prioritisation system whose limits are quantified, converting RQ6 from an
+assessment of feasibility into a working framework with a measured horizon.
+
 %============================================================================
 \section{Discussion}\label{sec:discussion}
 \paragraph{Why detection is at chance.} Three mechanisms explain
@@ -802,6 +835,29 @@ SPEI$_3$ 2008--23, most-negative growing-season value per year, with the
 growing-season drought index, showing significant drought--yield years but a
 weak national-linear link. (Drought $\rightarrow$ impact)}
 \label{fig:droughtyield}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_ews_architecture.png}
+\caption{Operational deployment architecture of the Uganda Climate Early-Warning
+Framework: six stages from multi-source ingest through leakage-safe
+pre-processing, the validated detection ensemble, the UCASI district-month risk
+nowcast, a persistence-based forward carry with alert tiers, and decision
+support. The dashed edge is ground-truth re-calibration against the register; the
+red box marks the measured skill ceiling --- predictive event skill requires
+coupling exposure, soil moisture and impact data absent from a weather-only
+feature space.}
+\label{fig:architecture}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_risk_nowcast.png}
+\caption{UCASI forward risk nowcast. (a) District risk surface for the most recent
+month: bubble size/colour encode the 0--100 score and severity band; Mbale (78,
+High) leads with the northern belt Moderate. (b) National monthly mean risk
+2008--2023 with documented disaster windows shaded. (c) Honest skill: the
+district-month score is at chance against a size-matched random null (ROC-AUC
+$0.55$ vs $0.50$; recall@TopK $0.11$ vs $0.12$), and the forward carry rests on
+lag-1 persistence ($r=0.35$), not predictive power.}
+\label{fig:nowcast}
 \end{figure}
 
 %============================================================================

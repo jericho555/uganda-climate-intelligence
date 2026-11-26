@@ -1,0 +1,124 @@
+{
+  "weights": {
+    "I": 0.3,
+    "D": 0.2,
+    "S": 0.2,
+    "M": 0.15,
+    "F": 0.15
+  },
+  "construction": "district-month UCASI recombination of the validated daily anomaly stream; forward carry = persistence rule",
+  "band_counts": {
+    "Low": 1467,
+    "Moderate": 704,
+    "High": 593,
+    "Extreme": 308
+  },
+  "skill_vs_event_months": {
+    "n_district_months": 3072,
+    "n_event_months": 378,
+    "k_selected": 378,
+    "auc": 0.55,
+    "auc_null_mean": 0.501,
+    "recall_at_k": 0.111,
+    "recall_null_mean": 0.122,
+    "recall_null_p95": 0.148
+  },
+  "persistence": {
+    "lag1_mean_tau": 0.291,
+    "lag1_min": 0.134,
+    "lag1_max": 0.448,
+    "pooled_lag1_r": 0.349,
+    "n_districts": 16
+  },
+  "latest_nowcast_top8": [
+    {
+      "location": "Mbale",
+      "region": "Eastern",
+      "year": 2023,
+      "month": 12,
+      "risk": 78.0,
+      "band": "High",
+      "anomaly_days": 7,
+      "longest_run": 7,
+      "max_concurrent_vars": 2
+    },
+    {
+      "location": "Gulu",
+      "region": "Northern",
+      "year": 2023,
+      "month": 12,
+      "risk": 49.5,
+      "band": "Moderate",
+      "anomaly_days": 0,
+      "longest_run": 0,
+      "max_concurrent_vars": 5
+    },
+    {
+      "location": "Lira",
+      "region": "Northern",
+      "year": 2023,
+      "month": 12,
+      "risk": 46.9,
+      "band": "Moderate",
+      "anomaly_days": 0,
+      "longest_run": 0,
+      "max_concurrent_vars": 4
+    },
+    {
+      "location": "Jinja",
+      "region": "Eastern",
+      "year": 2023,
+      "month": 12,
+      "risk": 44.1,
+      "band": "Moderate",
+      "anomaly_days": 0,
+      "longest_run": 0,
+      "max_concurrent_vars": 3
+    },
+    {
+      "location": "Masindi",
+      "region": "Northern",
+      "year": 2023,
+      "month": 12,
+      "risk": 44.1,
+      "band": "Moderate",
+      "anomaly_days": 0,
+      "longest_run": 0,
+      "max_concurrent_vars": 3
+    },
+    {
+      "location": "Arua",
+      "region": "Northern",
+      "year": 2023,
+      "month": 12,
+      "risk": 44.1,
+      "band": "Moderate",
+      "anomaly_days": 0,
+      "longest_run": 0,
+      "max_concurrent_vars": 3
+    },
+    {
+      "location": "Kumi",
+      "region": "Eastern",
+      "year": 2023,
+      "month": 12,
+      "risk": 41.2,
+      "band": "Low",
+      "anomaly_days": 0,
+      "longest_run": 0,
+      "max_concurrent_vars": 2
+    },
+    {
+      "location": "Kampala",
+      "region": "Central",
+      "year": 2023,
+      "month": 12,
+      "risk": 41.2,
+      "band": "Low",
+      "anomaly_days": 0,
+      "longest_run": 0,
+      "max_concurrent_vars": 2
+    }
+  ],
+  "note": "This is a monitoring/prioritisation NOWCAST. The forward-lead skill equals the measured lag-1 persistence; it is NOT a causal forecast. Predictive skill requires coupling exposure, soil moisture and impact data that a weather-only feature space omits."
+}
