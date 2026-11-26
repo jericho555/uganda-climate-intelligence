@@ -1,0 +1,206 @@
+{
+  "spi_stations": 10,
+  "spi_months": 4663,
+  "spi_record_start": "1926-01-01",
+  "spi_record_end": "2026-01-01",
+  "spei_locations": 16,
+  "spei_months": 3072,
+  "index_validation": {
+    "meteostat_SPI1": {
+      "n": 4304,
+      "mean": 0.009,
+      "sd": 0.988,
+      "min": -4.4,
+      "max": 3.56
+    },
+    "meteostat_SPI3": {
+      "n": 4266,
+      "mean": 0.001,
+      "sd": 0.999,
+      "min": -4.31,
+      "max": 3.44
+    },
+    "meteostat_SPI6": {
+      "n": 4245,
+      "mean": 0.001,
+      "sd": 0.998,
+      "min": -4.75,
+      "max": 3.03
+    },
+    "meteostat_SPI12": {
+      "n": 4203,
+      "mean": 0.003,
+      "sd": 0.989,
+      "min": -4.75,
+      "max": 3.25
+    },
+    "era5_SPI3": {
+      "n": 3040,
+      "mean": -0.001,
+      "sd": 1.0,
+      "min": -3.01,
+      "max": 2.68
+    },
+    "era5_SPI6": {
+      "n": 2992,
+      "mean": -0.0,
+      "sd": 1.0,
+      "min": -3.09,
+      "max": 2.83
+    },
+    "era5_SPEI3": {
+      "n": 3040,
+      "mean": -0.012,
+      "sd": 1.12,
+      "min": -4.75,
+      "max": 4.75
+    },
+    "era5_SPEI6": {
+      "n": 2992,
+      "mean": -0.027,
+      "sd": 1.157,
+      "min": -4.75,
+      "max": 4.75
+    }
+  },
+  "worst_century_droughts": [
+    {
+      "name": "Masindi",
+      "month": "1952-11",
+      "SPI12": -4.753
+    },
+    {
+      "name": "Masindi",
+      "month": "1952-12",
+      "SPI12": -4.753
+    },
+    {
+      "name": "Masindi",
+      "month": "1953-01",
+      "SPI12": -4.753
+    },
+    {
+      "name": "Masindi",
+      "month": "1953-02",
+      "SPI12": -4.753
+    },
+    {
+      "name": "Masindi",
+      "month": "1953-03",
+      "SPI12": -4.753
+    },
+    {
+      "name": "Masindi",
+      "month": "1953-04",
+      "SPI12": -4.753
+    },
+    {
+      "name": "Masindi",
+      "month": "1953-05",
+      "SPI12": -4.752
+    },
+    {
+      "name": "Masindi",
+      "month": "1952-10",
+      "SPI12": -4.336
+    }
+  ],
+  "decade_drought_trend": [
+    {
+      "decade": 1920,
+      "n_months": 136,
+      "drought_freq": 0.11,
+      "severe_freq": 0.044,
+      "extreme_freq": 0.037
+    },
+    {
+      "decade": 1930,
+      "n_months": 499,
+      "drought_freq": 0.104,
+      "severe_freq": 0.028,
+      "extreme_freq": 0.006
+    },
+    {
+      "decade": 1940,
+      "n_months": 600,
+      "drought_freq": 0.23,
+      "severe_freq": 0.11,
+      "extreme_freq": 0.038
+    },
+    {
+      "decade": 1950,
+      "n_months": 638,
+      "drought_freq": 0.149,
+      "severe_freq": 0.069,
+      "extreme_freq": 0.036
+    },
+    {
+      "decade": 1960,
+      "n_months": 762,
+      "drought_freq": 0.098,
+      "severe_freq": 0.045,
+      "extreme_freq": 0.016
+    },
+    {
+      "decade": 1970,
+      "n_months": 776,
+      "drought_freq": 0.085,
+      "severe_freq": 0.04,
+      "extreme_freq": 0.015
+    },
+    {
+      "decade": 1980,
+      "n_months": 407,
+      "drought_freq": 0.233,
+      "severe_freq": 0.103,
+      "extreme_freq": 0.032
+    },
+    {
+      "decade": 2020,
+      "n_months": 427,
+      "drought_freq": 0.267,
+      "severe_freq": 0.101,
+      "extreme_freq": 0.021
+    }
+  ],
+  "register_droughts_checked": 4,
+  "register_droughts_with_spei_le_minus1": 3,
+  "register_drought_spei": [
+    {
+      "event": "UG-003",
+      "regions": "Northern",
+      "window": "2010-12-01..2011-06-30",
+      "n_district_months": 28,
+      "min_SPEI3": -0.63,
+      "min_SPEI6": -0.67,
+      "min_SPI6": -1.22
+    },
+    {
+      "event": "UG-013",
+      "regions": "Northern",
+      "window": "2016-01-01..2016-08-31",
+      "n_district_months": 32,
+      "min_SPEI3": -1.14,
+      "min_SPEI6": -2.22,
+      "min_SPI6": -1.1
+    },
+    {
+      "event": "UG-015",
+      "regions": "Northern;Eastern",
+      "window": "2018-01-01..2018-06-30",
+      "n_district_months": 54,
+      "min_SPEI3": -4.75,
+      "min_SPEI6": -1.72,
+      "min_SPI6": -1.42
+    },
+    {
+      "event": "UG-022",
+      "regions": "Northern",
+      "window": "2020-10-01..2021-03-31",
+      "n_district_months": 24,
+      "min_SPEI3": -0.34,
+      "min_SPEI6": 0.26,
+      "min_SPI6": -0.01
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "weights": {
+    "I": 0.3,
+    "D": 0.2,
+    "S": 0.2,
+    "M": 0.15,
+    "F": 0.15
+  },
+  "n_events": 32,
+  "ucasi_range": [
+    11.7,
+    88.3
+  ],
+  "severity_counts": {
+    "Low": 13,
+    "Moderate": 9,
+    "High": 6,
+    "Extreme": 4
+  },
+  "top_events": [
+    {
+      "event_id": "UG-001",
+      "type": "Flood",
+      "start": "2010-03-01",
+      "regions": "Eastern;Central",
+      "UCASI": 88.3,
+      "severity": "Extreme",
+      "districts_affected": 10
+    },
+    {
+      "event_id": "UG-027",
+      "type": "Landslide",
+      "start": "2022-07-01",
+      "regions": "Central",
+      "UCASI": 80.4,
+      "severity": "Extreme",
+      "districts_affected": 5
+    },
+    {
+      "event_id": "UG-015",
+      "type": "Drought",
+      "start": "2018-01-01",
+      "regions": "Northern;Eastern",
+      "UCASI": 78.7,
+      "severity": "Extreme",
+      "districts_affected": 9
+    },
+    {
+      "event_id": "UG-030",
+      "type": "Flood",
+      "start": "2023-03-01",
+      "regions": "Eastern",
+      "UCASI": 76.1,
+      "severity": "Extreme",
+      "districts_affected": 5
+    },
+    {
+      "event_id": "UG-010",
+      "type": "Flood",
+      "start": "2014-09-01",
+      "regions": "Western;Central",
+      "UCASI": 67.9,
+      "severity": "High",
+      "districts_affected": 6
+    },
+    {
+      "event_id": "UG-024",
+      "type": "Flood",
+      "start": "2021-10-01",
+      "regions": "Central;Eastern",
+      "UCASI": 67.3,
+      "severity": "High",
+      "districts_affected": 6
+    },
+    {
+      "event_id": "UG-031",
+      "type": "Flood",
+      "start": "2023-09-01",
+      "regions": "Northern",
+      "UCASI": 63.3,
+      "severity": "High",
+      "districts_affected": 4
+    },
+    {
+      "event_id": "UG-016",
+      "type": "Flood",
+      "start": "2018-03-01",
+      "regions": "Eastern;Western",
+      "UCASI": 61.8,
+      "severity": "High",
+      "districts_affected": 5
+    }
+  ],
+  "mean_ucasi_by_type": {
+    "Drought": 53.8,
+    "Flood": 48.8,
+    "Landslide": 35.2
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "GenericEnsemble": {
+    "index": "is_anomaly(ensemble)",
+    "n_events": 32,
+    "detection_rate": 0.688,
+    "random_null_detection_rate": 1.0,
+    "mean_hit_rate": 0.06,
+    "median_lead_days": 22.5,
+    "pct_lead_ge3d": 0.955
+  },
+  "TypeMatched_all": {
+    "n_events": 32,
+    "detection_rate": 0.656,
+    "mean_hit_rate": 0.049,
+    "median_lead_days": 21.0,
+    "pct_lead_ge3d": 1.0,
+    "by_type_detection": {
+      "Drought": 0.5,
+      "Flood": 0.875,
+      "Landslide": 0.417
+    }
+  }
+}

@@ -1,0 +1,10 @@
+variable,shap_mean_abs
+temperature_2m_max,0.10752297302254929
+temperature_2m_mean,0.0961313308819505
+relative_humidity_2m_mean,0.09401393138905496
+pressure_msl_mean,0.038443945876711134
+wind_speed_10m_max,0.03631288028270903
+et0_fao_evapotranspiration,0.02762902885287924
+temperature_2m_min,0.018266205297731937
+precipitation_sum,0.014276596533341325
+shortwave_radiation_sum,0.011192264167243842

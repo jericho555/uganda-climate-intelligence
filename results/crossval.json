@@ -1,0 +1,98 @@
+{
+  "Arua->Arua": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.998,
+    "tmax": 0.993,
+    "tmin": 0.99,
+    "prcp": 0.939
+  },
+  "Gulu->Gulu": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.999,
+    "tmax": 0.996,
+    "tmin": 0.992,
+    "prcp": 0.931
+  },
+  "Masindi->Masindi": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.997,
+    "tmax": 0.993,
+    "tmin": 0.972,
+    "prcp": 0.977
+  },
+  "Soroti->Soroti": {
+    "n_months": 66,
+    "overlap": "2018-07-01..2023-12-01",
+    "tmean~tavg": 0.949,
+    "tmax": 0.97,
+    "tmin": 0.573,
+    "prcp": 0.269
+  },
+  "Kasese->FortPortal": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.948,
+    "tmax": 0.93,
+    "tmin": 0.7,
+    "prcp": 0.834
+  },
+  "Kampala->Kampala": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.967,
+    "tmax": 0.941,
+    "tmin": 0.952,
+    "prcp": 0.919
+  },
+  "Jinja->Jinja": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.991,
+    "tmax": 0.952,
+    "tmin": 0.978,
+    "prcp": 0.918
+  },
+  "Tororo->Tororo": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.993,
+    "tmax": 0.981,
+    "tmin": 0.934,
+    "prcp": 0.913
+  },
+  "Mbarara->Mbarara": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.991,
+    "tmax": 0.985,
+    "tmin": 0.885,
+    "prcp": 0.889
+  },
+  "Entebbe Airport->Kampala": {
+    "n_months": 190,
+    "overlap": "2008-01-01..2023-12-01",
+    "tmean~tavg": 0.76,
+    "tmax": 0.53,
+    "tmin": 0.296,
+    "prcp": 0.139
+  },
+  "Kabale->Mbarara": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.793,
+    "tmax": 0.728,
+    "tmin": 0.418,
+    "prcp": 0.738
+  },
+  "Lira->Lira": {
+    "n_months": 36,
+    "overlap": "2021-01-01..2023-12-01",
+    "tmean~tavg": 0.999,
+    "tmax": 0.999,
+    "tmin": 0.991,
+    "prcp": 0.934
+  }
+}

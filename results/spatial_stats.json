@@ -1,0 +1,37 @@
+{
+  "moran_global_I": -0.16235872022270123,
+  "moran_z": -1.0174772981724667,
+  "moran_p": 0.2839,
+  "n_districts": 16,
+  "hotspots": [
+    "Mbale"
+  ],
+  "coldspots": [],
+  "top5_anomaly_rate": [
+    {
+      "location": "Mbale",
+      "region": "Eastern",
+      "anomaly_rate": 0.10557837097878166
+    },
+    {
+      "location": "Luweero",
+      "region": "Central",
+      "anomaly_rate": 0.058008213552361396
+    },
+    {
+      "location": "Mityana",
+      "region": "Central",
+      "anomaly_rate": 0.05783709787816564
+    },
+    {
+      "location": "Lira",
+      "region": "Northern",
+      "anomaly_rate": 0.0568104038329911
+    },
+    {
+      "location": "Wakiso",
+      "region": "Central",
+      "anomaly_rate": 0.055441478439425054
+    }
+  ]
+}

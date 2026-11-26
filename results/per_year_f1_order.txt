@@ -1,0 +1,14 @@
+OCSVM
+IsolationForest
+COPOD
+ECOD
+HBOS
+PCA
+SOD
+LODA
+Zscore(max)
+SeasonalESD
+AutoEncoder
+MCD
+KNN
+LOF

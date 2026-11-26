@@ -1,0 +1,99 @@
+{
+  "yield_trend_pct_per_year": 1.1,
+  "yield_years": [
+    1961,
+    2024
+  ],
+  "climate_gap_note": "no continuous in-situ or reanalysis daily moisture 1990-2007 (station reporting collapse)",
+  "meteostat_century_linkage": {
+    "long_rains:SPI3": {
+      "n": 26,
+      "years": "1961-1986",
+      "pearson_r": 0.108,
+      "pearson_p": 0.601,
+      "spearman_r": 0.208,
+      "spearman_p": 0.309,
+      "slope_pct_per_sd": 2.68,
+      "wet_minus_dry_yieldgap_pct": 5.37
+    },
+    "bimodal:SPI3": {
+      "n": 26,
+      "years": "1961-1986",
+      "pearson_r": 0.113,
+      "pearson_p": 0.584,
+      "spearman_r": 0.098,
+      "spearman_p": 0.633,
+      "slope_pct_per_sd": 3.81,
+      "wet_minus_dry_yieldgap_pct": 7.61
+    }
+  },
+  "era5_modern_linkage": {
+    "long_rains:SPI3": {
+      "n": 16,
+      "years": "2008-2023",
+      "pearson_r": 0.285,
+      "pearson_p": 0.285,
+      "spearman_r": 0.224,
+      "spearman_p": 0.405,
+      "slope_pct_per_sd": 6.14,
+      "wet_minus_dry_yieldgap_pct": 12.28
+    },
+    "long_rains:SPEI3": {
+      "n": 16,
+      "years": "2008-2023",
+      "pearson_r": 0.256,
+      "pearson_p": 0.339,
+      "spearman_r": 0.188,
+      "spearman_p": 0.485,
+      "slope_pct_per_sd": 4.92,
+      "wet_minus_dry_yieldgap_pct": 9.84
+    },
+    "bimodal:SPI3": {
+      "n": 16,
+      "years": "2008-2023",
+      "pearson_r": 0.275,
+      "pearson_p": 0.302,
+      "spearman_r": 0.4,
+      "spearman_p": 0.125,
+      "slope_pct_per_sd": 9.24,
+      "wet_minus_dry_yieldgap_pct": 18.49
+    },
+    "bimodal:SPEI3": {
+      "n": 16,
+      "years": "2008-2023",
+      "pearson_r": 0.273,
+      "pearson_p": 0.306,
+      "spearman_r": 0.379,
+      "spearman_p": 0.147,
+      "slope_pct_per_sd": 8.49,
+      "wet_minus_dry_yieldgap_pct": 16.99
+    }
+  },
+  "worst_drought_years_vs_yield": {},
+  "drought_events_yield_anomaly": [
+    {
+      "event": "UG-003",
+      "year": 2010,
+      "yield_anom_pct": 13.2,
+      "regions": "Northern"
+    },
+    {
+      "event": "UG-013",
+      "year": 2016,
+      "yield_anom_pct": 1.6,
+      "regions": "Northern"
+    },
+    {
+      "event": "UG-015",
+      "year": 2018,
+      "yield_anom_pct": -34.7,
+      "regions": "Northern;Eastern"
+    },
+    {
+      "event": "UG-022",
+      "year": 2020,
+      "yield_anom_pct": -17.9,
+      "regions": "Northern"
+    }
+  ]
+}

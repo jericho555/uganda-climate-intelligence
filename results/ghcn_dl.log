@@ -1,0 +1,6 @@
+downloading stations table ...
+total lines: 133041
+Traceback (most recent call last):
+  File "c:\Users\Surface\Desktop\publish\uganda-climate-intelligence\src\_ghcn_dl.py", line 20, in <module>
+    elev=float(elev) if elev else None, name=name))
+ValueError: could not convert string to float: '7   25.'

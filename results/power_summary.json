@@ -1,0 +1,35 @@
+{
+  "power_span": "1988-01-01..2007-12-31",
+  "power_districts": 19,
+  "power_daily_rows": 138795,
+  "reliability": {
+    "Entebbe Airport~Kampala": {
+      "n_months": 54,
+      "r": 0.516,
+      "bias": -0.01
+    }
+  },
+  "reliability_mean_r": 0.516,
+  "continuous_temp_span": "1988-01-01..2023-12-01",
+  "national_temp_tau": -0.026,
+  "national_temp_p": 0.42149653839489876,
+  "national_temp_sens_per_decade_C": -0.039,
+  "districts_warming_sig": 7,
+  "districts_temp_tested": 19,
+  "temp_power_segment": {
+    "n_warm_sig": 19,
+    "n_cool_sig": 0,
+    "mean_tau": 0.217,
+    "span": "1988-2007"
+  },
+  "temp_era5_segment": {
+    "n_warm_sig": 5,
+    "n_cool_sig": 3,
+    "mean_tau": 0.052,
+    "span": "2008-2023"
+  },
+  "districts_humidity_drying_sig": 15,
+  "districts_humidity_tested": 19,
+  "rh_mean_tau": -0.181,
+  "sw_mean_tau": -0.01
+}

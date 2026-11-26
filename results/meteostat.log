@@ -1,0 +1,149 @@
+downloading meteostat station metadata (~22MB gz) ...
+Uganda stations: 14
+[ok] 63602 0       Arua
+1       Arua
+2       Arua
+3       Arua
+4       Arua
+        ... 
+3862    Arua
+3863    Arua
+3864    Arua
+3865    Arua
+3866    Arua
+Name: name, Length: 3867, dtype: object: 3867 rows 1971-04-01..2026-03-11
+[ok] 63630 0        Gulu
+1        Gulu
+2        Gulu
+3        Gulu
+4        Gulu
+         ... 
+23402    Gulu
+23403    Gulu
+23404    Gulu
+23405    Gulu
+23406    Gulu
+Name: name, Length: 23407, dtype: object: 23407 rows 1926-01-01..2026-03-11
+[ok] 63654 0        Masindi
+1        Masindi
+2        Masindi
+3        Masindi
+4        Masindi
+          ...   
+22753    Masindi
+22754    Masindi
+22755    Masindi
+22756    Masindi
+22757    Masindi
+Name: name, Length: 22758, dtype: object: 22758 rows 1926-01-01..2026-03-11
+[ok] 63658 0       Soroti
+1       Soroti
+2       Soroti
+3       Soroti
+4       Soroti
+         ...  
+2794    Soroti
+2795    Soroti
+2796    Soroti
+2797    Soroti
+2798    Soroti
+Name: name, Length: 2799, dtype: object: 2799 rows 2018-07-21..2026-03-19
+[ok] 63674 0       Kasese
+1       Kasese
+2       Kasese
+3       Kasese
+4       Kasese
+         ...  
+9600    Kasese
+9601    Kasese
+9602    Kasese
+9603    Kasese
+9604    Kasese
+Name: name, Length: 9605, dtype: object: 9605 rows 1964-01-01..2026-03-11
+[ok] 63680 0       Kampala
+1       Kampala
+2       Kampala
+3       Kampala
+4       Kampala
+         ...   
+1851    Kampala
+1852    Kampala
+1853    Kampala
+1854    Kampala
+1855    Kampala
+Name: name, Length: 1856, dtype: object: 1856 rows 2021-01-02..2026-03-11
+[ok] 63682 0        Jinja
+1        Jinja
+2        Jinja
+3        Jinja
+4        Jinja
+         ...  
+13016    Jinja
+13017    Jinja
+13018    Jinja
+13019    Jinja
+13020    Jinja
+Name: name, Length: 13021, dtype: object: 13021 rows 1955-01-01..2026-03-11
+[ok] 63684 0        Tororo
+1        Tororo
+2        Tororo
+3        Tororo
+4        Tororo
+          ...  
+22597    Tororo
+22598    Tororo
+22599    Tororo
+22600    Tororo
+22601    Tororo
+Name: name, Length: 22602, dtype: object: 22602 rows 1929-01-01..2026-03-11
+[ok] 63702 0        Mbarara
+1        Mbarara
+2        Mbarara
+3        Mbarara
+4        Mbarara
+          ...   
+20386    Mbarara
+20387    Mbarara
+20388    Mbarara
+20389    Mbarara
+20390    Mbarara
+Name: name, Length: 20391, dtype: object: 20391 rows 1926-01-01..2026-03-11
+[ok] 63705 0       Entebbe Airport
+1       Entebbe Airport
+2       Entebbe Airport
+3       Entebbe Airport
+4       Entebbe Airport
+             ...       
+6679    Entebbe Airport
+6680    Entebbe Airport
+6681    Entebbe Airport
+6682    Entebbe Airport
+6683    Entebbe Airport
+Name: name, Length: 6684, dtype: object: 6684 rows 1957-01-01..2026-03-19
+[ok] 63726 0        Kabale
+1        Kabale
+2        Kabale
+3        Kabale
+4        Kabale
+          ...  
+22521    Kabale
+22522    Kabale
+22523    Kabale
+22524    Kabale
+22525    Kabale
+Name: name, Length: 22526, dtype: object: 22526 rows 1926-01-01..2026-03-11
+[ok] HULI0 0       Lira
+1       Lira
+2       Lira
+3       Lira
+4       Lira
+        ... 
+1848    Lira
+1849    Lira
+1850    Lira
+1851    Lira
+1852    Lira
+Name: name, Length: 1853, dtype: object: 1853 rows 2021-01-02..2026-03-07
+
+METEOSTAT  stations=12/14  rows=151369  range=1926-01-01..2026-03-19
+years covered: 91

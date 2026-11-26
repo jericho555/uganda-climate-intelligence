@@ -1,0 +1,214 @@
+{
+  "n_stations_daily": 13,
+  "record_start": "1926-01-01",
+  "record_end": "2026-03-19",
+  "years_covered": 91,
+  "n_daily_rows": 151369,
+  "n_trend_tests": 12,
+  "n_significant": 10,
+  "temp_warming_sig": 3,
+  "temp_tests": 3,
+  "precip_sig": 7,
+  "precip_tests": 9,
+  "strongest_warming": [
+    {
+      "name": "Entebbe Airport",
+      "variable": "tmin",
+      "tau": 0.4665018767737801,
+      "p_value": 0.0,
+      "sens_slope": 0.00685,
+      "first": "1957-01-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Entebbe Airport",
+      "variable": "tavg",
+      "tau": 0.34918978302664105,
+      "p_value": 0.0,
+      "sens_slope": 0.00435,
+      "first": "1957-01-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Entebbe Airport",
+      "variable": "tmax",
+      "tau": 0.21547193994323904,
+      "p_value": 4.9403741098075216e-09,
+      "sens_slope": 0.00315,
+      "first": "1957-01-01",
+      "last": "2026-03-01"
+    }
+  ],
+  "precip_trends": [
+    {
+      "name": "Mbarara",
+      "tau": -0.39300805114224974,
+      "p_value": 0.0,
+      "sens_slope": -0.0445,
+      "first": "1926-01-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Gulu",
+      "tau": -0.38913531479122493,
+      "p_value": 0.0,
+      "sens_slope": -0.08412,
+      "first": "1926-01-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Tororo",
+      "tau": -0.3778009027560369,
+      "p_value": 0.0,
+      "sens_slope": -0.09245,
+      "first": "1929-01-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Masindi",
+      "tau": -0.3618574196787565,
+      "p_value": 0.0,
+      "sens_slope": -0.07232,
+      "first": "1926-01-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Kabale",
+      "tau": -0.35433724682313616,
+      "p_value": 0.0,
+      "sens_slope": -0.05234,
+      "first": "1937-03-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Jinja",
+      "tau": -0.341032910144213,
+      "p_value": 0.0,
+      "sens_slope": -0.06497,
+      "first": "1955-01-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Kasese",
+      "tau": -0.30248967272126936,
+      "p_value": 0.0,
+      "sens_slope": 0.0,
+      "first": "1964-01-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Arua",
+      "tau": -0.014843426679542006,
+      "p_value": 0.4084445810313435,
+      "sens_slope": 0.0,
+      "first": "1971-04-01",
+      "last": "2026-03-01"
+    },
+    {
+      "name": "Kabale",
+      "tau": 0.053510226644555,
+      "p_value": 0.3582175006944297,
+      "sens_slope": 0.11333,
+      "first": "1926-01-01",
+      "last": "1937-03-01"
+    }
+  ],
+  "crossval": {
+    "Arua->Arua": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.998,
+      "tmax": 0.993,
+      "tmin": 0.99,
+      "prcp": 0.939
+    },
+    "Gulu->Gulu": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.999,
+      "tmax": 0.996,
+      "tmin": 0.992,
+      "prcp": 0.931
+    },
+    "Masindi->Masindi": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.997,
+      "tmax": 0.993,
+      "tmin": 0.972,
+      "prcp": 0.977
+    },
+    "Soroti->Soroti": {
+      "n_months": 66,
+      "overlap": "2018-07-01..2023-12-01",
+      "tmean~tavg": 0.949,
+      "tmax": 0.97,
+      "tmin": 0.573,
+      "prcp": 0.269
+    },
+    "Kasese->FortPortal": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.948,
+      "tmax": 0.93,
+      "tmin": 0.7,
+      "prcp": 0.834
+    },
+    "Kampala->Kampala": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.967,
+      "tmax": 0.941,
+      "tmin": 0.952,
+      "prcp": 0.919
+    },
+    "Jinja->Jinja": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.991,
+      "tmax": 0.952,
+      "tmin": 0.978,
+      "prcp": 0.918
+    },
+    "Tororo->Tororo": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.993,
+      "tmax": 0.981,
+      "tmin": 0.934,
+      "prcp": 0.913
+    },
+    "Mbarara->Mbarara": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.991,
+      "tmax": 0.985,
+      "tmin": 0.885,
+      "prcp": 0.889
+    },
+    "Entebbe Airport->Kampala": {
+      "n_months": 190,
+      "overlap": "2008-01-01..2023-12-01",
+      "tmean~tavg": 0.76,
+      "tmax": 0.53,
+      "tmin": 0.296,
+      "prcp": 0.139
+    },
+    "Kabale->Mbarara": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.793,
+      "tmax": 0.728,
+      "tmin": 0.418,
+      "prcp": 0.738
+    },
+    "Lira->Lira": {
+      "n_months": 36,
+      "overlap": "2021-01-01..2023-12-01",
+      "tmean~tavg": 0.999,
+      "tmax": 0.999,
+      "tmin": 0.991,
+      "prcp": 0.934
+    }
+  }
+}

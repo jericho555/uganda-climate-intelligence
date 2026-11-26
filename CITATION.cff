@@ -1,0 +1,35 @@
+# CITATION.cff — read by GitHub's "Cite this repository" and ingested by Zenodo.
+# The DOI below is a PLACEHOLDER. A real concept/version DOI is minted only after
+# you connect this repository to Zenodo and publish a GitHub release (see README).
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Uganda Climate Intelligence Framework (UCIF)"
+abstract: >-
+  Reproducible pipeline and manuscript behind "A Climate Intelligence Framework
+  for Detecting, Validating and Assessing Weather Anomalies in Uganda". Builds a
+  ground-truth-honest benchmark of unsupervised anomaly detectors against a
+  curated disaster register, adds century-scale in-situ trends, an independent
+  NASA POWER gap-fill of the 1990-2007 observing collapse, derived SPI/SPEI
+  drought indices, a cereal-yield impact linkage, the UCASI severity index and
+  SHAP-based explainability. Every reported number is computed by the pipeline.
+authors:
+  - family-names: Masaba
+    given-names: Jeremiah
+    orcid: "https://orcid.org/0009-0004-5620-996X"
+    affiliation: "Department of Computer Science, Makerere University, Kampala, Uganda"
+repository-code: "https://github.com/REPLACE-WITH-USERNAME/uganda-climate-intelligence"
+# doi: "10.5281/REPLACE-AFTER-ZENODO-RELEASE"   # uncomment only once minted
+license: MIT
+keywords:
+  - climate intelligence
+  - anomaly detection
+  - Uganda
+  - drought
+  - SPI
+  - SPEI
+  - ERA5
+  - NASA POWER
+  - Meteostat
+  - reproducible research
+version: "1.0.0"
+date-released: "2026-11-26"

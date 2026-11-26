@@ -1,0 +1,14 @@
+numpy>=1.26
+pandas>=2.0
+scipy>=1.11
+scikit-learn>=1.4
+pyod>=1.1
+statsmodels>=0.14
+pymannkendall>=1.4
+ruptures>=1.1
+shap>=0.45
+scikit-posthocs>=0.8
+matplotlib>=3.8
+seaborn>=0.13
+geopandas>=0.14
+meteostat>=1.7

@@ -1,0 +1,811 @@
+%% A Climate Intelligence Framework for Detecting, Validating and Assessing
+%% Weather Anomalies in Uganda
+%% Target venue: Environmental Modelling & Software (Elsevier)
+%% Class: elsarticle. Compile: pdflatex main; bibtex main; pdflatex x2
+\documentclass[preprint,12pt]{elsarticle}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{lineno}
+\modulolinenumbers[5]
+
+\journal{Environmental Modelling \& Software}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{A Climate Intelligence Framework for Detecting, Validating and
+Assessing Weather Anomalies in Uganda}
+
+\author[inst1]{Jeremiah Masaba\corref{cor1}}
+\ead{masabjericho@gmail.com}
+\affiliation[inst1]{organization={Department of Computer Science,
+College of Computing and Communication Sciences, Makerere University},
+city={Kampala}, country={Uganda}}
+
+\cortext[cor1]{Corresponding author.}
+
+\begin{abstract}
+Unsupervised anomaly detection is widely proposed as an early-warning tool for
+weather-related disasters, yet most published evaluations on African climate
+records report near-perfect scores obtained without any independent
+ground-truth against which to validate. We build a fully reproducible
+\emph{climate intelligence framework} for Uganda that integrates (i) 16 years of
+open, reanalysis-based daily weather (ERA5, 16 districts, 93{,}504
+district-days, 13 variables), (ii) a curated register of 32 documented
+climate disasters used as held-out ground truth, (iii) a benchmark of 17
+anomaly detectors under chronological (train $\leq$2018 / test 2019--2023)
+evaluation with bootstrap confidence intervals and Friedman/Nemenyi testing,
+(iv) GIS hotspot analysis (Global/Local Moran's $I$, Getis--Ord $G_i^*$),
+(v) long-term trend testing (Mann--Kendall, Sen's slope, change points), and
+(vi) a novel composite severity index, the \textbf{Uganda Climate Anomaly
+Severity Index (UCASI)}, with SHAP-based explainability. Our central, and
+deliberately uncomfortable, finding is that \emph{no} generic unsupervised
+detector --- statistical, isolation/nearest-neighbour, or autoencoder ---
+beats chance against real disaster windows (held-out ROC-AUC 0.49--0.51;
+best F1 $=0.083$; best PR-AUC $=0.117$ against a base rate of $0.1115$), and
+that apparent event coverage (68.8\%) is fully explained by a size-matched
+random null (100\%). This directly refutes earlier reports of AUC $=1.0$ on the
+same record and shows why ground-truth-honest evaluation matters. The framework
+nevertheless yields defensible climate intelligence over a widened record that
+spans from a 16-year ERA5 detection window to a \textbf{91-year in-situ series}
+(12 Meteostat stations, 1926--2026): a significant warming signal (22 of 48
+series rising; Kampala $T_{max}$ $\tau=0.42$, $p<10^{-16}$) corroborated
+in-situ (Entebbe $T_{min}$ $\tau=0.47$) alongside a near-century precipitation
+decline ($\tau\approx-0.39$ at Mbarara/Gulu), a coherent east-African
+drying/warming contrast at the detected Mbale hotspot ($G_i^*=3.50$), and ERA5
+validated against collocated stations ($r=0.95$--$0.999$). An \emph{independent}
+second reanalysis (NASA POWER, MERRA-2) closes the 1990--2007 in-situ reporting
+collapse for temperature, humidity and radiation, showing \emph{all 19 districts}
+warm significantly through the dark period and \emph{15 of 19} dry in near-surface
+humidity. Standardised
+drought indices (SPI/SPEI) built from these data independently confirm 3 of 4
+documented register droughts --- signal that the raw daily detectors miss --- and
+a 64-year cereal-yield series shows the 2018 drought (min SPEI$_3=-4.75$) was
+the worst detrended yield year on record, while a national-annual linear link
+stays insignificant (regional droughts are masked by aggregation). A UCASI
+severity ranking places its top events on the 2010 eastern floods, the 2022 central
+landslide and the 2018 northern/eastern drought. We conclude that weather-only
+daily anomaly detection is insufficient for operational event-level early
+warning, and we release the pipeline, register and index as reusable building
+blocks.
+\end{abstract}
+
+\begin{keyword}
+climate intelligence \sep anomaly detection \sep early warning \sep Uganda \sep
+ERA5 \sep UCASI \sep reproducible evaluation
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
+
+%============================================================================
+\section{Introduction}
+Weather-related disasters --- flood, landslide and drought --- dominate the
+Ugandan hazard record and are expected to intensify under climate change
+\cite{ipcc2022,unma2022}. A growing body of work proposes unsupervised anomaly
+detection as a low-cost early-warning mechanism, because labelled disaster data
+are scarce and machine learning can in principle flag ``abnormal'' weather
+without supervision \cite{chandola2009,pang2021}. Several studies on African
+weather records report exceptional performance; for example, an evaluation on a
+Meteoblue Uganda dataset declared precision, recall and ROC-AUC all equal to
+$1.0$ \cite{masaba2023}.
+
+Such perfect scores are a statistical red flag. Anomaly detection is
+unsupervised by construction: without an \emph{independent, held-out} record of
+what actually constituted a disaster, ``accuracy'' is undefined, and any
+threshold tuned on the same data trivially separates itself. The absence of
+rigorous ground truth is not merely an academic nicety --- it inflates reported
+skill, misdirects scarce adaptation funding, and can embed false confidence into
+operational warning chains \cite{rietsch2020,gunderson2022}.
+
+This paper reframes the question from \emph{``which detector is most
+accurate?''} (unanswerable without labels) to \emph{``what does a
+reproducible, ground-truth-honest climate intelligence framework reveal about
+Uganda's weather anomalies, and where does unsupervised detection genuinely
+help?''}. We assemble the first such framework for Uganda and report every
+number from a single, auditable pipeline.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+\item A fully reproducible pipeline (open ERA5 reanalysis, CC-BY 4.0) spanning
+16 districts, 13 daily variables and 16 years, with a curated and citable
+disaster-event register used as external ground truth (Section~\ref{sec:data}).
+\item The first held-out, ground-truth benchmark of 17 anomaly detectors for
+Ugandan weather, with bootstrap confidence intervals, multi-seed stability and
+Friedman/Nemenyi ranking, and --- critically --- a size-matched random null
+(Section~\ref{sec:rq1}).
+\item GIS spatial intelligence (Global/Local Moran's $I$, Getis--Ord $G_i^*$)
+and temporal intelligence (Mann--Kendall, Sen's slope, STL, change points)
+computed directly on the record (Sections~\ref{sec:rq2}--\ref{sec:rq4}).
+\item Physically-interpreted \emph{derived} drought indices (SPI/SPEI) computed
+on both the century in-situ record and ERA5, which --- unlike the generic daily
+detectors --- independently corroborate documented drought events
+(Sections~\ref{sec:drought}--\ref{sec:droughtres}).
+\item An \emph{agricultural impact} layer coupling the drought indices to a 64-yr
+World Bank cereal-yield series, delivering an honest two-sided finding (severe
+droughts coincide with the worst yield years, yet national-annual linkage is
+confounded) (Section~\ref{sec:agrires}).
+\item A novel composite severity index, \textbf{UCASI}, that fuses intensity,
+duration, spatial spread, multivariate concurrence and frequency into a 0--100
+score with severity bands (Section~\ref{sec:ucasi}).
+\item SHAP-based explainability of the detection signal and an honest assessment
+of operational early-warning feasibility (Sections~\ref{sec:rq3}--\ref{sec:rq6}).
+\end{enumerate}
+
+\paragraph{Research questions.}
+RQ1: which detectors generalise to held-out disaster windows?
+RQ2: are anomalies spatially clustered, and where are hotspots?
+RQ3: which weather variables drive the detection signal?
+RQ4: are the climate series trending, and are anomalies stable across seeds/years?
+RQ5: do detected anomalies correspond to documented events?
+RQ6: can this support operational early warning?
+
+%============================================================================
+\section{Related work}\label{sec:related}
+Anomaly-detection taxonomies distinguish statistical (z-score, extreme student
+deviate), density/distance ($k$NN, LOF), tree/isolation (Isolation Forest),
+linear (PCA, EllipticEnvelope/MCD), information-theoretic (HBOS, LODA, ECOD,
+COPOD) and deep (autoencoder, VAE) families \cite{chandola2009,pang2021}.
+PyOD consolidates these and is our benchmark substrate \cite{zhao2019}.
+Spatial-dependence statistics (Moran's $I$, Getis--Ord $G_i^*$) are standard in
+GIScience \cite{anselin1995,ord1995}; non-parametric trend testing
+(Mann--Kendall, Sen's slope) is recommended by WMO for hydrometeorology
+\cite{hirsch1984}. In machine learning for development contexts, several authors
+warn that benchmark metrics without ground truth are misleading
+\cite{rietsch2020,gunderson2022,boyd2022}. Our work operationalises this critique
+for Ugandan climate data and, unlike prior studies \cite{masaba2023}, evaluates
+against an external disaster register rather than self-referential labels.
+
+%============================================================================
+\section{Study area and data}\label{sec:data}
+\subsection{Spatial and temporal scope}
+We analyse 19 (16 successfully retrieved) district/urban centroids covering all
+four Ugandan administrative regions (Central, Eastern, Northern, Western),
+each represented by its WGS84 centroid and mean elevation
+(Table~\ref{tab:data}). The study period is 1 January 2008--31 December 2023.
+
+\subsection{Data sources and provenance}
+Daily multivariate weather is drawn from the ERA5 reanalysis
+\cite{hersbach2020} via the Open-Meteo Archive API (CC-BY 4.0): 13 variables
+including $T_{max}$, $T_{min}$, $T_{mean}$, precipitation sum and hours,
+relative humidity, wind speed/gust/direction, mean sea-level and surface
+pressure, shortwave radiation and FAO-56 reference evapotranspiration
+(ET$_0$). The resulting detection matrix contains 93{,}504 district-days with
+0\, missing values.
+
+\emph{Long in-situ record (range extension).} To widen the temporal footprint
+far beyond the 16-year reanalysis window and to obtain an \emph{independent}
+observational check, we additionally retrieve the full historical daily record
+for every Meteostat station in Uganda (CC-BY 4.0 bulk) \cite{munoz2020meteostat}.
+Twelve stations return data (Arua, Gulu, Masindi, Soroti, Kasese, Kampala,
+Jinja, Tororo, Mbarara, Entebbe~Airport, Kabale, Lira) totalling 151{,}369
+station-days spanning \textbf{1926-01-01 to 2026-03-19 --- 91 years}, roughly
+$5.7\times$ longer than the ERA5 window. These century-scale series drive the
+instrumental trend analysis (Section~\ref{sec:insitu}) and the ERA5
+validation below; the detection benchmark itself remains on the feature-complete
+ERA5 partition so that unlabeled pre-2008 years never leak into evaluation.
+
+\emph{Independent gap-fill reanalysis (NASA POWER).} The Meteostat in-situ
+record has a genuine \emph{reporting collapse over 1990--2007}: the Ugandan
+stations stopped filing daily data (confirmed empty on the NCEI GHCN service),
+so neither Meteostat (pre-1990 / post-2020) nor ERA5 (from 2008) covers that
+window. We therefore add a second, \emph{independent} reanalysis --- NASA
+POWER \cite{white2023power}, MERRA-2-based, openly licensed, plain-JSON and
+not subject to the archive-API throttling that blocked our ERA5 back-fill.
+For all 19 district centroids we retrieve daily $T_{2m}$, near-surface relative
+humidity and surface downwelling shortwave radiation over
+\textbf{1988-01-01 to 2007-12-31} (138{,}795 district-days, 0 missing), which
+\emph{closes the 1990--2007 multivariate gap for temperature, humidity and
+radiation}. POWER is validated against the co-located Meteostat station over
+their 1988--89 overlap (mean bias $-0.01$\,$^\circ$C), and is used only for
+climatology/trend analysis --- never to impute precipitation, which POWER does
+not expose in the reachable data community here (reported transparently).
+
+\emph{Note on Meteoblue.} The original record was sourced from Meteoblue. Its
+bulk CSV export for non-European locations is commercial (history+ tier), and its
+History API rejects unauthenticated scripting; we therefore substitute ERA5, a
+peer-reviewed, openly licensed reanalysis that is spatially complete and
+independently citable --- a change that improves rather than limits
+reproducibility, and which we report transparently.
+
+\subsection{Ground-truth disaster register}\label{sec:register}
+We compile 32 documented climate disasters (16 floods, 12 landslides, 4
+droughts) from public relief records (UN-OCHA/UNMA, EM-DAT, FAO and FEWS NET)
+\cite{emdat2023,unma2022,fewsnet2021}, each geocoded to affected regions with a
+start/end date defining an event window. Windows are used \emph{only} for
+external validation, never for training. This yields a held-out positive rate
+of 0.1115 on the test partition.
+
+\begin{table}[h]
+\centering\small
+\caption{Data summary (all values computed by the released pipeline).}
+\label{tab:data}
+\begin{tabular}{ll}
+\toprule
+Quantity & Value \\
+\midrule
+Districts analysed & 16 (of 19 configured) \\
+Study period & 2008-01-01 to 2023-12-31 \\
+District-day observations & 93{,}504 \\ 
+Daily variables & 13 \\
+Missing cells & 0 \\
+In-situ stations (Meteostat) & 12 \\
+Station-day record & 151{,}369 \\
+In-situ span & 1926-01-01 to 2026-03-19 (91 yr) \\
+POWER gap-fill & 19 districts, 1988--2007, 138{,}795 district-days \\
+POWER variables & $T_{2m}$, RH, shortwave (fills 1990--2007 gap) \\
+POWER validation & bias $-0.01$\,$^\circ$C vs Meteostat (1988--89) \\
+Daily variables (POWER) & 3 \\
+Cereal yield series & 64 yr (1961--2024), World Bank/FAOSTAT \\
+Train / test split & $\leq$2018 \,/\, 2019--2023 (chronological) \\
+Held-out positive rate & 0.1115 \\
+Ground-truth events & 32 (16 flood, 12 landslide, 4 drought) \\
+Sources & ERA5 via Open-Meteo (CC-BY 4.0); \\ & Meteostat bulk (CC-BY 4.0); \\ & NASA POWER / MERRA-2 (open); \\ & World Bank/FAOSTAT (CC BY 4.0) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%============================================================================
+\section{Methodology: the framework}\label{sec:methods}
+Figure~\ref{fig:benchmark} situates the pipeline. Six modules run in sequence:
+\emph{fetch} $\rightarrow$ \emph{preprocess/label} $\rightarrow$
+\emph{detect/benchmark} $\rightarrow$ \emph{spatial} $+$ \emph{temporal}
+$\rightarrow$ \emph{UCASI} $\rightarrow$ \emph{explain}, with all figures drawn
+programmatically from the resulting artefacts.
+
+\subsection{Seasonal-anomaly features}
+Raw daily values are converted to day-of-year seasonal anomalies: for each
+calendar day we estimate a climatology (mean and standard deviation across
+years, circularly smoothed over a $\pm$15-day window) and standardise, clipping
+to $|z|\leq 8$. To capture event \emph{persistence} --- the physical precursor
+of hydro-meteorological disaster --- we add antecedent indices computed as
+rolling means of the anomalies, re-standardised to unit variance:
+wetness over 5 and 10 days, a 60-day dryness index (sign-flipped precipitation),
+a 5-day heat index and a 30-day evaporative-demand index (sign-flipped ET$_0$).
+The detector feature vector thus has 14 dimensions (9 base $z$ + 5 antecedent).
+
+\subsection{Detector family}\label{sec:detectors}
+We benchmark 17 methods spanning every major family: max/union seasonal z-scores,
+Isolation Forest, LOF, $k$NN, HBOS, CBLOF, LODA, ECOD, COPOD, PCA,
+EllipticEnvelope, a shallow reconstruction autoencoder, and a rank-averaged
+ensemble optionally filtered by temporal persistence and region-relative
+thresholding. One-class SVM and MCD were evaluated but excluded from the
+final run: the former exhausts memory on 64k rows (kernel matrix), the latter
+proved numerically unstable at this dimensionality --- a reproducibility finding
+we report rather than hide. Deep (torch) autoencoder/VAE variants are supported
+but skipped where the deep-learning backend is unavailable.
+
+\subsection{Evaluation protocol}
+Evaluation is chronological to prevent leakage. Continuous scores are thresholded
+at the $(1-\gamma)$ quantile ($\gamma=0.05$); we report precision, recall, F1,
+ROC-AUC, PR-AUC and Matthews correlation. F1 and PR-AUC carry 95\% bootstrap
+confidence intervals ($B=800$); seed-stability is the standard deviation of F1
+over three seeds; cross-detector differences are tested with the Friedman
+statistic over the five test years, with Nemenyi post-hoc where required.
+\emph{All event-level coverage is reported against a size-matched random null}
+(Section~\ref{sec:rq1}), the single most important methodological safeguard here.
+
+\subsection{Spatial analysis (RQ2)}\label{sec:spatial}
+Using a fixed-band inverse-distance weights matrix ($\leq$220\,km, haversine)
+over district anomaly rates, we compute Global Moran's $I$ with 9{,}999-permutation
+inference, Local Moran's $I$, and Getis--Ord $G_i^*$ $z$-scores (self-inclusive),
+classifying hotspots/coldspots at $\alpha=0.05$.
+
+\subsection{Temporal analysis (RQ4)}\label{sec:temporal}
+Monthly series (2008--2023) per district and variable are tested with the
+Mann--Kendall trend test and Sen's slope \cite{hirsch1984,khan2021},
+decomposed with robust STL (period $=12$), and screened for structural breaks
+with a kernel change-point method (PELT, RBF cost). The identical non-parametric
+test is reapplied to the ~91-year Meteostat in-situ monthly series
+(Section~\ref{sec:insitu}) to push trend inference back to the 1920s and to
+cross-check the reanalysis-derived signal against ground observations.
+
+\subsection{Derived drought indices (SPI / SPEI)}\label{sec:drought}
+Raw weather anomalies answer ``is today unusual?'' but not ``is there an
+agriculturally meaningful drought, and how severe?'' We therefore add two
+standard, interpretable indices. The \emph{Standardised Precipitation Index}
+(SPI) is the $k$-month precipitation accumulation mapped through a
+per-calendar-month gamma distribution to a unit-normal variate
+\cite{mckee1993}; the \emph{Standardised Precipitation--Evapotranspiration
+Index} (SPEI) applies the same transformation to the water balance
+$P-\mathrm{ET}_0$ \cite{vicente2010}. Because the difference series takes
+negative values we fit a Pearson III distribution per month for SPEI. Zero-
+precipitation months use McKee's reduced-probability adjustment
+$P_e=q+(1-q)G(x)$. SPI is computed on the century in-situ record (kept only
+where a month has $\geq$22 observed days, so monthly totals are not
+under-sampled) and on the complete 2008--2023 ERA5 panel; SPEI uses ERA5
+$\mathrm{ET}_0$. All series are validated to be $\approx N(0,1)$ before use,
+and banded into drought classes at $\mathrm{SPI/SPEI}\leq-1.0$ (moderate),
+$\leq-1.5$ (severe), $\leq-2.0$ (extreme).
+
+\subsection{Agricultural impact linkage}\label{sec:agri}
+To move from detection to impact we couple the drought indices to real crop
+production. National cereal (maize-dominant) production and harvested area
+(1961--2024) are taken from the World Bank / FAOSTAT series \cite{worldbank2024},
+and yield is derived as $1000\,P/A$ (kg/ha). Because yield is dominated by a
+$+1.1\%$/yr intensification trend, we express the response as the \emph{residual}
+of log-yield on a full-series linear time trend (an annual \% yield anomaly).
+The predictor is the growing-season moisture index: Uganda is bimodal and its
+main cereals grow in the long rains (March--May, secondarily Sept--Nov), so we
+average the station/district-season SPI (and SPEI where ET$_0$ is available)
+over those months. The two observation substrates are correlated
+\emph{separately} --- in-situ Meteostat SPI over the well-covered 1961--1989
+window, and ERA5 SPI/SPEI over 2008--2023 --- because they are different systems
+that must not be pooled onto one scale; the 1990--2007 in-situ reporting gap is
+excluded rather than interpolated.
+
+\subsection{UCASI severity index}\label{sec:ucasi}
+For each event window we compute five normalised dimensions from the validated
+ensemble map: mean anomaly \emph{intensity} $I$, anomaly \emph{duration} $D$
+(anomaly-days), spatial \emph{spread} $S$ (districts affected), \emph{multivariate
+concurrence} $M$ (maximum features exceeding $|z|>2$ simultaneously) and temporal
+\emph{frequency} $F$ (same-type events per year). UCASI is a weighted composite
+scaled to $[0,100]$:
+\begin{equation}
+\mathrm{UCASI} = 100\,(w_I I + w_D D + w_S S + w_M M + w_F F),
+\end{equation}
+with $w_I{=}0.30$, $w_D{=}0.20$, $w_S{=}0.20$, $w_M{=}0.15$, $w_F{=}0.15$
+(weights fixed a priori to privilege physical intensity, then
+duration/spread, then concurrence/frequency; sensitivity to the weighting is
+discussed in Section~\ref{sec:threats}). Scores are banded into Low/Moderate/
+High/Extreme by quantile.
+
+\subsection{Explainability (RQ3)}\label{sec:xai}
+A Random-Forest surrogate is trained to reproduce the ensemble flag from the 14
+features; SHAP (TreeExplainer) and permutation importance then identify which
+variables \emph{drive the detection signal}, cross-checked against the raw
+correlation of each $z$-feature with the ensemble score. We are explicit that
+this interprets the detector, not disaster causation.
+
+\subsection{Reproducibility}
+Every figure and table is generated from artefacts (CSV/JSON/NPZ) written by a
+single command (\texttt{run\_all.py}); no value in this paper is hard-coded or
+manually entered. Seeds are fixed (\texttt{SEED}=42).
+
+%============================================================================
+\section{Results}\label{sec:results}
+
+\subsection{RQ1 --- Detection does not generalise to real disasters}
+\label{sec:rq1}
+Table~\ref{tab:benchmark} reports the held-out benchmark. The result is uniform
+and unambiguous: \emph{every} detector sits at chance. ROC-AUC spans
+0.494--0.507 across all 17 methods (0.5 is random), and PR-AUC spans
+0.111--0.117 around the base rate of 0.1115. The best F1 is 0.083 (LOF), with a
+95\% bootstrap interval of $[0.071,0.094]$ that comfortably contains the
+performance of flagging 5\% of days at random. The persistence- and
+region-filtered ensembles --- our constructive attempts to inject physical
+signal --- do not escape chance (best PR-AUC 0.117).
+
+Friedman testing over the five test years returns $\chi^2=20.29$,
+$p=4.4\times10^{-4}$, confirming the \emph{rankings differ}, but the differences
+are between methods that are all effectively non-informative; seed standard
+deviation of F1 is 0, so this is not a variance artefact.
+
+\begin{table}[h]
+\centering\small
+\caption{Held-out benchmark (test 2019--2023, $n=29{,}216$, base rate 0.1115).
+Subsets shown, ordered by PR-AUC. Full results for all 17 methods are in the
+released \texttt{benchmark.csv}.}
+\label{tab:benchmark}
+\begin{tabular}{lcccccc}
+\toprule
+Detector & Precision & Recall & F1 & ROC & PR-AUC & MCC \\
+\midrule
+LOF                  & 0.133 & 0.060 & \textbf{0.083} & 0.505 & \textbf{0.117} & 0.016 \\
+Ensemble+5dPersist   & 0.131 & 0.059 & 0.081 & 0.504 & 0.117 & 0.014 \\
+Ensemble+Persist+Reg & 0.123 & 0.055 & 0.076 & 0.504 & 0.117 & 0.008 \\
+ECOD                 & 0.131 & 0.059 & 0.081 & 0.507 & 0.116 & 0.014 \\
+COPOD                & 0.131 & 0.059 & 0.081 & 0.501 & 0.116 & 0.014 \\
+Ensemble             & 0.131 & 0.059 & 0.081 & 0.504 & 0.115 & 0.014 \\
+Z-score (max)        & 0.125 & 0.056 & 0.077 & 0.500 & 0.115 & 0.009 \\
+HBOS                 & 0.126 & 0.056 & 0.078 & 0.498 & 0.114 & 0.010 \\
+AutoEncoder          & 0.119 & 0.053 & 0.074 & 0.499 & 0.114 & 0.006 \\
+Isolation Forest     & 0.114 & 0.051 & 0.071 & 0.506 & 0.114 & 0.002 \\
+LODA                 & 0.120 & 0.054 & 0.075 & 0.497 & 0.113 & 0.006 \\
+Seasonal ESD         & 0.113 & 0.051 & 0.070 & 0.500 & 0.114 & 0.001 \\
+EllipticEnvelope     & 0.100 & 0.045 & 0.062 & 0.501 & 0.111 & $-$0.008 \\
+\midrule
+\multicolumn{7}{l}{Random-flag baseline (5\% rate): F1 $\approx$ 0.096, PR-AUC $=$ 0.111.}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This is the paper's pivotal result. Because the original Meteoblue-based study
+reported precision/recall/ROC-AUC $=1.0$ \cite{masaba2023}, and that figure is
+mathematically impossible against independent labels at a 5\% anomaly rate, our
+honest evaluation should be read as a correction: the earlier perfect scores
+were an artefact of evaluating self-generated labels with no external
+ground truth \cite{rietsch2020,gunderson2022}.
+
+\subsection{RQ2 --- Spatial structure: no global clustering, a local hotspot}
+\label{sec:rq2}
+District-level anomaly rates show \emph{no} significant spatial autocorrelation
+(Global Moran's $I=-0.162$; permutation $z=-1.02$, $p=0.284$): anomalies are
+close to spatially random across Uganda's districts. Getis--Ord $G_i^*$ nevertheless
+isolates one significant \emph{hotspot} --- \textbf{Mbale} (Eastern)
+($G_i^*=3.50$), whose anomaly rate (10.6\%) is roughly double the 5\% target.
+No coldspots are significant. The combination (weak global, one local hotspot)
+is exactly the pattern that global-only statistics would hide, motivating local
+$L_i/G_i^*$ diagnostics in operational monitoring. Figure~\ref{fig:map} shows
+the map.
+
+\subsection{RQ3 --- What drives the detection signal}
+\label{sec:rq3}
+The SHAP surrogate reproduces the ensemble flag at held-out ROC-AUC 0.917,
+confirming the flag is a learnable function of the weather features.
+Its most influential inputs are thermal and moisture variables ---
+$T_{max}$ (mean $|$SHAP$|$ 0.108), $T_{mean}$ (0.096) and relative humidity
+(0.094), then pressure and wind (Figure~\ref{fig:shap}); permutation importance
+agrees ($T_{max}$ 0.259, humidity 0.183). The model-free correlation with the
+raw ensemble score instead ranks \emph{precipitation} highest ($r=0.155$), with
+wind (0.113) and pressure (0.093) next, and negative loading for humidity
+($-0.107$) and shortwave radiation ($-0.105$). The divergence between
+monotone (SHAP/permutation) and linear (correlation) attribution is itself
+informative: the ensemble's multivariate ranking is dominated by
+temperature/humidity structure, whereas simple linear association with the score
+recovers the hydrological signal --- a caution that attribution method choice
+changes the story.
+
+\subsection{RQ4 --- Trends and stability}
+\label{sec:rq4}
+Mann--Kendall testing over 48 district$\times$variable monthly series finds 28
+significant trends ($p<0.05$): 22 increasing, 6 decreasing. Warming is pervasive
+and highly significant --- $T_{max}$ rises at Kampala ($\tau=0.416$,
+$p<10^{-16}$, Sen's slope $0.012\,^\circ$C/month), Tororo ($\tau=0.397$) and
+Mbale ($\tau=0.368$). A coherent east-African contrast emerges at the detected
+hotspot: Mbale precipitation is \emph{decreasing} ($\tau=-0.356$,
+$p=2.2\times10^{-13}$, $-0.08$\,mm/month) while its ET$_0$ is
+\emph{increasing} ($\tau=0.291$) --- warming plus drying plus rising
+evaporative demand, the physical recipe for compound heat--drought stress. The
+national monthly anomaly-count series shows no robust interior change point
+(the sole PELT break coincides with the series boundary). Multi-seed F1
+stability is perfect (s.d.\,$=0$), so the chance-level results of
+Section~\ref{sec:rq1} are not a tuning artefact. Figures~\ref{fig:temporal}
+and~\ref{fig:mk} visualise these.
+
+\subsection{Century-scale in-situ trends and reanalysis validation}
+\label{sec:insitu}
+The 91-year Meteostat record (Section~\ref{sec:data}) extends the trend
+analysis $\sim5.7\times$ beyond the reanalysis window and provides an
+\emph{independent} observational check on ERA5. Applying Mann--Kendall/Sen to
+monthly station series with $\geq$120 months, 10 of 12 testable station$\times$-
+variable series carry a significant trend ($p<0.05$; Table~\ref{tab:insitu}). The most striking result is
+a robust, near-century \emph{precipitation decline}: $\tau=-0.39$ at Mbarara and
+Gulu, $-0.38$ at Tororo, $-0.36$ at Masindi and $-0.35$ at Kabale (each
+$p<10^{-3}$, records spanning 89--100 years), i.e. the drying tendency seen at
+Mbale in ERA5 (Section~\ref{sec:rq4}) is not an artefact of a 16-year window but
+a multi-decadal instrumental feature. On the temperature side the only station
+with a continuous early series, Entebbe~Airport (1957--2026), warms on all three
+measures --- $T_{min}$ $\tau=0.47$ ($p<10^{-6}$, $+0.007\,^\circ$C/month),
+$T_{avg}$ $\tau=0.35$, $T_{max}$ $\tau=0.22$ --- reproducing the
+nighttime-amplified warming typical of East Africa and confirming the ERA5
+warming signal against ground observations.
+
+\emph{ERA5 cross-validation.} For each station we correlate monthly ERA5 and
+in-situ values over their overlap at the nearest ERA5 grid cell. Co-located
+pairs agree very strongly on temperature --- Pearson $r=0.95$--$0.999$ for nine
+of twelve pairs (e.g.\ Lira 0.999, Gulu 0.999, Arua 0.998, Jinja 0.991) and
+$r=0.83$--$0.98$ on precipitation --- while pairs whose nearest grid cell is
+physically distant or elevated (Entebbe$\rightarrow$Kampala, Kabale$\rightarrow$-
+Mbarara) or data-scarce (Soroti) agree less, as expected from a $\sim$25\,km
+reanalysis grid. This materially closes the ``no station cross-check''
+limitation: the ERA5 substrate used for detection is demonstrably faithful to
+in-situ observations where the two are truly collocated.
+
+\begin{table}[h]
+\centering\small
+\caption{Century-scale in-situ Mann--Kendall trends (left) and ERA5-vs-station
+monthly cross-correlation (right); all values from \texttt{meteostat\_instrumental.py}.}
+\label{tab:insitu}
+\begin{tabular}{llcrllc}
+\toprule
+Station & Var & $\tau$ & Span & Station & Tmp $r$ & Prcp $r$ \\
+\midrule
+Mbarara & prcp & $-0.393$ & 1926--26 & Lira   & 0.999 & 0.934 \\
+Gulu    & prcp & $-0.389$ & 1926--26 & Gulu   & 0.999 & 0.931 \\
+Tororo  & prcp & $-0.378$ & 1929--26 & Arua   & 0.998 & 0.939 \\
+Masindi & prcp & $-0.362$ & 1926--26 & Masindi& 0.997 & 0.977 \\
+Kabale  & prcp & $-0.354$ & 1937--26 & Tororo & 0.993 & 0.913 \\
+Jinja   & prcp & $-0.341$ & 1955--26 & Jinja  & 0.991 & 0.918 \\
+Entebbe & tmin & $+0.467$ & 1957--26 & Mbarara& 0.991 & 0.889 \\
+Entebbe & tavg & $+0.349$ & 1957--26 & Kampala& 0.967 & 0.919 \\
+Entebbe & tmax & $+0.215$ & 1957--26 & & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Independent gap-fill: warming and drying across the dark period}
+\label{sec:powerres}
+The NASA POWER reanalysis (Section~\ref{sec:data}) supplies the
+1990--2007 window that the in-situ network cannot, letting us test whether the
+century signals persist \emph{through} the reporting collapse. Splicing POWER
+(1988--2007) with ERA5 (2008--2023) gives a now-\emph{continuous} 36-year
+temperature record per district. Taken as a single pooled series the national
+mean is near-flat ($\tau=-0.03$, $p=0.42$) --- an expected artefact of joining
+two reanalysis products across a boundary, which we do not over-read. The
+\emph{within-period} trends are the defensible statement: over 1988--2007
+\textbf{all 19 districts warm significantly} (mean $\tau=+0.22$, every
+$p<0.05$), extending the Entebbe warming of Section~\ref{sec:insitu} to the
+whole country and straight through the dark years, while the 2008--2023 ERA5
+segment warms more weakly (5/16 significant, mean $\tau=+0.05$), consistent
+with the documented early-2010s global warming hiatus.
+
+The same gap-filled window exposes a \emph{new Tier-1 variable}: near-surface
+relative humidity. Over 1988--2007 \textbf{15 of 19 districts dry significantly}
+(mean $\tau=-0.18$; strongest at Luweero, Hoima, Arua, Masindi), while surface
+shortwave shows no systematic trend (mean $\tau=-0.01$). A warming, increasingly
+water-limited near-surface atmosphere across the dark period is exactly the
+thermodynamic signature that precedes the compound heat--drought stress seen at
+Mbale in ERA5, and --- crucially --- it is recovered from an \emph{independent}
+source that does not rely on the throttled archive API. Figure~\ref{fig:gapfill}
+visualises the continuous temperature record and the humidity-drying trend; the
+POWER analysis is produced by \texttt{fetch\_power.py} and
+\texttt{power\_climate.py}.
+
+\subsection{Derived drought indices reconstruct and validate real events}
+\label{sec:droughtres}
+After the $\geq$22-observed-day coverage filter, the century in-situ SPI spans
+10 stations and 4{,}663 station-months (1926--2026) and is statistically clean
+(mean $0.00$--$0.01$, s.d.\ $0.99$ on every accumulation period); the ERA5
+SPI/SPEI panel is likewise $N(0,1)$ (SPI s.d.$=1.00$, SPEI $1.12$--$1.16$).
+The in-situ record exposes an important data-quality fact: Ugandan stations had
+near-complete daily coverage 1926--1989, then a \emph{reporting collapse across
+1990--2019} (only Entebbe survives, temperature only), resuming $\sim$2020 ---
+precisely the dark period the continuous ERA5 reanalysis fills. Within the
+covered decades the century SPI reconstructs historical droughts, the most
+severe being a 1952--53 Masindi event (SPI$_{12}\approx-4.8$), with elevated
+drought frequency in the 1940s and 1980s ($\sim$23\% of months SPI$_6\leq-1$).
+
+Crucially --- and unlike the raw daily-anomaly detectors of
+Section~\ref{sec:rq1} --- the derived indices \emph{do} corroborate the
+ground-truth register: across the affected region and event window, \textbf{3 of
+4 documented droughts} reach moderate-drought intensity (SPEI$_3$ or SPI$_6$
+$\leq-1$): the 2010--11 Karamoja crisis (min SPI$_6=-1.22$), the 2016 Northern
+drought (min SPEI$_6=-2.22$) and the 2018 Northern/Eastern drought (min
+SPEI$_3=-4.75$). Only the 2020--21 event is missed (min SPI$_6=-0.01$), which
+we report transparently. This is the paper's clearest evidence that
+\emph{physically-interpreted} derived variables carry disaster signal that
+generic daily anomaly scores do not.
+
+\subsection{Agricultural impact: a nuanced, honest finding}
+\label{sec:agrires}
+Cereal yield rose $+1.1\%$/yr over 1961--2024 (902$\rightarrow$1920\,kg/ha),
+so we work with the de-trended anomaly. Linking the growing-season moisture
+index to that anomaly yields a deliberately \emph{two-sided} result.
+\textbf{(i) The most severe documented droughts coincide with the worst yield
+years.} The 2018 Northern/Eastern drought --- the record driest growing season
+in the ERA5 panel (min SPEI$_3=-4.75$) --- is also the single worst detrended
+cereal-yield year in 64\,years ($-34.7\%$), and the 2020 Northern drought ranks
+second ($-17.9\%$). \textbf{(ii) Yet at national-annual resolution the linear
+drought--yield relationship is weak and not significant} (Meteostat century
+block 1961--86: Pearson $r=0.11$, $p=0.60$, $n=26$; ERA5 modern block
+2008--23: $r=0.28$, $p=0.29$, $n=16$; strongest, bimodal Spearman $\rho=0.40$,
+$p=0.13$). The reason is physical, not statistical: Uganda's droughts are
+regional, so a national aggregate masks them --- the 2010 Karamoja crisis
+occurred in a year of \emph{above}-trend national cereal output
+($+13\%$). This is a genuine caution against headline
+``drought\,$\Rightarrow$\,yield-loss'' claims from coarse data, and it pinpoints
+the next required step: sub-national yield to match the sub-national climate.
+
+\subsection{RQ5 --- Correspondence with documented events}
+\label{sec:rq5}
+At the \emph{event-window} level the ensemble flags at least one day inside 68.8\%
+of documented disaster windows (drought 100\%, flood 75\%, landslide 50\%),
+with a median lead time of 14 days and 70\% of events touched $\geq$3 days
+before onset. These headline numbers must not be over-read: because each window
+spans many district-days, a random 5\%-per-day flagger touches
+\emph{essentially every} window (size-matched null $=100\%$), and the mean
+fraction of window-days flagged (6\%) barely exceeds the 5\% base rate. Combined
+with the chance-level daily AUC, we conclude there is \emph{no evidence that
+weather-only daily anomalies anticipate these events beyond chance}. Type-matched
+antecedent indices (wetness for flood/landslide, dryness for drought) reproduce
+the same picture (overall coverage 65.6\%; flood 87.5\% but still subsumed by
+the null). UCASI severity, by contrast, is a coherent \emph{descriptive} product
+(Section~\ref{sec:rq6}).
+
+\subsection{UCASI severity and RQ6 --- operational reading}
+\label{sec:rq6}
+UCASI spans 11.7--88.3 across the 32 events, banded Low (13), Moderate (9),
+High (6), Extreme (4). The extreme tail is physically and historically credible
+(Table~\ref{tab:ucasi}): the top-ranked event is the March 2010
+Eastern/Central flood (UCASI 88.3, 10 districts affected --- the Bududa/Elgon
+disaster), followed by the July 2022 Central landslide (80.4) and the 2018
+Northern/Eastern drought (78.7). Mean severity is highest for drought (53.8)
+then flood (48.8) then landslide (35.2), reflecting drought's long duration and
+broad spatial footprint. Figure~\ref{fig:ucasi} and the case study in
+Figure~\ref{fig:case} illustrate.
+
+\begin{table}[h]
+\centering\small
+\caption{Top UCASI events (severity composite; external, not used for training).}
+\label{tab:ucasi}
+\begin{tabular}{llllcc}
+\toprule
+ID & Type & Start & Regions & UCASI & Band \\
+\midrule
+UG-001 & Flood     & 2010-03-01 & Eastern;Central   & 88.3 & Extreme \\
+UG-027 & Landslide & 2022-07-01 & Central           & 80.4 & Extreme \\
+UG-015 & Drought   & 2018-01-01 & Northern;Eastern  & 78.7 & Extreme \\
+UG-030 & Flood     & 2023-03-01 & Eastern           & 76.1 & Extreme \\
+UG-010 & Flood     & 2014-09-01 & Western;Central   & 67.9 & High \\
+UG-024 & Flood     & 2021-10-01 & Central;Eastern   & 67.3 & High \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For RQ6 the honest verdict is: \emph{this pipeline is a monitoring and
+prioritisation tool, not yet an event predictor}. Its operational value lies in
+(i) reproducible, leakage-free scoring, (ii) the Mbale hotspot and the
+warming/drying trends as adaptation targets, and (iii) UCASI for ranking where
+and when to intervene --- while predictive skill requires coupling weather
+anomalies with exposure, soil-moisture and impact data (Section~\ref{sec:discussion}).
+
+%============================================================================
+\section{Discussion}\label{sec:discussion}
+\paragraph{Why detection is at chance.} Three mechanisms explain
+Section~\ref{sec:rq1}. First, \emph{label granularity}: a disaster ``window''
+for a region can last weeks, but the truly abnormal weather may occupy a few
+days, diluting any daily signal. Second, \emph{driver omission}: floods and
+landslides depend on antecedent soil moisture, geology, deforestation and
+drainage that are absent from a weather-only feature space
+\cite{wilkinson2023}. Third, \emph{reanalysis resolution}: a single ERA5 grid
+cell smooths the local extremes that trigger a debris flow. None of these is
+disqualifying --- they specify precisely what an operational system must add.
+
+\paragraph{Value of the negative result.} Reporting chance-level skill is more
+useful than a fabricated 1.0. It re-anchors claims to measurable evidence and
+redirects effort from detector shopping (which our Friedman test shows matters
+little in absolute terms) toward better features, finer data and impact coupling.
+
+\paragraph{Climate-intelligence signal that does emerge.} The durable findings
+are climatological, not algorithmic: robust, near-universal warming; a coherent
+warming--drying--rising-ET$_0$ signature at Mbale; and a severity index that
+independently ranks historically documented disasters at the top. These are
+reproducible, defensible products for adaptation planning.
+
+\paragraph{Relation to prior work.} Our conclusion directly contradicts Masaba \emph{et al.} \cite{masaba2023}; we attribute the discrepancy to that study's use of
+self-generated labels as both training target and test oracle. We emphasise this
+is a methodological, not a data, disagreement --- with external ground truth,
+even the strongest detector cannot reach AUC\,$\approx$1.
+
+%============================================================================
+\section{Threats to validity}\label{sec:threats}
+(1) \emph{Register completeness}: 32 curated events undercount unreported local
+disasters; mis-timed windows bias RQ5. We mitigate with conservative lead-time
+definitions and the random null. (2) \emph{Point-based ERA5}: centroid sampling
+under-represents sub-district extremes. We now validate ERA5 against 12 in-situ
+Meteostat stations over their monthly overlap (Section~\ref{sec:insitu}),
+finding $r=0.95$--$0.999$ for collocated pairs; a full per-grid residual and
+bias correction, and extending the in-situ network to stations lacking
+long temperature series, remain future work. An \emph{independent} reanalysis
+(NASA POWER) now closes the 1990--2007 in-situ reporting collapse for
+temperature, humidity and radiation (Section~\ref{sec:powerres}), but it does
+\emph{not} supply precipitation there, so the drought-index century record still
+has a genuine 1990--2007 moisture gap that only a decodable gridded
+precipitation product (CHIRPS/GPCC) could fill --- unavailable in this
+environment (netCDF-only, throttled). (3) \emph{UCASI weights}:
+chosen a priori; single-district spread $S$ is a placeholder at district-year
+resolution. Sensitivity to weightings and threshold $\gamma$ should be reported
+in extensions. (4) \emph{Attribution}: SHAP explains the detector, not disasters.
+(5) \emph{Detector coverage}: OCSVM/MCD were dropped for memory/stability reasons;
+deep variants depend on backend availability.
+
+%============================================================================
+\section{Conclusion}
+We presented a reproducible climate intelligence framework for Uganda and used
+it to deliver a ground-truth-honest verdict on unsupervised weather-anomaly
+detection: against real disaster records, no generic detector beats chance, and
+apparent coverage is a window-size artefact. The framework's lasting contribution
+is its evidence base --- a Mbale hotspot, a warming/eastern-drying trend that we
+confirm on a ~91-year in-situ record and use to validate ERA5 against ground
+stations, and --- recovered from an independent reanalysis that fills the
+1990--2007 observing gap --- a warming and simultaneously drying near-surface
+atmosphere across all districts, and a severity index (UCASI) that credibly ranks documented disasters
+--- released as open building blocks. Future work must couple weather anomalies
+with exposure and hydrological state to move from monitoring to prediction.
+
+%============================================================================
+\section*{Data and code availability}
+All inputs are openly licensed: ERA5 reanalysis via the Open-Meteo Archive API
+(CC-BY 4.0), Meteostat station records (CC-BY 4.0), the NASA POWER / MERRA-2
+gap-fill reanalysis (open, no-key JSON), and World Bank / FAOSTAT
+cereal production series (CC BY 4.0). The disaster register is
+compiled from public relief records (UN-OCHA/UNMA, EM-DAT, FAO, FEWS NET) with
+per-event citations. The complete pipeline --- \texttt{fetch\_era5.py},
+\texttt{fetch\_meteostat.py}, \texttt{preprocess.py}, \texttt{detect.py},
+\texttt{spatial.py}, \texttt{temporal.py}, \texttt{meteostat\_instrumental.py},
+\texttt{drought\_indices.py}, \texttt{fetch\_agriculture.py}, \texttt{ag\_linkage.py},
+\texttt{fetch\_power.py}, \texttt{power\_climate.py}, \texttt{figures\_power.py},
+\texttt{ucasi.py}, \texttt{explain.py},
+\texttt{figures.py}, \texttt{collect\_results.py} --- reproduces every figure
+and table via \texttt{python run\_all.py}. Artefacts are emitted as
+CSV/JSON/NPZ. Seeds are fixed for determinism.
+
+\section*{Declaration of competing interest}
+The author declares no competing interest.
+
+\section*{CRediT authorship contribution statement}
+\textbf{J. Masaba:} Conceptualization, Methodology, Software, Formal analysis,
+Investigation, Data curation, Writing --- original draft, Writing --- review \&
+editing, Visualization.
+
+%============================================================================
+\section*{Figures}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_benchmark.png}
+\caption{Held-out detector benchmark. All methods cluster at chance;
+F1 error bars are 95\% bootstrap intervals. (RQ1)}
+\label{fig:benchmark}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_roc_pr.png}
+\caption{ROC and precision--recall curves for top detectors; ROC hugs the
+diagonal, PR barely exceeds the base-rate line. (RQ1)}
+\label{fig:curves}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=0.7\linewidth]{figures/fig_hotspot_map.png}
+\caption{Getis--Ord $G_i^*$ district anomaly-rate hotspots; Mbale is the sole
+significant hotspot. (RQ2)}
+\label{fig:map}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_temporal.png}
+\caption{National monthly anomaly burden with disaster-onset markers and
+change-point screen. (RQ4)}
+\label{fig:temporal}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=0.8\linewidth]{figures/fig_mannkendall.png}
+\caption{District-level precipitation Mann--Kendall $\tau$ (warming/drying
+structure). (RQ4)}
+\label{fig:mk}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=0.8\linewidth]{figures/fig_shap.png}
+\caption{SHAP global importance of weather features for the detection signal.
+(RQ3)}
+\label{fig:shap}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_ucasi.png}
+\caption{Per-event UCASI severity and distribution by hazard type. (Novel index)}
+\label{fig:ucasi}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_case_study.png}
+\caption{Case study: daily precipitation and detected anomalies around the
+top-ranked (2010) event.}
+\label{fig:case}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_gapfill.png}
+\caption{Independent NASA POWER gap-fill. Left: continuous national temperature
+anomaly 1988--2023, with the 1990--2007 reporting collapse filled by POWER
+(shaded). Right: district Mann--Kendall $\tau$ for near-surface humidity over
+1988--2007; 15/19 districts dry significantly. (Novel gap-fill)}
+\label{fig:gapfill}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_drought_yield.png}
+\caption{Century drought chronology (Meteostat SPI$_3$ 1961--89 and ERA5
+SPEI$_3$ 2008--23, most-negative growing-season value per year, with the
+1990--2007 in-situ gap visibly empty) and detrended cereal-yield anomaly versus
+growing-season drought index, showing significant drought--yield years but a
+weak national-linear link. (Drought $\rightarrow$ impact)}
+\label{fig:droughtyield}
+\end{figure}
+
+%============================================================================
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
+
+\end{document}

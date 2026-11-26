@@ -1,0 +1,384 @@
+{
+  "spatial_stats": {
+    "moran_global_I": -0.16235872022270123,
+    "moran_z": -1.0174772981724667,
+    "moran_p": 0.2839,
+    "n_districts": 16,
+    "hotspots": [
+      "Mbale"
+    ],
+    "coldspots": [],
+    "top5_anomaly_rate": [
+      {
+        "location": "Mbale",
+        "region": "Eastern",
+        "anomaly_rate": 0.10557837097878166
+      },
+      {
+        "location": "Luweero",
+        "region": "Central",
+        "anomaly_rate": 0.058008213552361396
+      },
+      {
+        "location": "Mityana",
+        "region": "Central",
+        "anomaly_rate": 0.05783709787816564
+      },
+      {
+        "location": "Lira",
+        "region": "Northern",
+        "anomaly_rate": 0.0568104038329911
+      },
+      {
+        "location": "Wakiso",
+        "region": "Central",
+        "anomaly_rate": 0.055441478439425054
+      }
+    ]
+  },
+  "ucasi_summary": {
+    "weights": {
+      "I": 0.3,
+      "D": 0.2,
+      "S": 0.2,
+      "M": 0.15,
+      "F": 0.15
+    },
+    "n_events": 32,
+    "ucasi_range": [
+      11.7,
+      88.3
+    ],
+    "severity_counts": {
+      "Low": 13,
+      "Moderate": 9,
+      "High": 6,
+      "Extreme": 4
+    },
+    "top_events": [
+      {
+        "event_id": "UG-001",
+        "type": "Flood",
+        "start": "2010-03-01",
+        "regions": "Eastern;Central",
+        "UCASI": 88.3,
+        "severity": "Extreme",
+        "districts_affected": 10
+      },
+      {
+        "event_id": "UG-027",
+        "type": "Landslide",
+        "start": "2022-07-01",
+        "regions": "Central",
+        "UCASI": 80.4,
+        "severity": "Extreme",
+        "districts_affected": 5
+      },
+      {
+        "event_id": "UG-015",
+        "type": "Drought",
+        "start": "2018-01-01",
+        "regions": "Northern;Eastern",
+        "UCASI": 78.7,
+        "severity": "Extreme",
+        "districts_affected": 9
+      },
+      {
+        "event_id": "UG-030",
+        "type": "Flood",
+        "start": "2023-03-01",
+        "regions": "Eastern",
+        "UCASI": 76.1,
+        "severity": "Extreme",
+        "districts_affected": 5
+      },
+      {
+        "event_id": "UG-010",
+        "type": "Flood",
+        "start": "2014-09-01",
+        "regions": "Western;Central",
+        "UCASI": 67.9,
+        "severity": "High",
+        "districts_affected": 6
+      },
+      {
+        "event_id": "UG-024",
+        "type": "Flood",
+        "start": "2021-10-01",
+        "regions": "Central;Eastern",
+        "UCASI": 67.3,
+        "severity": "High",
+        "districts_affected": 6
+      },
+      {
+        "event_id": "UG-031",
+        "type": "Flood",
+        "start": "2023-09-01",
+        "regions": "Northern",
+        "UCASI": 63.3,
+        "severity": "High",
+        "districts_affected": 4
+      },
+      {
+        "event_id": "UG-016",
+        "type": "Flood",
+        "start": "2018-03-01",
+        "regions": "Eastern;Western",
+        "UCASI": 61.8,
+        "severity": "High",
+        "districts_affected": 5
+      }
+    ],
+    "mean_ucasi_by_type": {
+      "Drought": 53.8,
+      "Flood": 48.8,
+      "Landslide": 35.2
+    }
+  },
+  "explain_summary": {
+    "surrogate_holdout_auc": 0.9172642093294376,
+    "n_train": 18000,
+    "top_shap": [
+      {
+        "variable": "temperature_2m_max",
+        "shap_mean_abs": 0.10752297302254929
+      },
+      {
+        "variable": "temperature_2m_mean",
+        "shap_mean_abs": 0.0961313308819505
+      },
+      {
+        "variable": "relative_humidity_2m_mean",
+        "shap_mean_abs": 0.09401393138905496
+      },
+      {
+        "variable": "pressure_msl_mean",
+        "shap_mean_abs": 0.038443945876711134
+      },
+      {
+        "variable": "wind_speed_10m_max",
+        "shap_mean_abs": 0.03631288028270903
+      }
+    ],
+    "top_perm": [
+      {
+        "variable": "temperature_2m_max",
+        "perm_importance": 0.2594552753076046,
+        "perm_std": 0.006651295903838834
+      },
+      {
+        "variable": "relative_humidity_2m_mean",
+        "perm_importance": 0.18269013433247835,
+        "perm_std": 0.011021307091060605
+      },
+      {
+        "variable": "temperature_2m_mean",
+        "perm_importance": 0.17333573609134012,
+        "perm_std": 0.012779665291385994
+      },
+      {
+        "variable": "wind_speed_10m_max",
+        "perm_importance": 0.07569458036751478,
+        "perm_std": 0.009120337470714283
+      },
+      {
+        "variable": "et0_fao_evapotranspiration",
+        "perm_importance": 0.06421873525978075,
+        "perm_std": 0.0041712204785986865
+      }
+    ],
+    "corr_with_score": {
+      "temperature_2m_max": 0.035,
+      "temperature_2m_min": 0.003,
+      "temperature_2m_mean": -0.011,
+      "precipitation_sum": 0.155,
+      "relative_humidity_2m_mean": -0.107,
+      "wind_speed_10m_max": 0.113,
+      "pressure_msl_mean": 0.093,
+      "shortwave_radiation_sum": -0.105,
+      "et0_fao_evapotranspiration": -0.019
+    }
+  },
+  "friedman": {
+    "friedman_chi2": 20.285714285714278,
+    "friedman_p": 0.0004385404670545834,
+    "years": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023
+    ],
+    "n_detectors": 14
+  },
+  "change_points": {
+    "monthly_anom_count_bkps_index": [
+      192
+    ],
+    "bkp_months": []
+  },
+  "benchmark_top": [
+    {
+      "detector": "LOF",
+      "precision": 0.1334702258726899,
+      "recall": 0.0598343050015342,
+      "f1": 0.0826271186440678,
+      "roc_auc": 0.5054722468460863,
+      "pr_auc": 0.1168302862890186,
+      "mcc": 0.0159764845473983,
+      "f1_lo": 0.0708740149511523,
+      "f1_hi": 0.0936124395773623,
+      "pr_auc_lo": 0.1092808299957006,
+      "pr_auc_hi": 0.1166624714921848,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "Ensemble+5dPersist",
+      "precision": 0.1314168377823408,
+      "recall": 0.0589137772322798,
+      "f1": 0.0813559322033898,
+      "roc_auc": 0.5043625091337891,
+      "pr_auc": 0.1166091736124253,
+      "mcc": 0.014479984075986,
+      "f1_lo": 0.0701973949845101,
+      "f1_hi": 0.0933038251603585,
+      "pr_auc_lo": 0.1090862555536815,
+      "pr_auc_hi": 0.1163761031316928,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "Ensemble+Persist+Region",
+      "precision": 0.1230348598769651,
+      "recall": 0.0552316661552623,
+      "f1": 0.0762388818297331,
+      "roc_auc": 0.5043625091337891,
+      "pr_auc": 0.1166091736124253,
+      "mcc": 0.008377264045655,
+      "f1_lo": 0.0658875037082595,
+      "f1_hi": 0.0871408689227492,
+      "pr_auc_lo": 0.1086924013825236,
+      "pr_auc_hi": 0.1157551355849098,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "ECOD",
+      "precision": 0.1314168377823408,
+      "recall": 0.0589137772322798,
+      "f1": 0.0813559322033898,
+      "roc_auc": 0.5072305658863221,
+      "pr_auc": 0.1162006807974528,
+      "mcc": 0.014479984075986,
+      "f1_lo": 0.0708668077990145,
+      "f1_hi": 0.092008607660161,
+      "pr_auc_lo": 0.1091583148690082,
+      "pr_auc_hi": 0.1165423184347666,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "COPOD",
+      "precision": 0.1307323750855578,
+      "recall": 0.0586069346425283,
+      "f1": 0.0809322033898305,
+      "roc_auc": 0.5012166544516357,
+      "pr_auc": 0.1155997652353143,
+      "mcc": 0.0139811505855152,
+      "f1_lo": 0.0701420335907588,
+      "f1_hi": 0.0913130040945206,
+      "pr_auc_lo": 0.1090258234018871,
+      "pr_auc_hi": 0.1163229591973671,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "Ensemble",
+      "precision": 0.1314168377823408,
+      "recall": 0.0589137772322798,
+      "f1": 0.0813559322033898,
+      "roc_auc": 0.5035138778329581,
+      "pr_auc": 0.1153322532640477,
+      "mcc": 0.014479984075986,
+      "f1_lo": 0.0698702050077869,
+      "f1_hi": 0.0923111979166666,
+      "pr_auc_lo": 0.1091674957704982,
+      "pr_auc_hi": 0.1164747503085308,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "Zscore(max)",
+      "precision": 0.1245722108145106,
+      "recall": 0.0558453513347652,
+      "f1": 0.0771186440677966,
+      "roc_auc": 0.5003115651545549,
+      "pr_auc": 0.1145644314272558,
+      "mcc": 0.0094916491712784,
+      "f1_lo": 0.0661239644724185,
+      "f1_hi": 0.0868318644023832,
+      "pr_auc_lo": 0.1086388268128262,
+      "pr_auc_hi": 0.1159507021341142,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "CBLOF",
+      "precision": 0.1184120465434633,
+      "recall": 0.0530837680270021,
+      "f1": 0.0733050847457627,
+      "roc_auc": 0.5052234462918428,
+      "pr_auc": 0.114516492444516,
+      "mcc": 0.0050021477570416,
+      "f1_lo": 0.062195365168112,
+      "f1_hi": 0.0834399503040676,
+      "pr_auc_lo": 0.1084247846372684,
+      "pr_auc_hi": 0.1156976101844635,
+      "f1_seed_std": 0.0
+    }
+  ],
+  "event_validation": {
+    "event_recall": 0.6875,
+    "event_recall_by_type": {
+      "Drought": 1.0,
+      "Flood": 0.75,
+      "Landslide": 0.5
+    },
+    "n_events": 32,
+    "median_lead_time_days": 14.0,
+    "pct_early_warning_ge3d": 0.7037037037037037
+  },
+  "data": {
+    "rows": 93504,
+    "locations": 16,
+    "location_list": [
+      "Arua",
+      "FortPortal",
+      "Gulu",
+      "Jinja",
+      "Kampala",
+      "Kumi",
+      "Lira",
+      "Luweero",
+      "Masindi",
+      "Mbale",
+      "Mbarara",
+      "Mityana",
+      "Mukono",
+      "Soroti",
+      "Tororo",
+      "Wakiso"
+    ],
+    "date_min": "2008-01-01",
+    "date_max": "2023-12-31",
+    "variables": [
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "temperature_2m_mean",
+      "precipitation_sum",
+      "precipitation_hours",
+      "relative_humidity_2m_mean",
+      "wind_speed_10m_max",
+      "wind_gusts_10m_max",
+      "wind_direction_10m_dominant",
+      "pressure_msl_mean",
+      "surface_pressure_mean",
+      "shortwave_radiation_sum",
+      "et0_fao_evapotranspiration"
+    ]
+  }
+}

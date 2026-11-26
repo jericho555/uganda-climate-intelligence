@@ -1,0 +1,43 @@
+stations=13  rows=151369  years=91 (1926-01-01..2026-03-19)
+trend tests=12  significant=10  temp warming sig=3/3  precip sig=7/9
+
+strongest warming:
+            name variable      tau      p_value  sens_slope
+Entebbe Airport     tmin 0.466502 0.000000e+00     0.00685
+Entebbe Airport     tavg 0.349190 0.000000e+00     0.00435
+Entebbe Airport     tmax 0.215472 4.940374e-09     0.00315
+
+cross-val sample: {
+ "Arua->Arua": {
+  "n_months": 36,
+  "overlap": "2021-01-01..2023-12-01",
+  "tmean~tavg": 0.998,
+  "tmax": 0.993,
+  "tmin": 0.99,
+  "prcp": 0.939
+ },
+ "Gulu->Gulu": {
+  "n_months": 36,
+  "overlap": "2021-01-01..2023-12-01",
+  "tmean~tavg": 0.999,
+  "tmax": 0.996,
+  "tmin": 0.992,
+  "prcp": 0.931
+ },
+ "Masindi->Masindi": {
+  "n_months": 36,
+  "overlap": "2021-01-01..2023-12-01",
+  "tmean~tavg": 0.997,
+  "tmax": 0.993,
+  "tmin": 0.972,
+  "prcp": 0.977
+ },
+ "Soroti->Soroti": {
+  "n_months": 66,
+  "overlap": "2018-07-01..2023-12-01",
+  "tmean~tavg": 0.949,
+  "tmax": 0.97,
+  "tmin": 0.573,
+  "prcp": 0.269
+ }
+}

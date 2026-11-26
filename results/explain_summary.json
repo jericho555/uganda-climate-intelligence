@@ -1,0 +1,64 @@
+{
+  "surrogate_holdout_auc": 0.9172642093294376,
+  "n_train": 18000,
+  "top_shap": [
+    {
+      "variable": "temperature_2m_max",
+      "shap_mean_abs": 0.10752297302254929
+    },
+    {
+      "variable": "temperature_2m_mean",
+      "shap_mean_abs": 0.0961313308819505
+    },
+    {
+      "variable": "relative_humidity_2m_mean",
+      "shap_mean_abs": 0.09401393138905496
+    },
+    {
+      "variable": "pressure_msl_mean",
+      "shap_mean_abs": 0.038443945876711134
+    },
+    {
+      "variable": "wind_speed_10m_max",
+      "shap_mean_abs": 0.03631288028270903
+    }
+  ],
+  "top_perm": [
+    {
+      "variable": "temperature_2m_max",
+      "perm_importance": 0.2594552753076046,
+      "perm_std": 0.006651295903838834
+    },
+    {
+      "variable": "relative_humidity_2m_mean",
+      "perm_importance": 0.18269013433247835,
+      "perm_std": 0.011021307091060605
+    },
+    {
+      "variable": "temperature_2m_mean",
+      "perm_importance": 0.17333573609134012,
+      "perm_std": 0.012779665291385994
+    },
+    {
+      "variable": "wind_speed_10m_max",
+      "perm_importance": 0.07569458036751478,
+      "perm_std": 0.009120337470714283
+    },
+    {
+      "variable": "et0_fao_evapotranspiration",
+      "perm_importance": 0.06421873525978075,
+      "perm_std": 0.0041712204785986865
+    }
+  ],
+  "corr_with_score": {
+    "temperature_2m_max": 0.035,
+    "temperature_2m_min": 0.003,
+    "temperature_2m_mean": -0.011,
+    "precipitation_sum": 0.155,
+    "relative_humidity_2m_mean": -0.107,
+    "wind_speed_10m_max": 0.113,
+    "pressure_msl_mean": 0.093,
+    "shortwave_radiation_sum": -0.105,
+    "et0_fao_evapotranspiration": -0.019
+  }
+}
