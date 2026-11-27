@@ -38,6 +38,7 @@ manuscript/*.synctex.gz
 manuscript/*.fls
 manuscript/*.fdb_latexmk
 manuscript/*.log
+manuscript/figures/  # duplicates of figures/
 
 # --- OS / editor ---
 .DS_Store
@@ -66,8 +67,14 @@ _build_overleaf*
 _*log
 _cm.txt
 uganda_ems_overleaf.zip
+uganda_crm_overleaf.zip
 results/*.log
 results/**/*.log
 results/_*
 results/tables/_*
 *.tmp
+
+# --- Large regenerable arrays ---
+results/shap_values.npy
+results/per_year_f1.npy
+results/shap_row_outputs.npy
