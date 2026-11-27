@@ -39,6 +39,7 @@ manuscript/*.fls
 manuscript/*.fdb_latexmk
 manuscript/*.log
 manuscript/figures/  # duplicates of figures/
+manuscript/  # removed from repo until journal publication
 
 # --- OS / editor ---
 .DS_Store
