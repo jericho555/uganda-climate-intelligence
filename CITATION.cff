@@ -23,7 +23,7 @@ authors:
     given-names: Jeremiah
     orcid: "https://orcid.org/0009-0004-5620-996X"
     affiliation: "Department of Computer Science, Makerere University, Kampala, Uganda"
-repository-code: "https://github.com/masaba2023/uganda-climate-intelligence"
+repository-code: "https://github.com/jericho555/uganda-climate-intelligence"
 # doi: "10.5281/REPLACE-AFTER-ZENODO-RELEASE"   # uncomment only once minted
 license: MIT
 keywords:
