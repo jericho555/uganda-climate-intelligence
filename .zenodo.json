@@ -32,7 +32,7 @@
   "publication_date": "2026-11-27",
   "related_identifiers": [
     {
-      "identifier": "https://github.com/jericho555/uganda-climate-intelligence"
+      "identifier": "https://github.com/jericho555/uganda-climate-intelligence",
       "relation": "isSupplementTo",
       "resource_type": "dataset"
     }
