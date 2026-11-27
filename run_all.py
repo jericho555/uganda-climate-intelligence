@@ -3,7 +3,13 @@
 Usage:  python run_all.py
 Order:  see STAGES below -- fetch -> preprocess -> detect -> random-null
         reference -> spatial/temporal -> climate layers -> impact layers ->
-        UCASI -> early warning -> explainability -> figures -> digest.
+        UCASI -> early warning -> explainability -> figures -> digest ->
+        release gate.
+
+The final stage (``verify_release``) re-checks the deliverables themselves --
+figure mirrors and resolution, cross-references, artefact arithmetic, dashboard
+rendering -- and raises SystemExit if any check fails, so a broken bundle stops
+the run instead of being reported as ``[done ...]``.
 """
 import sys
 import time
@@ -44,6 +50,7 @@ STAGES = [
     ("figures_early_warning", "EWS architecture + risk-nowcast figures"),
     ("collect_results", "Results digest + event-recall/lead-time (RQ5)"),
     ("check_ref_index", "Crossref/OpenAlex/arXiv check on the refuted baseline draft"),
+    ("verify_release", "Release gate: figure, manuscript, artefact and dashboard integrity"),
 ]
 
 

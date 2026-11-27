@@ -39,7 +39,8 @@ documented droughts. Every number in the paper is computed by this pipeline —
 | **ERA5** via the Open-Meteo Archive API | daily 13-variable reanalysis for 19 Ugandan district centroids, 2008–2023 (93,504 district-days) | CC-BY 4.0 |
 | **Meteostat** bulk | century-scale in-situ daily record, 12 stations, 1926–2026 (151,369 station-days) + ERA5 cross-validation | CC-BY 4.0 |
 | **NASA POWER** (MERRA-2) | independent gap-fill of the 1990–2007 in-situ reporting collapse: daily T2M / RH / shortwave for 19 districts, 1988–2007 (138,795 district-days) | open (no-key JSON) |
-| **World Bank / FAOSTAT** | 64-year cereal production / area / yield (1961–2024) impact layer | CC BY 4.0 |
+| **World Bank Open Data API** (FAOSTAT-derived) | 64-year cereal production / area / yield (1961–2024) impact layer. Only these national indicator series are used; the Bank's separate climate portal was **not** consulted | CC BY 4.0 |
+| **Our World in Data** (FAOSTAT-derived) | green-coffee production, 1961–2024 — the second, export-crop impact layer | CC BY 4.0 |
 | **Curated disaster register** | 32 documented hydro-meteorological disasters (UNMA, OCHA/ReliefWeb, EM-DAT, FAO/GIEWS, FEWS NET) with onset windows + affected regions | editorial records, cited |
 | **OCHA Uganda COD-AB** via HDX (`cod-ab-uga`) | 135 district polygons (simplified to a 217 KB subset in `data/`) that turn every map into a choropleth; `data/district_lookup.csv` joins the 19 sites to their districts | CC BY-IGO |
 
@@ -65,6 +66,32 @@ uganda-climate-intelligence/
   CITATION.cff / .zenodo.json / LICENSE / CHANGELOG.md
 ```
 
+## Figures
+
+Every figure is written by exactly one function, `config.save_figure()`, which
+fixes 300 dpi and drops an identical copy in both `figures/` (repository view)
+and `manuscript/figures/` (what LaTeX includes). No script sets its own dpi or
+writes to a single folder, so the compiled paper and the browsable figure set
+cannot disagree.
+
+## Release checks
+
+The pipeline ends by auditing its own deliverables:
+
+```bash
+python src/verify_release.py            # add --skip-dashboard if Streamlit is absent
+```
+
+22 assertions cover the figure mirror (same PNG set, byte-identical, ≥300 dpi read
+from the file header), the LaTeX source (balanced environments, resolvable
+cross-references, present `\includegraphics` targets, a .bib entry for every
+citation, no stray unicode dashes), the artefact arithmetic behind the paper's
+claims (SHAP additivity residual, attribution rows vs the stored sample, the
+nowcast carry envelope, and the 16 scored + 3 site-without-score + 116 unobserved
+district partition), and an in-process render of all ten dashboard tabs. A failure
+exits non-zero, so `run_all.py` stops rather than reporting a broken bundle as
+done.
+
 ## Reproduce
 
 ```bash
@@ -74,9 +101,11 @@ python run_all.py
 
 ## Interactive dashboard
 
-A read-only Streamlit view of the benchmark, daily anomaly stream, spatial
-hotspots, UCASI severity, trends and the risk nowcast — bound entirely to the
-artefacts under `results/` and `data/` (nothing is re-fitted on the page).
+A read-only Streamlit view, in **ten panels**, of the benchmark, daily anomaly
+stream, district choropleths, UCASI severity, trends, the drought/agriculture
+impact layer, the risk nowcast and the global *and* local detection attributions
+— bound entirely to the artefacts under `results/` and `data/` (nothing is
+re-fitted on the page).
 
 ```bash
 # one-time vendored install (works when system site-packages is not writable):
@@ -95,7 +124,7 @@ Stages run in the order declared in `run_all.py`: `fetch_era5` →
 `drought_indices` → `ag_linkage` → `coffee_linkage` → `ucasi` → `early_warning` →
 `_typematch` → `_explain_fast` → `figures` → `figures_power` → `figures_maps` →
 `figures_coffee` → `figures_early_warning` → `collect_results` →
-`check_ref_index`. Each stage caches to
+`check_ref_index` → `verify_release`. Each stage caches to
 disk and is idempotent; re-running skips cached fetches. `fetch_boundaries`
 rebuilds `data/district_boundaries.geojson` from the public HDX endpoint (a
 37 MB archive; only the 217 KB simplified subset is committed) and
@@ -108,7 +137,9 @@ partial answer rather than writing a convenient negative result.
 * **RQ1** held-out benchmark of detectors vs disaster ground-truth (P/R/F1/
   ROC-AUC/PR-AUC/MCC) with bootstrap CIs and a size-matched random null.
 * **RQ2** district anomaly-rate hotspots via Global Moran's I and Getis–Ord Gi*.
-* **RQ3** SHAP + permutation importance driving the detection signal.
+* **RQ3** SHAP + permutation importance driving the detection signal, plus the
+  persisted per-district-day attributions (`results/shap_values.npy`,
+  `results/shap_expected_value.json`) whose additivity error is reported.
 * **RQ4** Friedman + per-year F1 ranking, seed stability, STL / Mann–Kendall /
   Sen / change-point climatology.
 * **Century in-situ** (`meteostat_instrumental.py`): 91-year trends + ERA5↔station
@@ -120,6 +151,10 @@ partial answer rather than writing a convenient negative result.
 * **Impact linkage** (`ag_linkage.py`): severe drought years are the worst yield
   years, but the national-annual linear link is insignificant (regional droughts
   masked by aggregation).
+* **Coffee linkage** (`coffee_linkage.py`): detrended production, not yield, so the
+  weaker of the two series; the century in-situ and modern ERA5 substrates give
+  coefficients of *opposite sign*, which is reported as a null rather than
+  reconciled (`results/coffee_linkage.json`).
 * **UCASI** severity index ranks documented disasters; **RQ5** event recall.
 * **Geography** (`fetch_boundaries.py`, `region_label_check.py`): the 19 sites join
   to 19 of 135 OCHA districts (13.7% of national district area), and the one

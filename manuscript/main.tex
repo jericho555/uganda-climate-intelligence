@@ -164,9 +164,10 @@ with a persistence-based forward carry and a concrete deployment architecture,
 evaluated honestly against the register
 (Sections~\ref{sec:rq3}--\ref{sec:ews}).
 \item An \emph{interactive decision-support dashboard} (Streamlit) that
-operationalises the system: nine panels, read-only over the versioned result
+operationalises the system: ten panels, read-only over the versioned result
 artifacts, exposing the 24-detector benchmark, spatial and trend analytics,
-district risk nowcast maps, agricultural-impact evidence, SHAP explanations and
+district risk nowcast choropleths, agricultural-impact evidence, SHAP
+evidence at global and local level, and
 the UCASI ranking (Section~\ref{sec:dashboard}); released with the repository for
 reproducibility.
 \end{enumerate}
@@ -395,10 +396,11 @@ validation below; the detection benchmark itself remains on the feature-complete
 ERA5 partition so that unlabeled pre-2008 years never leak into evaluation.
 
 \emph{Independent gap-fill reanalysis (NASA POWER).} The Meteostat in-situ
-record has a genuine \emph{reporting collapse over 1990--2007}: the Ugandan
+record has a genuine \emph{reporting collapse over 1990--2019}: the Ugandan
 stations stopped filing daily data (confirmed empty on the NCEI GHCN service),
-so neither Meteostat (pre-1990 / post-2020) nor ERA5 (from 2008) covers that
-window. We therefore add a second, \emph{independent} reanalysis: NASA POWER
+so neither Meteostat (usable pre-1990 / post-2020) nor ERA5 (from 2008) covers
+the earlier part of that window. We therefore add a second, \emph{independent}
+reanalysis: NASA POWER
 \cite{power2024dataset}, which is MERRA-2-based, openly licensed and served as
 plain JSON, and is not subject to the archive-API throttling that blocked our
 ERA5 back-fill.
@@ -417,6 +419,13 @@ History API rejects unauthenticated scripting; we therefore substitute ERA5, a
 peer-reviewed, openly licensed reanalysis that is spatially complete and
 independently citable. The substitution changes the provenance of every
 reanalysis-derived number in this paper, so we report it in full.
+
+\emph{Note on the World Bank material.} The only World Bank content used here is
+the national agricultural indicator pair (cereal production and harvested area,
+FAOSTAT-derived) that \texttt{fetch\_agriculture.py} pulls from the Open Data
+API. The Bank's separate climate portal was not used: no portal-hosted index is
+cross-checked against the register, so the independent evidence in this paper
+rests on the in-situ Meteostat record, ERA5 and NASA POWER alone.
 
 \subsection{Ground-truth disaster register}\label{sec:register}
 We compile 32 documented climate disasters (16 floods, 12 landslides, 4
@@ -504,8 +513,17 @@ an LSTM encoder--decoder and a Transformer encoder autoencoder, each trained on
 error. To bound the number of per-series fits, the two innovation-temporal models
 and the two sequence autoencoders use a fixed three-variable subset (precipitation,
 mean temperature and ET$_0$ anomalies) rather than all 14 features. That scope
-restriction is a disclosed choice, not a silent one. With these, no
-detector family named in Section~\ref{sec:related} is left unreported.
+restriction is a disclosed choice, not a silent one. Every family surveyed in
+Section~\ref{sec:related} is now represented, but two members of our original
+shortlist are still absent and we name them rather than imply completeness: the
+probabilistic rescaling of density scores into a local outlier
+\emph{probability}, which would place LOF and $k$NN on one comparable scale, and
+an isolation forest fitted on \emph{lagged windows} rather than on the
+cross-sectional vector --- the Isolation Forest in Table~\ref{tab:benchmark} is
+the standard method applied to engineered antecedent features, not a
+sequence-aware variant. Both belong to families that already sit at chance level
+here, so neither is expected to change the verdict, but a group extending this
+benchmark should not have to guess whether they were run.
 
 \subsection{Ensemble construction}\label{sec:ensemble}
 Two rank-averaged ensembles run in this pipeline, for two different purposes, and
@@ -642,6 +660,12 @@ reported on purpose. SHAP and permutation importance measure what the \emph{flag
 depends on and are sensitive to non-monotone structure; a plain correlation
 measures what the \emph{score} rises with monotonically. Where the two disagree,
 the disagreement is a statement about the score, not an error to be reconciled.
+Local attributions are persisted as well as global ones:
+\texttt{\_explain\_fast.py} writes the surrogate's attribution matrix for 1{,}200
+held-out district-days, the exact standardised feature rows those attributions
+explain, the surrogate's own output for each row and the base value they sum to,
+so a single-case explanation can be re-derived and its additivity checked rather
+than asserted, in the figure and in the dashboard alike.
 We are explicit that this interprets the detector, not disaster causation.
 
 \subsection{Reproducibility}
@@ -771,7 +795,8 @@ Only two districts depart from it: Jinja at 2.1\% sits clearly below, and Mbale
 ensemble score in the panel (0.553 against 0.486--0.511 elsewhere).
 
 Getis--Ord $G_i^*$ flags Mbale as the single significant hotspot
-($z=3.50$); no coldspot is significant. That hit is not an artefact of
+($z=3.50$); no coldspot is significant (Figure~\ref{fig:map}). That hit is not
+an artefact of
 testing 16 districts at $\alpha=0.05$: $z=3.50$ corresponds to a two-sided
 $p\approx5\times10^{-4}$, which survives Bonferroni correction across the
 panel. What the hotspot is \emph{not}, however, is a neighbourhood. Local
@@ -821,6 +846,14 @@ temperature/humidity structure, whereas simple linear association with the score
 recovers the hydrological signal. That divergence is a caution rather than a
 contradiction: the choice of attribution method changes the story told about the
 detector.
+The local level is exact for the surrogate rather than approximate: over the
+1{,}200 persisted district-days the base value ($0.4996$, on the surrogate's
+anomaly-class probability scale) plus the nine attributions reproduces the
+surrogate's own output to a maximum absolute error of
+$4.4\times10^{-14}$ (Figure~\ref{fig:shap}b). Each district-day therefore has an
+auditable explanation --- which feature pushed that day towards the flagged end,
+and by how much --- and the dashboard exposes the same matrix row by row instead
+of only its summary.
 
 \subsection{RQ4: trends and stability}
 \label{sec:rq4}
@@ -981,7 +1014,8 @@ regional, so a national aggregate masks them: the 2010 Karamoja crisis
 occurred in a year of \emph{above}-trend national cereal output
 ($+13\%$). This is a caution against headline
 ``drought\,$\Rightarrow$\,yield-loss'' claims from coarse data, and it pinpoints
-the next required step: sub-national yield to match the sub-national climate.
+the next required step: sub-national yield to match the sub-national climate
+(Figure~\ref{fig:droughtyield}).
 
 \subsection{Coffee: the confounding generalises to the signature export}
 \label{sec:coffee}
@@ -1094,7 +1128,19 @@ Figure~\ref{fig:nowcast}c), the same conclusion the daily benchmark reached,
 now confirmed at coarser aggregation. What does carry forward is
 \emph{persistence}: the month-to-month autocorrelation of the score is positive
 but modest (lag-1 pooled $r=0.35$), so the week/month/season nowcast is a
-persistence extrapolation of current conditions, not a causal forecast. We
+persistence extrapolation of current conditions, not a causal forecast. That
+extrapolation is then \emph{measured} rather than assumed. Differencing the
+district-month score from one month to the next over the whole record (3{,}056
+observed transitions) gives a median absolute move of 8.2 points, an 80th
+percentile of 32.3 and a 95th percentile of 44.8, on a near-symmetric signed
+spread (10th to 90th percentile, $-33.0$ to $+31.6$). Restricted to the 900
+transitions that \emph{begin} in a High or Extreme cell the typical move is
+larger (median 23.7) and its signed spread is asymmetric: fewer than one in ten
+of those transitions raises the score by more than 7.8 points, while ten percent
+cut it by 42.9 or more, so escalation out of a severe cell is rare in the record
+and relief is common. These are empirical quantiles of what carrying
+the score forward actually did, not a fitted prediction interval, and they are
+the width a user of the nowcast should assume on the one-month step. We
 therefore present the framework honestly: Figure~\ref{fig:architecture} gives the
 six-stage deployment architecture (multi-source ingest $\rightarrow$ leakage-safe
 pre-processing $\rightarrow$ validated detection ensemble $\rightarrow$ UCASI risk
@@ -1112,11 +1158,22 @@ reported result directly from the persisted, version-stamped artifacts under
 \texttt{results/} and \texttt{data/}. The dashboard is strictly \emph{read-only}: it
 re-fits nothing on the page, so it cannot introduce numbers that do not appear in
 the manuscript, and each artifact carries the \texttt{git} commit that produced it.
-Nine panels serve the six capabilities: an overview; the 24-detector benchmark with
-bootstrap intervals and the size-matched random null; GIS spatial intelligence;
-temporal trends; drought indices; agricultural and coffee impact, shown with its
-confounded two-sided finding; the UCASI severity ranking; SHAP explainability; and
-the district-month risk nowcast. Figure~\ref{fig:architecture} is carried through as
+Ten panels serve the six capabilities: an overview; the 24-detector benchmark
+with bootstrap intervals and the size-matched random null; a daily explorer over
+the 93{,}504 district-day stream with register windows overlaid; GIS spatial
+intelligence as a district \emph{choropleth}; the UCASI event and severity
+ranking; the Mann--Kendall trend matrix; drought indices with the cereal and
+coffee impact linkage, shown with its confounded two-sided finding; the
+district-month risk nowcast, again as a choropleth and now carrying the measured
+width of the one-month step; the SHAP drivers at both global and local level; and
+a reproducibility page that lists every artifact file the paper reads. Both maps
+are drawn with \texttt{pydeck} on the same \texttt{data/district\_boundaries.geojson}
+the figures use, with no third-party basemap requested, and both classify
+districts in Python so that the legend on screen is provably the legend that
+painted the polygons: a district is shaded only if the panel being viewed scores
+it, a district that hosts a site but lies outside the ERA5 detection panel gets
+its own class, and the remaining COD districts are labelled no-data rather than
+zero. Figure~\ref{fig:architecture} is carried through as
 the ingestion-to-decision-support backbone. The
 application, its launcher and pinned optional dependencies ship in
 \texttt{dashboard/} of the release repository.
@@ -1373,7 +1430,12 @@ together with \texttt{fetch\_boundaries.py} for the district geometry and
 coverage figures, \texttt{region\_label\_check.py} for the regional-label
 sensitivity reported in Section~\ref{sec:threats} and
 \texttt{check\_ref_index.py} for the publication check on the prior draft,
-reproduces every figure and table via \texttt{python run\_all.py}.
+reproduces every figure and table via \texttt{python run\_all.py}. That run ends
+with \texttt{verify\_release.py}, which re-asserts the package's own integrity
+claims --- mirrored 300\,dpi artwork, resolvable cross-references, the district
+arithmetic behind every map class, a checked SHAP additivity residual and a
+clean in-process render of all ten dashboard panels --- and exits non-zero rather
+than passing a bundle whose artefacts disagree with the text.
 Artefacts are
 emitted as CSV/JSON/NPZ, including \texttt{results/random\_null.json}, the
 reference distribution against which every event-level score is compared. Seeds
@@ -1475,8 +1537,12 @@ structure). (RQ4)}
 \end{figure}
 \begin{figure}[h]\centering
 \includegraphics[width=0.8\linewidth]{figures/fig_shap.png}
-\caption{SHAP global importance of weather features for the detection signal.
-(RQ3)}
+\caption{Feature attribution for the detection signal, at both levels the
+framework asks for. (a) Global importance: mean $|$SHAP$|$ per feature over the
+1{,}200 explained held-out district-days. (b) Local explanations: the same matrix
+as a beeswarm, each dot a district-day, coloured by its standardised feature
+value and placed by its attribution on the surrogate's anomaly-class probability
+scale (base value 0.4996). (RQ3)}
 \label{fig:shap}
 \end{figure}
 \begin{figure}[h]\centering

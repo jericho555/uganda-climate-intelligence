@@ -5,6 +5,50 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
 ## [Unreleased]
 
 ### Added
+- **Persisted local attributions (`src/_explain_fast.py`, `src/explain.py`):** the
+  explainability stage previously left only the aggregated `shap_values.npy` on
+  disk, so a per-district-day explanation could not be audited. Both entry points
+  now write the rows behind that matrix (`results/tables/shap_sample.csv`), the
+  surrogate's own output for those rows (`results/shap_row_outputs.npy`) and
+  `results/shap_expected_value.json` with the base value and a checked additivity
+  residual. The committed set comes from the held-out path: 1,200 test
+  district-days, base value 0.4996, surrogate held-out AUC 0.917, and
+  max |base + ΣSHAP − predict_proba| = 4.44e-14, which is why the paper can call
+  the local decomposition exact for the surrogate. A `_positive_class()` helper
+  replaces the pinned `sv[1]` indexing so the same three artefacts survive a SHAP
+  release that changes the binary return shape.
+- **Measured carry uncertainty (`src/early_warning.py`):** the persistence nowcast
+  carries the current district-month score forward, which needs an interval rather
+  than a bare point. `carry_uncertainty` now differs the score inside the
+  persisted district-month table and reports the empirical spread — 3,056
+  transitions, median |Δ| 8.2, p80 32.3, p95 44.8, signed q10/q90 −33.0/+31.6 —
+  and the same statistics restricted to the 900 transitions beginning in a High or
+  Extreme cell (median 23.7, q10/q90 −42.9/+7.8). No model is fitted and none is
+  claimed: the artefact states it is the width of the nowcast. Surfaced in
+  `results/early_warning_summary.json` and, via `collect_results.py`, in
+  `results/results_digest.json`.
+- **Dashboard impacts panel (`dashboard/app.py`):** a tenth panel, *Impacts &
+  Agriculture*, renders the drought/agriculture layer that the paper describes and
+  the dashboard did not previously show — century in-situ SPI coverage, the
+  decade-drought frequency table, index validation, register-drought
+  corroboration (3 of 4, with the missed event named), the ERA5 district index
+  explorer, detrended cereal-yield anomalies against documented drought years,
+  both linkage blocks with their coefficients and p-values, and the coffee
+  sign-reversal between substrates. Every value is read from
+  `results/drought_summary.json`, `results/ag_linkage.json`,
+  `results/coffee_linkage.json` and their tables.
+- **Release gate (`src/verify_release.py`, final `run_all.py` stage):** the package
+  now asserts its own deliverables instead of describing them — the two figure
+  folders hold the same PNGs byte-identically at ≥300 dpi (read from the PNG
+  `pHYs` header, no imaging library needed), the LaTeX source has balanced
+  environments, no orphaned cross-reference, no missing `\includegraphics` or
+  `.bib` target and no stray unicode dash, the SHAP additivity residual and the
+  attribution row count agree with the artefacts the figure cites, the nowcast
+  carries its uncertainty block, the map's three district classes partition the
+  135 polygons (16 + 3 + 116), and every dashboard tab renders in-process without
+  an exception. It exits non-zero on failure, so a bundle whose artefacts
+  disagree with the text stops the pipeline rather than printing `[done ...]`.
+  22/22 checks pass on the committed state.
 - **District geometry (`src/fetch_boundaries.py`):** the study area is now
   resolved into real polygons from the OCHA Uganda Common Operational Dataset
   (`cod-ab-uga`, 135 admin-2 districts, licence CC BY-IGO, archive pinned by
@@ -52,7 +96,34 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   `python dashboard/run_dashboard.py` with a vendored `._webpkgs` install.
 
 ### Changed
-- **Title:** now *A National Climate Anomaly Intelligence System for Uganda:
+- **One figure-output rule (`src/config.py`):** `FIG_DPI = 300`,
+  `FIG_FOLDERS = (figures/, manuscript/figures/)` and a single `save_figure()`
+  that writes the same Figure object at the same resolution into both folders and
+  closes it. All five figure scripts (`figures`, `figures_power`, `figures_maps`,
+  `figures_coffee`, `figures_early_warning`) call it instead of handling
+  `savefig`/`close` per folder, so a stale artwork copy inside the manuscript
+  bundle is no longer possible; the 17 committed PNGs are byte-identical in the two
+  folders. Elsevier requests ≥300 dpi for halftone and combination artwork.
+- **Two-panel SHAP figure (`src/figures.py`):** `fig_shap` now carries the global
+  mean |SHAP| ranking and a local attribution bar for a persisted district-day,
+  drawn from the matrices above rather than recomputed.
+- **Manuscript disclosures (`manuscript/main.tex`):** the World Bank paragraph now
+  states that only the Open Data API indicator pair is used and that the Bank's
+  climate portal was not consulted, so no portal-hosted index is cross-checked
+  against the register; the earlier claim that every surveyed detector family was
+  reported is replaced by naming the two shortlist members still absent (the local
+  outlier *probability* rescaling, and a lagged-window Isolation Forest — the
+  benchmark's Isolation Forest is the standard method on engineered antecedent
+  features, not a sequence-aware variant) together with why neither is expected to
+  change the verdict. The dashboard subsection lists the ten panels as they exist,
+  the RQ3 text carries the additivity result, the ews section carries the measured
+  carry width, and the in-situ reporting-collapse window is corrected to
+  1990–2019 to match the data.
+- **Dashboard documentation (`dashboard/README.md`):** it claimed the app needs
+  only `streamlit`, `pandas` and `numpy` and listed nine tabs. Corrected to ten
+  panels, with the `pydeck` dependency, the fallback behaviour, the no-basemap /
+  Python-side-classification map rules and the artefact list per tab.
+- **Title:** now *A National Climate Anomaly Intelligence System for Uganda:*
   Ground-Truth Validation, Risk Nowcasting, and Long-Term Climate Change
   Assessment*, naming the three things the paper actually delivers and the
   system-level claim the evidence supports. The subtitle no longer enumerates
@@ -115,6 +186,21 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   nowcast/impact results — no metric, table or figure value changed.
 
 ### Fixed
+- **Stale results digest:** `results/results_digest.json` still carried the
+  14-detector Friedman result (χ² = 20.29, p = 4.4e-4) recorded before the two
+  torch sequence autoencoders joined the benchmark, while `results/friedman.json`
+  and the manuscript report χ² = 28.77, p = 8.7e-6 over 24 detectors. Re-running
+  `collect_results.py` re-syncs the digest, and the same run now folds
+  `early_warning_summary` into it, which it had never included. The digest is what
+  the dashboard's reproducibility page enumerates, so the mismatch would have been
+  visible to a reviewer as the paper disagreeing with its own artifact.
+- **Districts silently rendered as "no data" (`dashboard/app.py`):** the
+  choropleth shaded the 16 districts that carry an ERA5 detection-panel score,
+  while `results/district_coverage.json` reports 19 site-districts. Hoima, Kabale
+  and Kasese have a station but no panel score, and were being painted with the
+  same grey as the 116 districts never observed. A fourth class, *site, no panel
+  score*, is now styled, legended and captioned separately (16 + 3 + 116 = 135), so
+  a user cannot read "no score" as "no data".
 - **Packaging metadata out of sync:** `CITATION.cff` and `.zenodo.json` still
   quoted the original conference-paper title ("A Climate Intelligence Framework
   for Detecting, Validating and Assessing Weather Anomalies in Uganda") while
