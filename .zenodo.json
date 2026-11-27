@@ -1,6 +1,6 @@
 {
   "title": "Uganda Climate Intelligence Framework (UCIF)",
-  "description": "<p>Reproducible pipeline and manuscript behind <em>\"A National Climate Anomaly Intelligence System for Uganda: Ground-Truth Validation, Risk Nowcasting, and Long-Term Climate Change Assessment\"</em>.</p><p>The framework builds a ground-truth-honest benchmark of unsupervised anomaly detectors against a curated disaster register, adds century-scale in-situ trends, an independent NASA POWER gap-fill of the 1990–2007 observing collapse, derived SPI/SPEI drought indices, a cereal-yield impact linkage, the UCASI severity index and SHAP-based explainability.</p><p><strong>v1.1.0 — Forward-looking operational layers added:</strong></p><ul><li>Drought Early Warning System (SPI-6 trajectory + decline-run rules, validation against disaster register)</li><li>Yield Impact Forecast (national log-yield detrending, growing-season SPI-3 regression, chronological skill check)</li><li>Seasonal Climate Outlook (SEAS5 51-member ensemble downscaled via Open-Meteo API, tercile classification)</li><li>Automated Climate Risk Bulletin (narrative Markdown synthesis from all layers, no hard-coded values)</li><li>Professional Streamlit dashboard with 14 interactive panels and Altair visualizations</li></ul><p>Every reported number is computed by the pipeline; the manuscript cross-checks all claims against persisted artifacts.</p>",
+  "description": "<p>Reproducible pipeline and manuscript behind <em>\"A National Climate Anomaly Intelligence System for Uganda: Ground-Truth Validation, Risk Nowcasting, and Long-Term Climate Change Assessment\"</em>. The framework builds a ground-truth-honest benchmark of unsupervised anomaly detectors against a curated disaster register, adds century-scale in-situ trends, an independent NASA POWER gap-fill of the 1990–2007 observing collapse, derived SPI/SPEI drought indices, a cereal-yield impact linkage, the UCASI severity index and SHAP-based explainability. Version 1.1 adds four forward-looking operational layers: drought early warning (SPI-6 trajectory and decline-run rules), yield impact forecast (growing-season SPI-3 regression), seasonal climate outlook (SEAS5 ensemble downscaled via Open-Meteo), and automated climate risk bulletin. Every reported number is computed by the pipeline; the manuscript cross-checks all claims against persisted artifacts.</p>",
   "creators": [
     {
       "name": "Masaba, Jeremiah",
@@ -23,23 +23,14 @@
     "reproducible research",
     "climate risk management"
   ],
-  "license": {
-    "id": "MIT"
-  },
-  "upload_type": "software",
-  "access_right": "open",
+  "license": "MIT",
   "version": "1.1.0",
   "publication_date": "2026-11-27",
   "related_identifiers": [
     {
       "identifier": "https://github.com/jericho555/uganda-climate-intelligence",
       "relation": "isSupplementTo",
-      "resource_type": "dataset"
-    }
-  ],
-  "communities": [
-    {
-      "identifier": "climate-informatics"
+      "resource_type": "software"
     }
   ]
 }
