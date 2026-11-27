@@ -15,6 +15,8 @@ families, we first implemented them from validated primitives:
              -> standardised one-step-ahead innovations (a real TEMPORAL model).
   Structural: statsmodels UnobservedComponents (local level + weekly seasonal),
              the statistical core of Prophet, scored the same way.
+  TemporalIF: Isolation Forest on a 14-day lag-window embedding of the same
+             series (temporal isolation forest, deep_models.temporal_if_scores).
 
 Update: a CPU-only torch (2.4.1) is now vendored into the workspace via pip's
 ``--target`` (directory ``._torchpkgs``), so the previously-omitted recurrent and
@@ -207,6 +209,54 @@ def structural_scores(tr, te, feats):
         mod = UnobservedComponents(ytr, level="local level", seasonal=7)
         return mod.fit(method="lbfgs", maxiter=50, disp=0)
     return _innovations(tr, te, feats, build)
+
+
+def temporal_if_scores(tr, te, feats, window=14, max_train_windows=8000, seed=None):
+    """Temporal (lag-window) Isolation Forest.
+
+    Each day is embedded as the flattened block of the ``window`` daily feature
+    vectors ENDING at that day -- the lag embedding of LagGEDScore (Cannon et al.
+    2002) applied to Isolation Forest, i.e. the time-series variant the method
+    family asks for. The embedding itself supplies the temporal context a
+    cross-sectional detector throws away (how the day was reached, not just where
+    it sits), while the forest stays the same.
+
+    Leak-free by construction: standardisation and the forest are fitted on
+    TRAIN windows only, and the window attached to a TEST row reads values at or
+    before its own date (series are sorted by date per location, never reversed),
+    so no future observation can influence a score.
+    """
+    import config as C
+    from sklearn.ensemble import IsolationForest
+    seed = C.SEED if seed is None else seed
+    mu = tr[feats].mean().values
+    sd = tr[feats].std().values + 1e-9
+    idxpos = pd.Series(np.arange(len(te)), index=te.index)
+    tr_w, te_w, te_pos = [], [], []
+    for loc in te.location.unique():
+        trL = tr[tr.location == loc].sort_values("date")
+        teL = te[te.location == loc].sort_values("date")
+        comb = pd.concat([trL, teL], axis=0).sort_values("date")
+        A = np.nan_to_num((comb[feats].values - mu) / sd,
+                          nan=0.0, posinf=0.0, neginf=0.0)
+        wins = _build_windows(A, window)                 # (T, window, F)
+        is_te = comb.index.isin(teL.index)
+        te_w.append(wins[is_te].reshape(int(is_te.sum()), -1))
+        te_pos.append(idxpos.loc[comb.index[is_te]].values)
+        trw = wins[~is_te]
+        if len(trw) > max_train_windows:
+            trw = trw[::int(np.ceil(len(trw) / max_train_windows))]
+        tr_w.append(trw.reshape(len(trw), -1))
+    Xtr = np.concatenate(tr_w, axis=0)
+    if len(Xtr) > max_train_windows:
+        rng = np.random.default_rng(seed)
+        Xtr = Xtr[rng.choice(len(Xtr), max_train_windows, replace=False)]
+    iso = IsolationForest(n_estimators=300, random_state=seed, n_jobs=-1).fit(Xtr)
+    out = np.zeros(len(te))
+    for blk, pos in zip(te_w, te_pos):
+        if len(blk):
+            out[pos] = -iso.decision_function(blk)
+    return out
 
 
 # --------------------------------------------------------------------------- #

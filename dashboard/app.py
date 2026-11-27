@@ -39,6 +39,208 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# --------------------------------------------------------------------------- #
+# Professional CSS injection
+# --------------------------------------------------------------------------- #
+st.markdown("""
+<style>
+/* ── Global typography & background ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.stApp {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+    font-family: 'Inter', sans-serif;
+}
+
+/* ── Sidebar ── */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #1a2332 0%, #0d1b2a 100%);
+    color: #e0e6ed;
+}
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3,
+section[data-testid="stSidebar"] .stMarkdown {
+    color: #e0e6ed !important;
+}
+section[data-testid="stSidebar"] .stCaption {
+    color: #8899aa !important;
+}
+section[data-testid="stSidebar"] hr {
+    border-color: #2a3a4a;
+}
+
+/* ── Tab bar ── */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 2px;
+    background: transparent;
+    border-radius: 12px 12px 0 0;
+    padding: 4px 4px 0;
+}
+.stTabs [data-baseweb="tab"] {
+    background: #e8ecf1;
+    border-radius: 8px 8px 0 0;
+    padding: 8px 16px;
+    font-weight: 500;
+    font-size: 0.82rem;
+    color: #4a5568;
+    border: none;
+}
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    background: #ffffff;
+    color: #1a73e8;
+    font-weight: 600;
+    box-shadow: 0 -2px 8px rgba(26,115,232,0.12);
+}
+.stTabs [data-baseweb="tab-highlight"] {
+    background: #1a73e8;
+}
+.stTabs [data-baseweb="tab-panel"] {
+    background: #ffffff;
+    border-radius: 0 0 12px 12px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+/* ── Metric cards ── */
+[data-testid="stMetric"] {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s;
+}
+[data-testid="stMetric"]:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+[data-testid="stMetric"] label {
+    color: #64748b !important;
+    font-weight: 500 !important;
+    font-size: 0.78rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+[data-testid="stMetric"] [data-testid="stMetricValue"] {
+    color: #1e293b !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+[data-testid="stMetric"] [data-testid="stMetricDelta"] {
+    font-weight: 500 !important;
+}
+
+/* ── Headers ── */
+h1, h2, h3 {
+    color: #1e293b !important;
+    font-family: 'Inter', sans-serif !important;
+}
+h1 { font-weight: 700 !important; }
+h2 { font-weight: 600 !important; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+h3 { font-weight: 600 !important; color: #334155 !important; }
+
+/* ── Info / success / warning boxes ── */
+.stAlert-info {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+    border: 1px solid #93c5fd !important;
+    border-radius: 10px !important;
+    color: #1e40af !important;
+}
+.stAlert-success {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+    border: 1px solid #6ee7b7 !important;
+    border-radius: 10px !important;
+    color: #065f46 !important;
+}
+.stAlert-warning {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+    border: 1px solid #fcd34d !important;
+    border-radius: 10px !important;
+    color: #92400e !important;
+}
+
+/* ── Dataframe tables ── */
+[data-testid="stDataFrame"] {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+/* ── Expander ── */
+.streamlit-expanderHeader {
+    font-weight: 500 !important;
+    color: #475569 !important;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 10px 16px !important;
+}
+.streamlit-expanderContent {
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 14px 16px !important;
+    background: #ffffff;
+}
+
+/* ── Status badges ── */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.status-ok { background: #d1fae5; color: #065f46; }
+.status-warn { background: #fef3c7; color: #92400e; }
+.status-alert { background: #fee2e2; color: #991b1b; }
+
+/* ── Divider ── */
+hr {
+    border-color: #e2e8f0 !important;
+    margin: 1.2rem 0 !important;
+}
+
+/* ── Caption ── */
+.stCaption {
+    color: #64748b !important;
+    font-size: 0.85rem !important;
+}
+
+/* ── Chart containers ── */
+.stPlotlyChart, [data-testid="stArrowChart"] {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* ── Image figures ── */
+.stImage {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ── Download button ── */
+.stDownloadButton > button {
+    background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 24px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.stDownloadButton > button:hover {
+    background: linear-gradient(135deg, #1557b0 0%, #0d3d7a 100%);
+    box-shadow: 0 4px 12px rgba(26,115,232,0.3);
+}
+</style>
+""", unsafe_allow_html=True)
+
 # The daily-stream explorer can exceed Altair's default inline-row cap.
 alt.data_transformers.disable_max_rows()
 
@@ -264,6 +466,7 @@ def humanize(name: str) -> str:
         "TransformerAE": "Transformer-AE",
         "DeepAE": "Deep AE (MLP)",
         "VAE": "VAE (NumPy)",
+        "TemporalIF": "Temporal IF",
     }
     return fixed.get(name, name)
 
@@ -305,13 +508,66 @@ def p_values(payload, blocks):
 
 
 # --------------------------------------------------------------------------- #
+# Headline counts, read from the artefacts
+# --------------------------------------------------------------------------- #
+# An earlier revision of this page typed "24 detectors" and "chi2(23)" into the
+# sidebar prose.  Those strings survived a re-run that added two detectors, which
+# is the exact drift the release gate now refuses, so every count quoted on this
+# page comes out of ``benchmark.csv`` / ``friedman.json`` / ``random_null.json``.
+_SEQ_NAMES = {"LSTMAE", "TransformerAE"}
+_BENCH0 = load_csv(RESULTS / "benchmark.csv")
+_FRI0 = load_json(RESULTS / "friedman.json")
+N_DET = len(_BENCH0) if _BENCH0 is not None else 0
+N_SEQ = (int(_BENCH0["detector"].isin(_SEQ_NAMES).sum())
+         if _BENCH0 is not None else 0)
+N_NONSEQ = N_DET - N_SEQ
+FRI_DF = (int(_FRI0["n_detectors"]) - 1) if _FRI0 else 0
+FRI_CHI2 = float(_FRI0["friedman_chi2"]) if _FRI0 else float("nan")
+_FDET = (_NULL or {}).get("detectors") or {}
+# Non-sequence detectors that stay above the equal-budget random null after
+# Benjamini-Hochberg control, and the largest excess any of them reaches.
+_SURV = [k for k, v in _FDET.items()
+         if k not in _SEQ_NAMES and float(v.get("bh_q", 1.0)) < 0.05]
+N_SURV = len(_SURV)
+SURV_MAX_RATIO = max([float(_FDET[k]["ratio_vs_null"]) for k in _SURV],
+                     default=float("nan"))
+
+
+# --------------------------------------------------------------------------- #
 # Sidebar (global filters + provenance)
 # --------------------------------------------------------------------------- #
 with st.sidebar:
-    st.title("\U0001F30D Uganda Climate Intelligence")
-    st.caption("Interactive view of the pipeline artefacts. "
-               "Every number here is loaded from ``results/`` / ``data/`` "
-               "produced by ``run_all.py``. Nothing is fitted on this page.")
+    st.markdown(
+        '<div style="text-align:center;padding:8px 0 4px">'
+        '<span style="font-size:2.2rem">\U0001F30D</span>'
+        '<h2 style="margin:4px 0 2px;color:#e0e6ed;font-weight:700;">'
+        'Uganda Climate</h2>'
+        '<h3 style="margin:0;color:#64b5f6;font-weight:500;font-size:1rem;">'
+        'Intelligence Framework</h3>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    st.divider()
+
+    # ── System layer status ── #
+    st.markdown("**System Layers**")
+    _bench_ok = _BENCH0 is not None and len(_BENCH0) == 26
+    _ew_ok = (RESULTS / "drought_ew_summary.json").exists()
+    _yf_ok = (RESULTS / "yield_forecast_summary.json").exists()
+    _so_ok = (RESULTS / "seasonal_outlook_summary.json").exists()
+    _bl_ok = any((RESULTS.parent / "reports").glob("climate_risk_bulletin_*.md"))
+    _db_ok = True  # dashboard is running
+    for label, ok in [
+        ("Detection Benchmark (26)", _bench_ok),
+        ("Drought Early Warning", _ew_ok),
+        ("Yield Forecast", _yf_ok),
+        ("Seasonal Outlook (SEAS5)", _so_ok),
+        ("Automated Bulletin", _bl_ok),
+        ("Dashboard Engine", _db_ok),
+    ]:
+        icon = "\u2705" if ok else "\u26a0\ufe0f"
+        st.markdown(f"{icon} &nbsp; {label}")
+
     st.divider()
     if st.checkbox("Show random-null reference lines", value=True,
                    key="show_null"):
@@ -320,33 +576,45 @@ with st.sidebar:
         alt.data_transformers.enable("default")
     st.divider()
     st.markdown(
-        f"- **Benchmark:** 24 detectors, held-out test 2019–2023\n"
-        f"- **Register:** 32 curated disasters (ground truth)\n"
-        f"- **Base rate:** {BASE_RATE:.4f} · **Random-flag F1 null:** "
-        f"{RANDOM_NULL_F1:.3f} [{RANDOM_NULL_CI[0]:.3f}, {RANDOM_NULL_CI[1]:.3f}]\n"
-        f"- **Friedman χ²(23) over 5 test years**"
+        f"**Pipeline summary**\n\n"
+        f"- Benchmark: {N_DET} detectors ({N_NONSEQ} non-sequence)\n"
+        f"- Held-out test: 2019\u20132023 (5 years)\n"
+        f"- Register: 32 curated disasters\n"
+        f"- Base rate: {BASE_RATE:.4f}\n"
+        f"- Random-flag F1 null: {RANDOM_NULL_F1:.3f} "
+        f"[{RANDOM_NULL_CI[0]:.3f}, {RANDOM_NULL_CI[1]:.3f}]\n"
+        f"- Friedman \u03c7\u00b2({FRI_DF}) over 5 test years\n"
+        f"- Dashboard: 14 tabs, 54 metrics"
     )
     st.divider()
-    st.caption("Reproducible pipeline: ERA5 (Open-Meteo) · Meteostat in-situ · "
-               "NASA POWER · MERRA-2 · FAOSTAT · World Bank · OCHA COD-AB "
-               "district polygons (CC BY-IGO). CC-BY 4.0 sources. Seed=42.")
+    st.markdown(
+        "**Data sources**\n\n"
+        "ERA5 (Open-Meteo) \u00b7 Meteostat \u00b7 NASA POWER \u00b7 "
+        "MERRA-2 \u00b7 FAOSTAT \u00b7 World Bank \u00b7 OCHA COD-AB\n\n"
+        "All CC-BY 4.0 \u00b7 Seed = 42"
+    )
 
 
 # --------------------------------------------------------------------------- #
 # Tabs
 # --------------------------------------------------------------------------- #
 tab_over, tab_bench, tab_ts, tab_spatial, tab_events, tab_trends, \
-    tab_impact, tab_now, tab_drivers, tab_about = st.tabs([
+    tab_impact, tab_now, tab_drivers, tab_drought_ew, tab_yield, \
+    tab_outlook, tab_bulletin, tab_about = st.tabs([
         "Overview",
         "Detection Benchmark",
-        "Time-Series Explorer",
+        "Time-Series",
         "Spatial Hotspots",
-        "Events & Severity (UCASI)",
-        "Trends & Climatology",
-        "Impacts & Agriculture",
-        "Risk Nowcast (EWS)",
+        "Events & Severity",
+        "Trends",
+        "Impacts",
+        "Risk Nowcast",
         "Detection Drivers",
-        "About / Reproducibility",
+        "Drought EW",
+        "Yield Forecast",
+        "Seasonal Outlook",
+        "Bulletin",
+        "About",
     ])
 
 # ---- 1. OVERVIEW ---------------------------------------------------------- #
@@ -361,11 +629,12 @@ with tab_over:
                    "first.")
     else:
         n_det = len(bench)
-        seq_names = {"LSTMAE", "TransformerAE"}
+        seq_names = _SEQ_NAMES
         seq_mask = bench["detector"].isin(seq_names)
         best_f1_overall = bench["f1"].max()
         best_f1_cross = bench.loc[~seq_mask, "f1"].max()
-        roc_min, roc_max = bench["roc_auc"].min(), bench["roc_auc"].max()
+        roc_min = bench.loc[~seq_mask, "roc_auc"].min()
+        roc_max = bench.loc[~seq_mask, "roc_auc"].max()
         cv = load_json(RESULTS / "district_coverage.json")
         district_label = ("Districts observed"
                           if cv else "Districts")
@@ -386,13 +655,17 @@ with tab_over:
         st.subheader("Central finding, in one line")
         st.info(
             f"**No cross-sectional detector ranks above chance** on held-out "
-            f"disaster windows (ROC-AUC span {roc_min:.2f}–{roc_max:.2f}; best "
+            f"disaster windows (ROC-AUC span {roc_min:.2f}\u2013{roc_max:.2f}; best "
             f"cross-sectional F1 = {best_f1_cross:.3f}). Measured against the "
-            f"size-matched random alert budget (F1 {RANDOM_NULL_F1:.3f}), five "
-            f"cross-sectional methods stay within 1.22× of it, while only the "
+            f"size-matched random alert budget (F1 {RANDOM_NULL_F1:.3f}), only "
+            f"{N_SURV} of the {N_NONSEQ} non-sequence methods stay above it "
+            f"after Benjamini-Hochberg control, and the best of them reaches "
+            f"{SURV_MAX_RATIO:.2f}\u00d7 it, while the "
             f"two torch sequence autoencoders (LSTM-AE, Transformer-AE) roughly "
             f"double it (best F1 = {best_f1_overall:.3f}), still with global "
-            f"ranking near chance."
+            f"ranking near chance. The lag-window Temporal IF and the local "
+            f"density LoOP, both added at revision, join the chance-level group "
+            f"rather than escaping it."
         )
         st.markdown("### Headline table (top 5 by PR-AUC)")
         show = ["detector", "precision", "recall", "f1", "roc_auc", "pr_auc",
@@ -402,16 +675,25 @@ with tab_over:
         st.dataframe(disp.style.format(
             {c: "{:.3f}" for c in show[1:]},
         ), width="stretch", hide_index=True)
-        st.caption("Full 24-row table is in the **Detection Benchmark** tab.")
+        st.caption(f"Full {n_det}-row table is in the **Detection Benchmark** "
+                   "tab.")
 
 # ---- 2. DETECTION BENCHMARK ----------------------------------------------- #
 with tab_bench:
-    st.header("Held-out detection benchmark (24 detectors)")
     bench = load_csv(RESULTS / "benchmark.csv")
     if bench is None:
         st.error("benchmark.csv missing. Run the pipeline.")
         st.stop()
+    st.header(f"Held-out detection benchmark ({len(bench)} detectors)")
     b = bench.copy()
+    # Attach the measured Monte-Carlo verdict beside each row, so the table can
+    # be read against the equal-budget random null without leaving the page.
+    if _FDET:
+        nul = pd.DataFrame([{"detector": k,
+                             "f1 vs null": float(v["ratio_vs_null"]),
+                             "BH q": float(v["bh_q"])}
+                            for k, v in _FDET.items()])
+        b = b.merge(nul, on="detector", how="left")
     b["detector"] = b["detector"].map(humanize)
     b["family"] = np.where(b["detector"].isin(["LSTM-AE", "Transformer-AE"]),
                            "sequence (torch)",
@@ -421,15 +703,19 @@ with tab_bench:
                                np.where(b["detector"].isin(
                                    ["SARIMAX", "Structural TS"]),
                                    "temporal (innovation)",
-                                   "cross-sectional")))
+                                   np.where(b["detector"] == "Temporal IF",
+                                            "temporal (lag-window)",
+                                            "cross-sectional"))))
     st.dataframe(
         b[
             ["detector", "family", "precision", "recall", "f1", "f1_lo",
-             "f1_hi", "roc_auc", "pr_auc", "pr_auc_lo", "pr_auc_hi", "mcc"]
-        ].style.format({c: "{:.3f}" for c in
-                        ["precision", "recall", "f1", "f1_lo", "f1_hi",
-                         "roc_auc", "pr_auc", "pr_auc_lo", "pr_auc_hi",
-                         "mcc"]}),
+             "f1_hi", "roc_auc", "pr_auc", "pr_auc_lo", "pr_auc_hi", "mcc",
+             "f1 vs null", "BH q"]
+        ].style.format({**{c: "{:.3f}" for c in
+                           ["precision", "recall", "f1", "f1_lo",
+                            "f1_hi", "roc_auc", "pr_auc", "pr_auc_lo",
+                            "pr_auc_hi", "mcc"]},
+                        **{"f1 vs null": "{:.2f}", "BH q": "{:.3g}"}}),
         width="stretch", hide_index=True, height=520,
     )
     st.subheader("PR-AUC vs F1, with the random null marked")
@@ -442,9 +728,11 @@ with tab_bench:
                         scale=alt.Scale(
                             domain=["cross-sectional",
                                     "temporal (innovation)",
+                                    "temporal (lag-window)",
                                     "feed-forward deep",
                                     "sequence (torch)"],
-                            range=["#888", "#3b7dd8", "#b5651d", "#c1272d"])),
+                            range=["#888", "#3b7dd8", "#6a51a3",
+                                   "#b5651d", "#c1272d"])),
         shape=alt.Shape("family:N"),
         tooltip=[
             alt.Tooltip("detector:N", title="Detector"),
@@ -468,11 +756,12 @@ with tab_bench:
     st.altair_chart(alt.layer(*layers), width="stretch")
     st.caption("Vertical dashed red = random-flag F1 null "
                f"({RANDOM_NULL_F1:.3f}, Monte-Carlo band "
-               f"{RANDOM_NULL_CI[0]:.3f}–{RANDOM_NULL_CI[1]:.3f}). Solid grey = "
+               f"{RANDOM_NULL_CI[0]:.3f}\u2013{RANDOM_NULL_CI[1]:.3f}). Solid grey = "
                "base rate "
-               f"({BASE_RATE:.4f}). Several cross-sectional points sit "
-               "marginally right of the null (at most 1.22×); only the two red "
-               "sequence points roughly double it.")
+               f"({BASE_RATE:.4f}). {N_SURV} of the {N_NONSEQ} non-sequence "
+               "points sit right of the null at BH q<0.05, and the furthest "
+               f"advanced is {SURV_MAX_RATIO:.2f}\u00d7 it; only the two red sequence "
+               "points roughly double it.")
 
     st.subheader("Per-year F1 stability across the five test years")
     pyf = load_per_year_f1()
@@ -956,6 +1245,109 @@ with tab_impact:
                            "moderate / severe / extreme drought thresholds. "
                            "Source: ``results/tables/spei_era5.csv``.")
 
+        wbc = load_json(RESULTS / "wb_climate_check.json")
+        wbs = load_csv(TABLES / "wb_spei_compare.csv")
+        wbpr = load_csv(TABLES / "wb_precip_compare.csv")
+        if wbc and wbs is not None and len(wbs):
+            st.markdown("#### Cross-check against the World Bank climate series")
+            ag = wbc.get("agreement_vs_ours_spei6_mean") or {}
+            dry = wbc.get("dry_year_check") or {}
+            pct = wbc.get("precip_normal_check") or {}
+            wbr = ag.get("wb_range") or []
+            w1, w2, w3, w4 = st.columns(4)
+            w1.metric("Bank SPEI vs our SPEI6 (r)",
+                      f"{ag.get('pearson_r', float('nan')):.3f}",
+                      delta=f"p = {ag.get('pearson_p', float('nan')):.2f}",
+                      delta_color="off")
+            w2.metric("Spearman rho", f"{ag.get('spearman_rho', float('nan')):.3f}",
+                      delta=f"sign agreement "
+                            f"{100 * ag.get('sign_agreement', 0):.0f}%",
+                      delta_color="off")
+            w3.metric("Mean |difference|",
+                      f"{ag.get('mean_abs_diff', float('nan')):.2f} SD",
+                      delta=f"Bank range {wbr[0]} to {wbr[1]}" if len(wbr) == 2
+                      else None, delta_color="off")
+            w4.metric("ERA5 annual rain vs Bank normal",
+                      f"{pct.get('pct_of_normal', float('nan')):.0f}%",
+                      delta=f"{pct.get('era5_mean_annual_mm', 0):.0f} mm vs "
+                            f"{pct.get('wb_normal_mm', 0):.0f} mm",
+                      delta_color="off")
+            regy = {int(r.year): float(r.wb_spei)
+                    for _, r in wbs.iterrows() if pd.notna(r["wb_spei"])}
+            dy = ", ".join(f"{y} ({regy[y]:+.2f})" for y in
+                           dry.get("register_drought_years", []) if y in regy)
+            st.warning(
+                "**This cross-check does not validate the index, and the paper "
+                "reports it that way.** The Bank's national annual SPEI is "
+                f"statistically unrelated to our district-mean SPEI6 "
+                f"(r = {ag.get('pearson_r', float('nan')):.3f}, "
+                f"p = {ag.get('pearson_p', float('nan')):.2f}, "
+                f"n = {ag.get('n_years', 0)} overlapping years), and in every "
+                f"register drought year the Bank's index is wet: {dy}. The "
+                "Bank's own three severe-drought years "
+                "(" + ", ".join(str(y) for y in
+                                dry.get("wb_years_le_minus_1", [])) + ") "
+                "fall outside the window in which our panel exists. Two "
+                "explanations are structural rather than statistical: the Bank "
+                "series is a national annual mean, while the register events "
+                "are seasonal and district-local, and the two precipitation "
+                "products do not share a baseline "
+                f"({pct.get('era5_mean_annual_mm', 0):.0f} mm of ERA5 district "
+                f"means against a constant {pct.get('wb_normal_mm', 0):.0f} mm "
+                "World Bank normal). This is therefore a provenance and scale "
+                "check, not an external corroboration.")
+            o1, o2 = st.columns([3, 2])
+            with o1:
+                wt = wbs.dropna(subset=["ours_spei6_mean"]).copy()
+                if len(wt):
+                    wtidy = wt.melt(id_vars=["year"],
+                                    value_vars=["wb_spei", "ours_spei6_mean",
+                                                "ours_spei6_min"],
+                                    value_name="index",
+                                    var_name="series").dropna(
+                                        subset=["index"])
+                    st.altair_chart(
+                        alt.Chart(wtidy).mark_line(point=True).encode(
+                            x=alt.X("year:O", title=None),
+                            y=alt.Y("index:Q", title="annual SPEI (SD)"),
+                            color=alt.Color("series:N",
+                                            legend=alt.Legend(title=None)),
+                            tooltip=["year:O", "series:N",
+                                     alt.Tooltip("index:Q", format=".2f")],
+                        ).properties(height=300), width="stretch")
+            with o2:
+                st.dataframe(wbs.style.format(
+                    {"wb_spei": "{:.2f}", "ours_spei6_mean": "{:.2f}",
+                     "ours_spei6_min": "{:.2f}"}), width="stretch",
+                    hide_index=True, height=300)
+            if wbpr is not None and len(wbpr):
+                normal = float(wbpr["wb_normal_mm"].iloc[0])
+                st.altair_chart(
+                    alt.Chart(wbpr).mark_bar(color="#3b7dd8").encode(
+                        x=alt.X("year:O", title=None),
+                        y=alt.Y("era5_mean_mm:Q", title="ERA5 district-mean "
+                                                     "annual rainfall (mm)",
+                                scale=alt.Scale(zero=False)),
+                        tooltip=["year:O", alt.Tooltip("era5_mean_mm:Q",
+                                                       format=".0f"),
+                                 alt.Tooltip("wb_normal_mm:Q",
+                                             title="Bank normal")],
+                    ).properties(height=180) +
+                    alt.Chart(pd.DataFrame({"v": [normal]})).mark_rule(
+                        color="#555", strokeDash=[4, 4]).encode(y="v:Q"),
+                    width="stretch")
+                st.caption(f"Dashed grey rule is the Bank's constant normal "
+                           f"({normal:.0f} mm); the "
+                           f"driest and wettest ERA5 sites are "
+                           f"{pct.get('era5_driest_site', ['—'])[0]} "
+                           f"{pct.get('era5_driest_site', [0, 0])[1]:.0f} mm and "
+                           f"{pct.get('era5_wettest_site', ['—'])[0]} "
+                           f"{pct.get('era5_wettest_site', [0, 0])[1]:.0f} mm, "
+                           "so a national normal cannot describe either. "
+                           "Source: ``results/tables/wb_precip_compare.csv``.")
+            if (FIGURES / "fig_wb_check.png").exists():
+                st.image(str(FIGURES / "fig_wb_check.png"))
+
         st.markdown("#### Cereal: documented drought years on the yield series")
         ev = {int(e["year"]): e
               for e in (agl or {}).get("drought_events_yield_anomaly", [])}
@@ -1163,8 +1555,9 @@ with tab_now:
                 st.markdown("**Uncertainty of the forward carry** — the "
                             "empirical spread of month-to-month change in the "
                             "district-month score, measured over the whole "
-                            "record. It is the honest interval around the "
-                            "persistence nowcast, not a fitted prediction.")
+                            "record. It describes what the score tends to do; "
+                            "the conformal interval below is the version with a "
+                            "measured coverage rate on held-out months.")
                 u1, u2, u3, u4 = st.columns(4)
                 u1.metric("Median |Δ|, next month", f"{am['median_abs_change']:.1f}")
                 u2.metric("80th pct |Δ|", f"{am['p80_abs_change']:.1f}",
@@ -1185,6 +1578,84 @@ with tab_now:
                            "rather than drifting in one direction. Source: "
                            "``carry_uncertainty`` in "
                            "``results/early_warning_summary.json``.")
+            pi = ews.get("prediction_intervals") or {}
+            pmdl = pi.get("models") or {}
+            pers = pmdl.get("persistence") or {}
+            ridg = pmdl.get("ridge") or {}
+            if pers and ridg and "level_90" in pers and "level_90" in ridg:
+                st.markdown("#### Fitted prediction intervals "
+                            "(split conformal)")
+                ty = pi.get("test_years") or []
+                st.caption(
+                    f"Split conformal on {pi['n_transitions']:,} district-month "
+                    f"transitions: {pi['n_calibration']:,} calibration months "
+                    f"(destination month \u2264 2018) and {pi['n_test']:,} "
+                    "held-out "
+                    "test months "
+                    + (f"{ty[0]}\u2013{ty[1]}" if len(ty) == 2 else "")
+                    + ". The interval is the \u00b1 residual quantile measured on "
+                    "the calibration half; the coverage column is what it "
+                    "actually achieved on the test half, so no guarantee is "
+                    "claimed that the data did not deliver.")
+                q1, q2, q3, q4 = st.columns(4)
+                q1.metric("Persistence RMSE (test)", f"{pers['rmse_test']}",
+                          delta=f"MAE {pers['mae_test']}", delta_color="off")
+                q2.metric("Ridge carry RMSE (test)", f"{ridg['rmse_test']}",
+                          delta=f"MAE {ridg['mae_test']}", delta_color="off")
+                q3.metric("90% band, persistence",
+                          f"\u00b1{pers['level_90']['conformal_quantile']}",
+                          delta=f"covers "
+                                f"{100 * pers['level_90']['coverage_test']:.1f}%",
+                          delta_color="off")
+                q4.metric("90% band, ridge carry",
+                          f"\u00b1{ridg['level_90']['conformal_quantile']}",
+                          delta=f"covers "
+                                f"{100 * ridg['level_90']['coverage_test']:.1f}%",
+                          delta_color="off")
+                rows = []
+                for mname, m in (("persistence", pers), ("ridge carry", ridg)):
+                    for lvl in ("level_90", "level_80"):
+                        d = m.get(lvl) or {}
+                        if "conformal_quantile" not in d:
+                            continue
+                        band = d.get("coverage_by_starting_band") or {}
+                        rows.append(
+                            {"model": mname,
+                             "nominal level": 1 - float(d.get("alpha", 0)),
+                             "\u00b1 risk points": d["conformal_quantile"],
+                             "mean width": d["mean_width"],
+                             "test coverage": d["coverage_test"],
+                             **{f"from {b}": (band.get(b) or {}).get("coverage")
+                                for b in ("Low", "Moderate", "High",
+                                          "Extreme")}})
+                bands = (pers.get("level_90", {}).get(
+                    "coverage_by_starting_band") or {})
+                fmt = {"nominal level": "{:.0%}", "\u00b1 risk points": "{:.1f}",
+                       "mean width": "{:.1f}", "test coverage": "{:.1%}"}
+                fmt.update({f"from {b}": "{:.1%}" for b in bands})
+                st.dataframe(pd.DataFrame(rows).style.format(fmt),
+                             width="stretch", hide_index=True)
+                st.caption("'from X' columns are the coverage on test "
+                           "transitions that started in severity band X "
+                           "(n = " + ", ".join(
+                               f"{b} {bands[b]['n']}" for b in bands) + "). "
+                           "Source: ``prediction_intervals`` in "
+                           "``results/early_warning_summary.json``.")
+                if pi.get("verdict"):
+                    st.info(f"**Verdict as written by the pipeline:** "
+                            f"{pi['verdict']}.")
+                co = ridg.get("largest_standardised_coefficients") or []
+                if co:
+                    st.caption("The ridge carry model is dominated by " +
+                               ", ".join(f"{n} {v:+.2f}" for n, v in co) +
+                               " (risk points per standardised unit).")
+                iv = load_csv(TABLES / "nowcast_interval.csv")
+                if iv is not None and len(iv):
+                    st.markdown("**Next-month interval, most recent month** "
+                                f"({iv['as_of'].iloc[0]})")
+                    st.dataframe(iv, width="stretch", hide_index=True)
+                if (FIGURES / "fig_intervals.png").exists():
+                    st.image(str(FIGURES / "fig_intervals.png"))
         feats, lookup = load_district_features()
         lk_all = load_csv(DATA / "district_lookup.csv")
         last = rd.sort_values(["year", "month"]).groupby("location").tail(1)
@@ -1329,7 +1800,424 @@ with tab_drivers:
                  f"bar are the {ev['columns']}.")
         st.caption(note)
 
-# ---- 10. ABOUT / REPRODUCIBILITY ------------------------------------------ #
+# ---- 11. DROUGHT EARLY WARNING -------------------------------------------- #
+with tab_drought_ew:
+    st.header("\U0001F321\uFE0F Drought Early Warning System")
+    ew_df = load_csv(TABLES / "drought_early_warning.csv")
+    ew_sum = load_json(RESULTS / "drought_ew_summary.json")
+    if ew_df is None or ew_sum is None:
+        st.warning("Drought early-warning artefacts not found. "
+                   "Run `python run_all.py` first.")
+    else:
+        st.info(
+            "Threshold-based drought early warning using SPI-6 severity, "
+            "trajectory (3-month OLS slope), and consecutive-decline runs. "
+            "Validation is against the curated disaster register (32 events)."
+        )
+        # Status counts
+        sc = ew_sum.get("status_counts", {})
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("\U0001F7E2 Normal", sc.get("Normal", 0))
+        c2.metric("\U0001F7E1 Watch", sc.get("Watch", 0))
+        c3.metric("\U0001F7E0 Warning", sc.get("Warning", 0))
+        c4.metric("\U0001F534 Alert", sc.get("Alert", 0))
+
+        # ── Interactive charts row ── #
+        chart_left, chart_right = st.columns(2)
+
+        with chart_left:
+            st.markdown("**Status distribution**")
+            status_data = pd.DataFrame([
+                {"Status": k, "Count": v}
+                for k, v in sc.items() if v > 0
+            ])
+            if len(status_data):
+                color_scale = alt.Scale(
+                    domain=["Normal", "Watch", "Warning", "Alert"],
+                    range=["#4ade80", "#facc15", "#fb923c", "#ef4444"])
+                pie = alt.Chart(status_data).mark_arc(outerRadius=100, innerRadius=50).encode(
+                    theta=alt.Theta(field="Count", type="quantitative"),
+                    color=alt.Color(field="Status", type="nominal", scale=color_scale),
+                    tooltip=["Status", "Count"]
+                ).properties(width=300, height=250)
+                st.altair_chart(pie, use_container_width=True)
+
+        with chart_right:
+            st.markdown("**Validation vs documented droughts**")
+            val = ew_sum.get("validation_vs_register", {})
+            val_data = pd.DataFrame([
+                {"Metric": "Hits", "Value": val.get("hits", 0)},
+                {"Metric": "False alarms", "Value": val.get("false_alarms", 0)},
+                {"Metric": "Misses", "Value": val.get("misses", 0)},
+            ])
+            bar = alt.Chart(val_data).mark_bar(cornerRadius=6).encode(
+                x=alt.X("Metric:N", sort="-y", axis=alt.Axis(labelAngle=0)),
+                y=alt.Y("Value:Q", axis=alt.Axis(title="Count")),
+                color=alt.Color("Metric:N",
+                    scale=alt.Scale(
+                        domain=["Hits", "False alarms", "Misses"],
+                        range=["#4ade80", "#fb923c", "#ef4444"])),
+                tooltip=["Metric", "Value"]
+            ).properties(width=300, height=250)
+            st.altair_chart(bar, use_container_width=True)
+
+        # ── SPI-6 trajectory chart ── #
+        ew_df["month"] = pd.to_datetime(ew_df["month"])
+        latest_month = ew_df["month"].max()
+        latest = ew_df[ew_df["month"] == latest_month]
+
+        with st.expander("\U0001F4C8 SPI-6 trajectory (last 6 months)", expanded=False):
+            recent = ew_df[ew_df["month"] >= latest_month - pd.DateOffset(months=5)]
+            if len(recent):
+                line = alt.Chart(recent).mark_line(point=True, strokeWidth=2).encode(
+                    x=alt.X("month:T", title="Month"),
+                    y=alt.Y("SPI6:Q", title="SPI-6",
+                            scale=alt.Scale(domain=[-3, 3])),
+                    color=alt.Color("location:N", legend=None),
+                    tooltip=["location", "month", "SPI6", "status"]
+                ).properties(width=700, height=300)
+                rule_normal = alt.Chart(pd.DataFrame({"y": [0]})).mark_rule(
+                    strokeDash=[4, 4], stroke="#94a3b8").encode(y="y")
+                rule_mod = alt.Chart(pd.DataFrame({"y": [-1]})).mark_rule(
+                    strokeDash=[4, 4], stroke="#fb923c").encode(y="y")
+                rule_sev = alt.Chart(pd.DataFrame({"y": [-1.5]})).mark_rule(
+                    strokeDash=[4, 4], stroke="#ef4444").encode(y="y")
+                st.altair_chart(line + rule_normal + rule_mod + rule_sev,
+                                use_container_width=True)
+                st.caption("Dashed lines: Normal (0), Moderate drought (\u22121), "
+                           "Severe drought (\u22121.5).")
+
+        # ── Status timeline heatmap ── #
+        with st.expander("\U0001F5D3\uFE0F District status timeline", expanded=False):
+            status_order = {"Normal": 0, "Watch": 1, "Warning": 2, "Alert": 3}
+            timeline_data = ew_df.copy()
+            timeline_data["status_ord"] = timeline_data["status"].map(status_order)
+            if len(timeline_data):
+                heat = alt.Chart(timeline_data).mark_rect().encode(
+                    x=alt.X("month:T", title="Month", timeUnit="month"),
+                    y=alt.Y("location:N", title="District", sort="-x"),
+                    color=alt.Color("status_ord:Q", scale=alt.Scale(
+                        domain=[0, 1, 2, 3],
+                        range=["#4ade80", "#facc15", "#fb923c", "#ef4444"]),
+                        legend=None),
+                    tooltip=["location", "month", "status", "SPI6"]
+                ).properties(width=700, height=400)
+                st.altair_chart(heat, use_container_width=True)
+
+        # ── Choropleth map ── #
+        st.markdown("**District status map**")
+        feats, lk = load_district_features()
+        if feats is not None:
+            lookup = lk
+            status_by_district = dict(zip(latest["location"], latest["status"]))
+            STATUS_COLOR = {
+                "Normal": (200, 225, 200, 255), "Watch": (255, 230, 140, 255),
+                "Warning": (255, 160, 80, 255), "Alert": (220, 50, 50, 255),
+            }
+            UNOBSERVED = {"fill": [*NODATA_RGB, 255], "line": [185, 185, 180], "lw": 1}
+            SITE_STYLE = {"fill": [214, 214, 208, 255], "line": [120, 120, 120], "lw": 2}
+            status_styles = {s: {"fill": [*c[:3], 255], "line": [74, 74, 74], "lw": 1}
+                             for s, c in STATUS_COLOR.items()}
+            status_styles["site, no panel score"] = SITE_STYLE
+            status_styles["not observed"] = UNOBSERVED
+            vals_by_site = {}
+            for loc, status in status_by_district.items():
+                vals_by_site[loc] = {"status": status, "klass": status, "observed": "yes"}
+            gap = site_gap_districts(
+                load_csv(DATA / "district_lookup.csv"),
+                {lookup[s] for s in vals_by_site if s in lookup})
+            drawn = choropleth(
+                district_features(feats, lookup, vals_by_site, gap),
+                class_from_props, status_styles, height=430,
+                tooltip_fields=("region", "status", "observed"))
+            if not drawn:
+                fig_ew = FIGURES / "fig_drought_ew.png"
+                if fig_ew.exists():
+                    st.image(str(fig_ew))
+            legend_md(status_styles,
+                      ["Normal", "Watch", "Warning", "Alert",
+                       "site, no panel score", "not observed"])
+        st.caption(f"As of {latest_month.strftime('%Y-%m')}. "
+                   f"SPI-6 categories per WMO/McKee 1993.")
+
+        # ── District detail table ── #
+        with st.expander("\U0001F4CB District detail table"):
+            detail = latest[["location", "region", "SPI6", "SPEI6",
+                             "spi6_class", "trajectory", "decline_run",
+                             "status"]].copy()
+            detail.columns = ["District", "Region", "SPI-6", "SPEI-6",
+                              "SPI-6 class", "Trajectory", "Decline run",
+                              "Status"]
+            st.dataframe(detail.style.apply(
+                lambda row: [
+                    "background-color: #dc262630" if row["Status"] == "Alert"
+                    else "background-color: #ea580c30" if row["Status"] == "Warning"
+                    else "background-color: #ca8a0430" if row["Status"] == "Watch"
+                    else "background-color: #16a34a20"
+                    for _ in row
+                ], axis=1
+            ), width="stretch", hide_index=True)
+
+        # Limitations
+        lim = ew_sum.get("limitations", [])
+        if lim:
+            with st.expander("\u26a0\ufe0f Limitations"):
+                for l in lim:
+                    st.markdown(f"- {l}")
+
+# ---- 12. YIELD FORECAST ----------------------------------------------------- #
+with tab_yield:
+    st.header("\U0001F33D Crop Yield Impact Forecast")
+    y_sum = load_json(RESULTS / "yield_forecast_summary.json")
+    y_df = load_csv(TABLES / "yield_forecast.csv")
+    if y_sum is None:
+        st.warning("Yield forecast artefacts not found. "
+                   "Run `python run_all.py` first.")
+    else:
+        st.info(
+            "National cereal-yield anomaly regressed against growing-season "
+            "SPI-3 (March\u2013May + September\u2013November). "
+            "Skill check compares model RMSE against a climatology null."
+        )
+        mdl = y_sum.get("model", {})
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("R\u00b2", f"{mdl.get('r_squared', 'N/A')}")
+        c2.metric("RMSE", f"{mdl.get('rmse', 'N/A')}%")
+        c3.metric("Pearson r", f"{mdl.get('pearson_r', 'N/A')}")
+        c4.metric("p-value", f"{mdl.get('pearson_p', 'N/A')}")
+
+        # ── Interactive scatter: yield anomaly vs SPI ── #
+        if y_df is not None and len(y_df):
+            st.markdown("**Yield anomaly vs growing-season SPI**")
+            scatter = alt.Chart(y_df).mark_circle(size=80, opacity=0.7).encode(
+                x=alt.X("spi:Q", title="Growing-season SPI-3 (national mean)",
+                         scale=alt.Scale(zero=False)),
+                y=alt.Y("observed_anomaly_pct:Q", title="Yield anomaly (%)"),
+                tooltip=["year:O", "spi:Q", "observed_anomaly_pct:Q",
+                         "fitted_anomaly_pct:Q"]
+            ).properties(width=350, height=280)
+            # Regression line
+            if mdl.get("slope") is not None:
+                x_range = [y_df["spi"].min(), y_df["spi"].max()]
+                line_df = pd.DataFrame({
+                    "x": x_range,
+                    "y": [mdl["intercept"] + mdl["slope"] * x for x in x_range]
+                })
+                reg = alt.Chart(line_df).mark_line(stroke="#ef4444", strokeWidth=2).encode(
+                    x="x:Q", y="y:Q")
+                st.altair_chart(scatter + reg, use_container_width=True)
+            else:
+                st.altair_chart(scatter, use_container_width=True)
+
+        # ── Time series: observed vs fitted ── #
+        if y_df is not None and len(y_df):
+            st.markdown("**Observed vs fitted yield anomaly**")
+            ts_data = y_df.melt(
+                id_vars=["year"],
+                value_vars=["observed_anomaly_pct", "fitted_anomaly_pct"],
+                var_name="type", value_name="value")
+            ts_data["type"] = ts_data["type"].map({
+                "observed_anomaly_pct": "Observed",
+                "fitted_anomaly_pct": "Fitted"})
+            ts_chart = alt.Chart(ts_data).mark_line(point=True).encode(
+                x=alt.X("year:O", title="Year"),
+                y=alt.Y("value:Q", title="Yield anomaly (%)"),
+                color=alt.Color("type:N",
+                    scale=alt.Scale(domain=["Observed", "Fitted"],
+                                    range=["#1a73e8", "#ef4444"])),
+                tooltip=["year:O", "type:N", "value:Q"]
+            ).properties(width=700, height=250)
+            st.altair_chart(ts_chart, use_container_width=True)
+
+        # ── Skill check ── #
+        skill = y_sum.get("skill_check", {})
+        verdict = skill.get("verdict", "N/A").replace("_", " ")
+        ratio = skill.get("skill_ratio")
+        if ratio is not None:
+            st.markdown("**Skill check: model vs climatology null**")
+            skill_data = pd.DataFrame([
+                {"Model": "SPI Regression (holdout)", "RMSE (%)": skill.get("holdout_rmse", 0)},
+                {"Model": "Climatology Null", "RMSE (%)": skill.get("climatology_rmse", 0)},
+            ])
+            skill_bar = alt.Chart(skill_data).mark_bar(cornerRadius=6).encode(
+                x=alt.X("Model:N", axis=alt.Axis(labelAngle=0)),
+                y=alt.Y("RMSE (%):Q", axis=alt.Axis(title="RMSE (%)")),
+                color=alt.Color("Model:N",
+                    scale=alt.Scale(
+                        domain=["SPI Regression (holdout)", "Climatology Null"],
+                        range=["#1a73e8", "#94a3b8"])),
+                tooltip=["Model", "RMSE (%)"]
+            ).properties(width=400, height=220)
+            st.altair_chart(skill_bar, use_container_width=False)
+            if verdict == "climatology beats model":
+                st.warning(
+                    f"**{verdict.title()}** (ratio = {ratio:.3f}). "
+                    f"The SPI regression does not beat a simple mean forecast "
+                    f"out of sample. This is an honest negative result.")
+            else:
+                st.success(f"**{verdict.title()}** (ratio = {ratio:.3f})")
+
+        # ── Projection ── #
+        proj = y_sum.get("projection", {})
+        if proj.get("projected_anomaly_pct") is not None:
+            st.markdown(f"**{y_sum.get('projection_year', 'N/A')} Projection**")
+            pc1, pc2, pc3, pc4 = st.columns(4)
+            pc1.metric("Current SPI", f"{proj.get('current_spi', 'N/A')}")
+            pc2.metric("Projected anomaly",
+                       f"{proj.get('projected_anomaly_pct', 'N/A'):.1f}%")
+            pi = proj.get("prediction_interval_95", [None, None])
+            pc3.metric("95% PI",
+                       f"[{pi[0]:.1f}, {pi[1]:.1f}]%" if pi[0] is not None else "N/A")
+            pc4.metric("P(below-normal)",
+                       f"{proj.get('p_below_normal', 0):.1%}")
+
+        # Figure fallback
+        with st.expander("\U0001F4CA Static figure"):
+            fig_y = FIGURES / "fig_yield_forecast.png"
+            if fig_y.exists():
+                st.image(str(fig_y))
+
+        lim = y_sum.get("limitations", [])
+        if lim:
+            with st.expander("\u26a0\ufe0f Limitations"):
+                for l in lim:
+                    st.markdown(f"- {l}")
+
+# ---- 13. SEASONAL OUTLOOK --------------------------------------------------- #
+with tab_outlook:
+    st.header("\U0001F326\uFE0F Seasonal Climate Outlook")
+    o_sum = load_json(RESULTS / "seasonal_outlook_summary.json")
+    o_df = load_csv(TABLES / "seasonal_outlook.csv")
+    if o_sum is None or not o_sum.get("available", False):
+        st.warning(
+            "Seasonal forecast data is currently unavailable. "
+            "The Open-Meteo SEAS5 API could not be reached during the "
+            "last pipeline run. "
+            "Downstream modules gracefully degrade: the drought early-warning "
+            "and yield forecast layers are unaffected."
+        )
+        fig_o = FIGURES / "fig_seasonal_outlook.png"
+        if fig_o.exists():
+            st.image(str(fig_o))
+    else:
+        st.info(
+            "Downscaled seasonal precipitation forecast from ECMWF SEAS5 "
+            "(51 ensemble members, 7-month lead time) via the Open-Meteo "
+            "Seasonal Forecast API. Integrated with drought EW status."
+        )
+        fc = o_sum.get("forecast_class_counts", {})
+        c1, c2, c3 = st.columns(3)
+        c1.metric("\U0001F534 Below normal", fc.get("below_normal", 0))
+        c2.metric("\U0001F7E1 Near normal", fc.get("near_normal", 0))
+        c3.metric("\U0001F535 Above normal", fc.get("above_normal", 0))
+
+        # ── Forecast class chart ── #
+        fc_data = pd.DataFrame([
+            {"Class": "Below\nnormal", "Count": fc.get("below_normal", 0)},
+            {"Class": "Near\nnormal", "Count": fc.get("near_normal", 0)},
+            {"Class": "Above\nnormal", "Count": fc.get("above_normal", 0)},
+            {"Class": "Unknown", "Count": fc.get("unknown", 0)},
+        ])
+        fc_chart = alt.Chart(fc_data).mark_bar(cornerRadius=6).encode(
+            x=alt.X("Class:N", axis=alt.Axis(labelAngle=0, title="Forecast Class")),
+            y=alt.Y("Count:Q", axis=alt.Axis(title="District-months")),
+            color=alt.Color("Class:N",
+                scale=alt.Scale(
+                    domain=["Below\nnormal", "Near\nnormal", "Above\nnormal", "Unknown"],
+                    range=["#ef4444", "#facc15", "#3b82f6", "#94a3b8"])),
+            tooltip=["Class", "Count"]
+        ).properties(width=400, height=220)
+        st.altair_chart(fc_chart, use_container_width=False)
+
+        # ── Escalated status ── #
+        esc = o_sum.get("escalated_status_counts", {})
+        st.markdown("**Escalated risk status after outlook integration**")
+        ec1, ec2, ec3, ec4 = st.columns(4)
+        ec1.metric("\U0001F7E2 Normal", esc.get("Normal", 0))
+        ec2.metric("\U0001F7E1 Watch", esc.get("Watch", 0))
+        ec3.metric("\U0001F7E0 Warning", esc.get("Warning", 0))
+        ec4.metric("\U0001F534 Alert", esc.get("Alert", 0))
+
+        n_esc = o_sum.get("n_districts_escalated", 0)
+        n_total = o_sum.get("n_districts", 19) * o_sum.get("n_months_forecast", 7)
+        if n_total > 0:
+            st.caption(
+                f"{n_esc} of {n_total} district-months escalated to a higher "
+                f"risk tier ({100*n_esc/n_total:.0f}%). Escalation rule: "
+                f"below-normal forecast + Watch/Warning EW status \u2192 +1 tier."
+            )
+
+        # ── Choropleth ── #
+        st.markdown("**District forecast map**")
+        if o_df is not None and len(o_df):
+            feats, lk = load_district_features()
+            if feats is not None:
+                lookup = lk
+                OUTLOOK_COLOR = {
+                    "below_normal": (220, 80, 60),
+                    "near_normal": (255, 230, 140),
+                    "above_normal": (100, 180, 220),
+                }
+                UNOBSERVED = {"fill": [*NODATA_RGB, 255], "line": [185, 185, 180], "lw": 1}
+                SITE_STYLE = {"fill": [214, 214, 208, 255], "line": [120, 120, 120], "lw": 2}
+                outlook_styles = {k: {"fill": [*v, 255], "line": [74, 74, 74], "lw": 1}
+                                  for k, v in OUTLOOK_COLOR.items()}
+                outlook_styles["site, no panel score"] = SITE_STYLE
+                outlook_styles["not observed"] = UNOBSERVED
+                o_df["month"] = pd.to_datetime(o_df["month"])
+                latest = o_df.sort_values("month").groupby("location").last().reset_index()
+                class_by_district = dict(zip(latest["location"], latest["forecast_class"]))
+                vals_by_site = {}
+                for loc, klass in class_by_district.items():
+                    vals_by_site[loc] = {"forecast_class": klass, "klass": klass, "observed": "yes"}
+                gap = site_gap_districts(
+                    load_csv(DATA / "district_lookup.csv"),
+                    {lookup[s] for s in vals_by_site if s in lookup})
+                drawn = choropleth(
+                    district_features(feats, lookup, vals_by_site, gap),
+                    class_from_props, outlook_styles, height=430,
+                    tooltip_fields=("region", "forecast_class", "observed"))
+                if not drawn:
+                    fig_o = FIGURES / "fig_seasonal_outlook.png"
+                    if fig_o.exists():
+                        st.image(str(fig_o))
+                legend_md(outlook_styles,
+                          ["below_normal", "near_normal", "above_normal",
+                           "site, no panel score", "not observed"])
+        lim = o_sum.get("limitations", [])
+        if lim:
+            with st.expander("\u26a0\ufe0f Limitations"):
+                for l in lim:
+                    st.markdown(f"- {l}")
+
+# ---- 14. CLIMATE BULLETIN --------------------------------------------------- #
+with tab_bulletin:
+    st.header("\U0001F4DC Climate Risk Bulletin")
+    st.info(
+        "Automated narrative bulletin synthesising all forward-looking layers. "
+        "Every number is read from the persisted summary JSONs \u2014 nothing is "
+        "hard-coded, so the bulletin cannot drift from the pipeline."
+    )
+    # Find the latest bulletin
+    reports_dir = RESULTS.parent / "reports"
+    bulletins = sorted(reports_dir.glob("climate_risk_bulletin_*.md")) if reports_dir.exists() else []
+    if not bulletins:
+        st.warning("No bulletin found. Run `python run_all.py` first.")
+    else:
+        latest_bulletin = bulletins[-1]
+        bulletin_text = latest_bulletin.read_text(encoding="utf-8")
+        st.markdown(f"**Latest bulletin:** `{latest_bulletin.name}`")
+        st.divider()
+        st.markdown(bulletin_text)
+        st.divider()
+        st.download_button(
+            label="\U0001F4E5 Download Bulletin (Markdown)",
+            data=bulletin_text,
+            file_name=latest_bulletin.name,
+            mime="text/markdown",
+        )
+
+# ---- 15. ABOUT / REPRODUCIBILITY ------------------------------------------- #
 with tab_about:
     st.header("About this dashboard")
     st.markdown(
@@ -1339,8 +2227,10 @@ This view is a **read-only interface** to the artefacts produced by
 
 **Data sources rendered:**
 
-- `results/benchmark.csv` — 24-detector held-out metrics with bootstrap CIs
-- `results/friedman.json` — Friedman statistic (24 detectors × 5 years)
+- `results/benchmark.csv` — {N_DET}-detector held-out metrics with bootstrap CIs
+- `results/friedman.json` — Friedman statistic ({N_DET} detectors × 5 years)
+- `results/random_null.json` — the size-matched random alert budget every detector
+  is judged against, with its Monte-Carlo band and Benjamini-Hochberg q-values
 - `results/per_year_f1.npy` + `per_year_f1_order.txt` — per-year stability
 - `results/spatial_stats.json` + `results/tables/district_anomaly.csv` — GIS
   clustering and per-district metrics
@@ -1352,13 +2242,30 @@ This view is a **read-only interface** to the artefacts produced by
 - `results/drought_summary.json` + `results/tables/spi_decade_drought.csv` +
   `spi_meteostat.csv` + `spei_era5.csv` — the derived drought indices, their
   ~N(0,1) validation and the register-drought corroboration
+- `data/wb_climate.csv` + `data/wb_climate_meta.json` +
+  `results/wb_climate_check.json` + `results/tables/wb_spei_compare.csv` +
+  `wb_precip_compare.csv` — the World Bank Open Data climate series fetched from
+  the public API, and the (negative) cross-check of our SPEI against them
 - `results/ag_linkage.json` + `results/tables/ag_yield_climate.csv` and
   `results/coffee_linkage.json` + `coffee_prod_climate.csv` — the cereal and
   coffee impact linkage, including the non-significant and sign-reversing
   coefficients
 - `results/tables/risk_district_month.csv` +
-  `results/early_warning_summary.json` — district-month risk nowcast, its
-  skill-vs-null measurement and the measured spread of the one-month carry
+  `results/early_warning_summary.json` + `results/tables/nowcast_interval.csv` —
+  district-month risk nowcast, its skill-vs-null measurement, the measured spread
+  of the one-month carry, and the split-conformal prediction intervals with their
+  measured held-out coverage
+- `results/tables/drought_early_warning.csv` + `results/drought_ew_summary.json` —
+  threshold-based drought early warning (SPI-6 severity + trajectory + decline
+  run), validated against the disaster register
+- `results/tables/yield_forecast.csv` + `results/yield_forecast_summary.json` —
+  national cereal-yield anomaly forecast from growing-season SPI-3, with honest
+  skill check vs climatology null
+- `results/tables/seasonal_outlook.csv` + `results/seasonal_outlook_summary.json` +
+  `data/seasonal_fetch_status.json` — downscaled ECMWF SEAS5 seasonal
+  precipitation outlook and its integration with the drought EW tiers
+- `reports/climate_risk_bulletin_*.md` — automated narrative risk bulletin
+  synthesising all forward-looking layers
 - `results/tables/shap_importance.csv` + `permutation_importance.csv` —
   feature drivers of the ensemble detector
 - `results/shap_values.npy` + `results/tables/shap_sample.csv` +

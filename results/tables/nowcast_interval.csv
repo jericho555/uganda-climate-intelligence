@@ -1,0 +1,17 @@
+location,region,as_of,risk_now,band,next_point,next_ridge,pi80_lo,pi80_hi,pi90_lo,pi90_hi
+Mbale,Eastern,2023-12,78.0,High,78.0,58.8,47.7,100.0,38.7,100.0
+Gulu,Northern,2023-12,49.5,Moderate,49.5,48.4,19.2,79.8,10.2,88.8
+Lira,Northern,2023-12,46.9,Moderate,46.9,48.6,16.6,77.2,7.6,86.2
+Arua,Northern,2023-12,44.1,Moderate,44.1,49.1,13.8,74.4,4.8,83.4
+Jinja,Eastern,2023-12,44.1,Moderate,44.1,49.1,13.8,74.4,4.8,83.4
+Masindi,Northern,2023-12,44.1,Moderate,44.1,49.1,13.8,74.4,4.8,83.4
+Kampala,Central,2023-12,41.2,Low,41.2,49.6,10.9,71.5,1.9,80.5
+Kumi,Eastern,2023-12,41.2,Low,41.2,49.6,10.9,71.5,1.9,80.5
+Luweero,Central,2023-12,41.2,Low,41.2,49.6,10.9,71.5,1.9,80.5
+Mbarara,Western,2023-12,41.2,Low,41.2,49.6,10.9,71.5,1.9,80.5
+Mityana,Central,2023-12,41.2,Low,41.2,49.6,10.9,71.5,1.9,80.5
+Mukono,Central,2023-12,41.2,Low,41.2,49.6,10.9,71.5,1.9,80.5
+Soroti,Eastern,2023-12,41.2,Low,41.2,49.6,10.9,71.5,1.9,80.5
+Tororo,Eastern,2023-12,41.2,Low,41.2,49.6,10.9,71.5,1.9,80.5
+Wakiso,Central,2023-12,41.2,Low,41.2,49.6,10.9,71.5,1.9,80.5
+FortPortal,Western,2023-12,38.7,Low,38.7,49.8,8.4,69.0,0.0,78.0

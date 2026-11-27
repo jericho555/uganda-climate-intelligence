@@ -130,6 +130,131 @@ def check_manuscript() -> None:
           f"line(s) {bad[:6]}" if bad else "")
 
 
+def check_numbers() -> None:
+    """Assertions that the numbers quoted in the text are the released ones.
+
+    The manuscript promises no value is hard-coded. That is only true if the
+    headline figures still match the artefacts they came from, so the counts,
+    spans, test statistics, conformal widths and correlations quoted in the text
+    are re-derived here. This is the check that catches a re-run that moved a
+    number without anyone editing the prose.
+    """
+    tex = read_text(C.MANUSCRIPT / "main.tex")
+
+    def latex_int(v: int) -> str:
+        return f"{v:,}".replace(",", "{,}")
+
+    # ---- benchmark size and the ranking test built on it -----------------
+    bench = C.RESULTS / "benchmark.csv"
+    check("benchmark table artefact exists", bench.exists())
+    if not bench.exists():
+        return
+    rows = column_values(bench, "detector")
+    n = len(rows)
+    fr = json.loads(read_text(C.RESULTS / "friedman.json"))
+    check("friedman detector count matches the benchmark rows",
+          fr["n_detectors"] == n, f"csv {n} vs json {fr['n_detectors']}")
+    check("the text states the benchmarked detector count",
+          f"benchmark of {n} detectors" in tex
+          and f"over {n} detectors" in tex
+          and f"All {n} methods" in tex,
+          f"expected '{n} detectors' / 'All {n} methods'")
+    added = {"LoOP", "TemporalIF"}
+    check("the two detectors added at revision are benchmarked and named",
+          added <= set(rows) and all(d in tex for d in added),
+          "missing from csv: " + ", ".join(sorted(added - set(rows))))
+    roc = dict(zip(rows, column_values(bench, "roc_auc")))
+    pr = dict(zip(rows, column_values(bench, "pr_auc")))
+    nonseq = [r for r in rows if r not in ("LSTMAE", "TransformerAE")]
+    check("non-sequence detector count implied by the text is right",
+          f"the {len(nonseq)}\nnon-sequence methods" in tex
+          or f"the {len(nonseq)} cross-sectional methods" in tex,
+          f"{len(nonseq)} non-sequence of {n}")
+    lo, hi = min(float(roc[r]) for r in nonseq), max(float(roc[r]) for r in nonseq)
+    check("the ROC-AUC span quoted in the text is the table's",
+          f"{lo:.3f}--{hi:.3f}" in tex, f"{lo:.3f}-{hi:.3f}")
+    plo, phi = min(float(pr[r]) for r in nonseq), max(float(pr[r]) for r in nonseq)
+    check("the PR-AUC span quoted in the text is the table's",
+          f"{plo:.3f}--{phi:.3f}" in tex, f"{plo:.3f}-{phi:.3f}")
+    chi2, p = fr["friedman_chi2"], fr["friedman_p"]
+    check("the Friedman chi-square in the text is the artefact's",
+          f"$\\chi^2={chi2:.2f}$" in tex, f"{chi2:.2f}")
+    pm, _, pe = f"{p:.1e}".partition("e")
+    check("the Friedman p-value in the text is the artefact's",
+          f"p={pm}\\times10^{{{int(pe)}}}" in tex, f"{p:.1e}")
+
+    # ---- split-conformal prediction intervals ---------------------------
+    ews = json.loads(read_text(C.RESULTS / "early_warning_summary.json"))
+    pi = ews.get("prediction_intervals") or {}
+    mdl = pi.get("models") or {}
+    check("the nowcast summary publishes fitted prediction intervals",
+          {"persistence", "ridge"} <= set(mdl),
+          "keys: " + ", ".join(sorted(mdl)))
+    if {"persistence", "ridge"} <= set(mdl):
+        check("the transition counts quoted in the text are the conformal ones",
+              all(latex_int(pi[k]) in tex for k in
+                  ("n_transitions", "n_calibration", "n_test")),
+              f"{pi['n_transitions']}/{pi['n_calibration']}/{pi['n_test']}")
+        per, rid = mdl["persistence"], mdl["ridge"]
+        check("both conformal RMSE values appear in the text",
+              f"RMSE {per['rmse_test']}" in tex and f"{rid['rmse_test']}" in tex,
+              f"{per['rmse_test']} / {rid['rmse_test']}")
+        widths = [f"$\\pm{mdl[m][lvl]['conformal_quantile']}$"
+                  for m in mdl for lvl in ("level_90", "level_80")]
+        check("every conformal width quoted in the text is the fitted one",
+              all(w in tex for w in widths), ", ".join(widths))
+        covs = [f"{100 * mdl[m][lvl]['coverage_test']:.1f}\\%"
+                for m in mdl for lvl in ("level_90", "level_80")]
+        check("every measured conformal coverage figure is in the text",
+              all(c in tex for c in covs), ", ".join(covs))
+        band = per["level_90"]["coverage_by_starting_band"]
+        check("per-band persistence coverage quoted in the text is the artefact's",
+              all(f"{100 * band[b]['coverage']:.1f}\\%" in tex for b in band),
+              ", ".join(f"{b}={band[b]['coverage']}" for b in band))
+        check("the verdict does not oversell the better-fitting model's band",
+              "conservative" in (pi.get("verdict") or "").lower(),
+              (pi.get("verdict") or "")[:60])
+
+    # ---- World Bank climate-portal cross-check --------------------------
+    for rel in ["wb_climate.csv", "wb_climate_meta.json"]:
+        check(f"World Bank input present: data/{rel}", (C.DATA / rel).exists())
+    wb_p = C.RESULTS / "wb_climate_check.json"
+    check("World Bank cross-check artefact exists", wb_p.exists())
+    if wb_p.exists():
+        wb = json.loads(read_text(wb_p))
+        ag = wb["agreement_vs_ours_spei6_mean"]
+        check("the World Bank SPEI correlation quoted in the text is the measured one",
+              f"$r={ag['pearson_r']:.3f}$" in tex, f"r={ag['pearson_r']}")
+        check("its significance is quoted as measured",
+              f"$p={ag['pearson_p']:.2f}$" in tex, f"p={ag['pearson_p']:.2f}")
+        check("the abstract rounds the same correlation",
+              f"$r={ag['pearson_r']:.2f}$" in tex, f"r={ag['pearson_r']:.2f}")
+        dry = wb["dry_year_check"]
+        check("the Bank's severe-drought years named in the text are the artefact's",
+              all(str(y) in tex for y in dry["wb_years_le_minus_1"]),
+              str(dry["wb_years_le_minus_1"]))
+        spei = (json.loads(read_text(C.DATA / "wb_climate_meta.json"))
+                .get("EN.CLC.SPEI.XD", {}).get("values", {}))
+        check("no register drought year is dry on the Bank's national index",
+              spei and all(spei.get(str(y)) is not None and spei[str(y)] > 0
+                           for y in dry["register_drought_years"]),
+              str(dry["register_drought_years"]))
+        pc = wb["precip_normal_check"]
+        check("the precipitation scale check quoted in the text is the measured one",
+              latex_int(int(round(pc["era5_mean_annual_mm"]))) in tex
+              or latex_int(pc["era5_mean_annual_mm"]) in tex,
+              f"{pc['era5_mean_annual_mm']} mm vs normal {pc['wb_normal_mm']}")
+    for rel in ["wb_spei_compare.csv", "wb_precip_compare.csv"]:
+        check(f"World Bank comparison table present: results/tables/{rel}",
+              (C.RESULTS / "tables" / rel).exists())
+    check("the World Bank figure is drawn",
+          (C.FIGURES / "fig_wb_check.png").exists()
+          and "figures/fig_wb_check.png" in tex)
+    check("the conformal-interval figure is drawn",
+          (C.FIGURES / "fig_intervals.png").exists()
+          and "figures/fig_intervals.png" in tex)
+
+
 def check_artefacts() -> None:
     """Claims the paper makes that are cheap to falsify against the JSON."""
     ev_p = C.RESULTS / "shap_expected_value.json"
@@ -159,6 +284,31 @@ def check_artefacts() -> None:
     digest = json.loads(read_text(C.RESULTS / "results_digest.json"))
     check("results digest exports the nowcast summary",
           digest.get("early_warning_summary") is not None)
+    check("results digest exports the drought EW summary",
+          digest.get("drought_ew_summary") is not None)
+    check("results digest exports the yield forecast summary",
+          digest.get("yield_forecast_summary") is not None)
+    check("results digest exports the seasonal outlook summary",
+          digest.get("seasonal_outlook_summary") is not None)
+
+    # ---- forward-looking early-warning artefacts -------------------------
+    for tbl in ["drought_early_warning.csv", "yield_forecast.csv",
+                "seasonal_outlook.csv"]:
+        check(f"early-warning table present: results/tables/{tbl}",
+              (C.RESULTS / "tables" / tbl).exists())
+    for js in ["drought_ew_summary.json", "yield_forecast_summary.json",
+               "seasonal_outlook_summary.json"]:
+        check(f"early-warning summary present: results/{js}",
+              (C.RESULTS / js).exists())
+    for fig in ["fig_drought_ew.png", "fig_yield_forecast.png",
+                "fig_seasonal_outlook.png"]:
+        check(f"early-warning figure present: figures/{fig}",
+              (C.FIGURES / fig).exists())
+    # Bulletin
+    bulletins = list(C.REPORTS.glob("climate_risk_bulletin_*.md"))
+    check("automated climate risk bulletin exists in reports/",
+          len(bulletins) >= 1,
+          f"{len(bulletins)} bulletin(s)")
 
     geo = json.loads(read_text(C.DATA / "district_boundaries.geojson"))
     cov = json.loads(read_text(C.RESULTS / "district_coverage.json"))
@@ -216,12 +366,40 @@ def check_dashboard() -> bool:
           "; ".join(str(e.value)[:200] for e in at.exception) if at.exception else
           f"{len(at.tabs)} tabs, {len(at.metric)} metrics")
     labels = [getattr(t, "label", "") for t in at.tabs]
-    check("dashboard exposes the ten panels the paper describes",
-          len(labels) == 10, ", ".join(labels))
+    check("dashboard exposes the fourteen panels the paper describes",
+          len(labels) == 14, ", ".join(labels))
     texts = "\n".join(str(getattr(m, "value", "")) for m in at.info)
     texts += "\n".join(str(getattr(c, "value", "")) for c in at.caption)
+    texts += "\n".join(str(getattr(w, "value", "")) for w in at.warning)
     check("no tab reports a missing artefact",
           "missing. Run" not in texts and "not built yet" not in texts)
+
+    # The rendered page must say what the artefacts say.  ``app.py`` used to
+    # carry hand-typed counts ("24 detectors", "chi2(23)", "five ... 1.22x")
+    # that a re-run silently invalidated, so the numbers on screen are compared
+    # with the files, and the stale literals are refused outright.
+    src = read_text(C.ROOT / "dashboard" / "app.py")
+    body = "\n".join(l for l in src.splitlines()
+                     if not l.lstrip().startswith("#"))
+    bench_n = len(column_values(C.RESULTS / "benchmark.csv", "detector"))
+    stale = [s for s in (f"{bench_n} detectors", f"{bench_n}-detector",
+                         "\u03c7\u00b2(23)", "Full 24-row", "five cross-sectional",
+                         "1.22")
+             if s in body]
+    check("no stale hand-typed count survives in the dashboard prose",
+          not stale, ", ".join(stale))
+    check("dashboard takes the detector count from the artefact",
+          "N_DET = len(_BENCH0)" in body and "{N_DET} detectors" in body
+          and "{len(bench)} detectors" in body,
+          f"benchmark.csv holds {bench_n} rows")
+    for need in ("wb_climate_check.json", "wb_spei_compare.csv",
+                 "wb_precip_compare.csv", "nowcast_interval.csv",
+                 "prediction_intervals", "fig_wb_check.png",
+                 "fig_intervals.png"):
+        check(f"dashboard renders the {need} artefact", need in body)
+    check("dashboard renders the conformal verdict and the World Bank finding",
+          "Verdict as written by the pipeline" in texts
+          and "does not validate the index" in texts)
     return True
 
 
@@ -230,6 +408,8 @@ def main() -> None:
     check_figures()
     print("== manuscript ==")
     check_manuscript()
+    print("== numbers in the text vs the artefacts ==")
+    check_numbers()
     print("== artefacts ==")
     check_artefacts()
     if "--skip-dashboard" not in sys.argv:

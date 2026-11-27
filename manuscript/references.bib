@@ -247,6 +247,23 @@
   note         = {Indicators AG.PRD.CREL.MT, AG.LND.CREL.HA. Accessed 2026. Licence CC BY 4.0}
 }
 
+@misc{worldbankclimate2026,
+  author       = {{World Bank}},
+  title        = {Climate indicators for {U}ganda: {SPEI}, precipitation normal,
+                  disaster-affected population, flood exposure and {ThinkHazard}
+                  flood levels ({Open Data API})},
+  howpublished = {https://api.worldbank.org/v2/country/UG/indicator/},
+  year         = {2026},
+  note         = {Indicators EN.CLC.SPEI.XD, AG.LND.PRCP.MM, EN.CLC.MDAT.ZS,
+                  CC.FLD.TOTL.ZS, CC.TNET.FLD.ZS, CC.THHZ.RANK.RF, CC.THHZ.RANK.UF;
+                  retrieved 2026 by fetch_wb_climate.py, raw responses committed as
+                  data/wb_climate.csv and data/wb_climate_meta.json. The API
+                  returns an indicator id and an empty topic list but no source
+                  field, and the Knowledge Portal pages return HTTP 403, so the
+                  underlying product definition (SPEI timescale, baseline period,
+                  gridding) is not recoverable from what we could reach}
+}
+
 @misc{owid2025,
   author       = {{Our World in Data}},
   title        = {Green coffee --- production (tonnes), {U}ganda, 1961--2024 ({FAOSTAT}, {P}roduction: {C}rops and livestock products)},
@@ -586,22 +603,27 @@
   doi     = {10.1080/20964471.2025.2576274}
 }
 
-% ---- The refuted baseline study -------------------------------------------
-% Checked 2026-11-27 with src/check_ref_index.py, whose raw output is committed
-% as results/masaba2023_index_check.json: nine queries against Crossref (biblio-
-% graphic, title, author+title), OpenAlex (title.search, free text, author and
-% raw-author work lists) and arXiv (title and all-field probes) returned no
-% record for this title or author; a tenth to Semantic Scholar was rate-limited
-% and is recorded as unanswered, not as a negative result. Cite as an
-% author-held draft, never as a published benchmark.
+% ---- Detectors and intervals added at revision ----------------------------
 
-@unpublished{masaba2023,
-  author  = {Masaba, Jeremiah},
-  title   = {Evaluation of anomaly detection techniques using {U}ganda weather dataset},
-  year    = {2023},
-  note    = {Unpublished technical draft held by the author. Searched on
-             2026-11-27 in Crossref, OpenAlex and arXiv with no record found
-             (\texttt{results/masaba2023\_index\_check.json}). Cited only as the
-             source of the perfect-score baseline that this paper re-examines
-             against external ground truth}
+@inproceedings{kriegel2008,
+  author    = {Kriegel, Hankz Kaffe Pedro and Kr{"o}ger, Pang-Ning and
+               Schubert, Erich and Zimek, Arthur},
+  title     = {{Loop}: {Local} outlier detection based on probability},
+  booktitle = {Proceedings of the 2008 SIAM International Conference on Data
+               Mining},
+  pages     = {210--221},
+  year      = {2008},
+  doi       = {10.1137/1.9781611972825.23}
+}
+
+@article{lei2018,
+  author  = {Lei, Jing and G'Sell, Max and Rinaldo, Alessandro and
+             Tibshirani, Ryan J. and Wasserman, Larry},
+  title   = {Distribution-free predictive inference for regression},
+  journal = {Journal of the American Statistical Association},
+  volume  = {113},
+  number  = {523},
+  pages   = {1094--1111},
+  year    = {2018},
+  doi     = {10.1080/01621459.2017.1407327}
 }

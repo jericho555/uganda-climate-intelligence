@@ -12,7 +12,8 @@ DATA = ROOT / "data"
 RESULTS = ROOT / "results"
 FIGURES = ROOT / "figures"
 MANUSCRIPT = ROOT / "manuscript"
-for _d in (DATA, RESULTS, FIGURES, MANUSCRIPT, DATA / "raw", RESULTS / "tables"):
+REPORTS = ROOT / "reports"
+for _d in (DATA, RESULTS, FIGURES, MANUSCRIPT, DATA / "raw", RESULTS / "tables", REPORTS):
     _d.mkdir(parents=True, exist_ok=True)
 
 # Every figure the manuscript includes is also kept in figures/ so the release
@@ -144,3 +145,30 @@ N_BOOTSTRAP = 800
 CLIMATOLOGY_WINDOW = 15         # running-window climatology for seasonal anomalies
 PERSISTENCE_WINDOW = 5          # days over which the ensemble score is smoothed
 DETECT_FEATURES = [f"{f}_z" for f in FEATURES] + list(DERIVED)
+
+# ----------------------------------------------------------------------------
+# Forward-looking early warning configuration (Phases 1-4)
+# ----------------------------------------------------------------------------
+# SPI severity categories (WMO / McKee 1993 thresholds)
+# Each tuple: (category_name, upper_SPI_bound)
+# Values above +0.5 (and >= +1.0/+1.5) are wet classes
+SPI_CATEGORIES = [
+    ("extreme_drought", -2.0),
+    ("severe_drought", -1.5),
+    ("moderate_drought", -1.0),
+    ("mild_drought", -0.5),
+    ("near_normal", 0.5),
+]
+
+# Drought early-warning escalation tiers
+EW_TIERS = ("Normal", "Watch", "Warning", "Alert")
+SPI_DECLINE_RUN = 3             # consecutive monthly declines that trigger escalation
+
+# Growing season for the national cereal-yield regression (bimodal Uganda)
+GROWING_MONTHS = (3, 4, 5, 9, 10, 11)  # long rains + short rains
+YIELD_BELOW_NORMAL_PCTL = 10    # "below-normal" = below 10th pct of detrended yield
+
+# Seasonal forecast configuration (Phase 3)
+SEASONAL_LEAD_MONTHS = 3        # forecast horizon for outlook
+SEASONAL_API_URL = "https://seasonal-api.open-meteo.com/v1/seasonal"
+SEASONAL_MODELS = "ecmwf_seas5"  # SEAS5 seasonal model

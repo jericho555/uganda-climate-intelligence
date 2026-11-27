@@ -1,0 +1,128 @@
+{
+  "yield_years": [
+    1961,
+    2024
+  ],
+  "yield_trend_pct_per_year": 1.1,
+  "growing_months": [
+    3,
+    4,
+    5,
+    9,
+    10,
+    11
+  ],
+  "model": {
+    "n": 16,
+    "years": "2008-2023",
+    "slope": 9.244,
+    "intercept": 0.533,
+    "r_squared": 0.076,
+    "pearson_r": 0.275,
+    "pearson_p": 0.302,
+    "spearman_r": 0.4,
+    "spearman_p": 0.125,
+    "slope_95ci": [
+      -9.255,
+      27.744
+    ],
+    "rmse": 15.27,
+    "fitted": [
+      4.155047439857236,
+      -0.626747472192234,
+      8.020966414808159,
+      6.761889779589624,
+      0.5375734147238131,
+      5.12860497577,
+      2.176058229121012,
+      -0.6701771901642081,
+      -7.917451191429752,
+      -3.8479614320159605,
+      -0.9843926441388221,
+      -0.5582806662541552,
+      5.525153930556229,
+      -5.375705280409236,
+      -3.615309106915541,
+      -0.19495400126910511
+    ],
+    "years_list": [
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023
+    ],
+    "yield_anomaly": [
+      7.458521801230766,
+      17.28492627674134,
+      13.198403963976624,
+      15.990414557959465,
+      13.535558835024197,
+      10.87187347982832,
+      13.853774257583495,
+      13.057231386846446,
+      1.5537313411807752,
+      -9.39628643281365,
+      -34.67062382480339,
+      -31.156546477783476,
+      -17.925327862806206,
+      -2.4596939056348077,
+      -0.6255369858631177,
+      -2.056105211029724
+    ],
+    "spi": [
+      0.3918229166666667,
+      -0.1254375,
+      0.8100104166666666,
+      0.6738125,
+      0.0005104166666666891,
+      0.49713541666666666,
+      0.17775,
+      -0.1301354166666667,
+      -0.91409375,
+      -0.47388541666666667,
+      -0.164125,
+      -0.11803124999999999,
+      0.5400312500000001,
+      -0.6391458333333334,
+      -0.44871875,
+      -0.0787291666666667
+    ],
+    "verdict": "model_fitted"
+  },
+  "skill_check": {
+    "holdout_rmse": 14.35,
+    "climatology_rmse": 10.97,
+    "skill_ratio": 1.308,
+    "verdict": "climatology_beats_model"
+  },
+  "projection": {
+    "current_spi": -0.079,
+    "projected_anomaly_pct": -0.19,
+    "prediction_interval_95": [
+      -30.13,
+      29.74
+    ],
+    "p_below_normal": 0.135,
+    "threshold_pct": -17.05
+  },
+  "projection_year": 2023,
+  "note": "National-scale yield forecast from growing-season SPI. District-level yield projection is not identifiable from available data (FAOSTAT provides only national annual totals).",
+  "limitations": [
+    "National scale only; no district-level yield data",
+    "Few overlapping years (16) -> wide confidence intervals",
+    "Correlation does not imply causation; technology trend removed by detrending",
+    "Skill check: climatology_beats_model"
+  ]
+}

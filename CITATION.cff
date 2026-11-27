@@ -12,14 +12,18 @@ abstract: >-
   detectors against a curated disaster register, adds century-scale in-situ
   trends, an independent NASA POWER gap-fill of the 1990-2007 observing collapse,
   derived SPI/SPEI drought indices, a cereal-yield impact linkage, the UCASI
-  severity index and SHAP-based explainability. Every reported number is
+  severity index and SHAP-based explainability. Version 1.1 adds four
+  forward-looking operational layers: drought early warning (SPI-6 trajectory
+  and decline-run rules), yield impact forecast (growing-season SPI-3
+  regression), seasonal climate outlook (SEAS5 ensemble downscaled via
+  Open-Meteo), and automated climate risk bulletin. Every reported number is
   computed by the pipeline.
 authors:
   - family-names: Masaba
     given-names: Jeremiah
     orcid: "https://orcid.org/0009-0004-5620-996X"
     affiliation: "Department of Computer Science, Makerere University, Kampala, Uganda"
-repository-code: "https://github.com/REPLACE-WITH-USERNAME/uganda-climate-intelligence"
+repository-code: "https://github.com/masaba2023/uganda-climate-intelligence"
 # doi: "10.5281/REPLACE-AFTER-ZENODO-RELEASE"   # uncomment only once minted
 license: MIT
 keywords:
@@ -33,5 +37,5 @@ keywords:
   - NASA POWER
   - Meteostat
   - reproducible research
-version: "1.0.0"
-date-released: "2026-11-26"
+version: "1.1.0"
+date-released: "2026-11-27"

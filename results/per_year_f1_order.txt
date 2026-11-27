@@ -2,9 +2,10 @@ LSTMAE
 TransformerAE
 GeneralizedESD
 StructuralTS
-Ensemble+5dPersist
-Ensemble+Persist+Region
 LOF
+TemporalIF
+Ensemble+Persist+Region
+Ensemble+5dPersist
 SARIMAX
 ECOD
 COPOD
@@ -22,3 +23,4 @@ OneClassSVM
 LODA
 EllipticEnvelope
 VAE
+LoOP

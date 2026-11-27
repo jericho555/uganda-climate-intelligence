@@ -1,0 +1,23 @@
+{
+  "as_of_month": "2023-12-01",
+  "status_counts": {
+    "Normal": 9,
+    "Watch": 4,
+    "Warning": 2,
+    "Alert": 1
+  },
+  "districts_flagged_declining_3mo": [],
+  "validation_vs_register": {
+    "n_drought_events": 4,
+    "hits": 34,
+    "false_alarms": 837,
+    "misses": 0,
+    "hit_rate": 1.0
+  },
+  "note": "Threshold-based drought early warning using district SPI-6 severity, trajectory, and decline run. Status tiers: Normal (no concern), Watch (mild drought or deteriorating), Warning (moderate+ drought or 3+ month decline), Alert (severe/extreme drought sustained).",
+  "limitations": [
+    "District SPI-12 infeasible on 16-year ERA5 window; only SPI-3/SPI-6 computed",
+    "SPI nowcast is a condition indicator, not a probabilistic forecast",
+    "Validation uses documented drought events; small sample (4 droughts) limits statistical power"
+  ]
+}

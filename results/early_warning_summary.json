@@ -49,6 +49,367 @@
     },
     "reading": "carrying the current score forward one month, 80% of observed transitions moved it by at most the p80 value below; that is the width of the nowcast, not a model fit"
   },
+  "prediction_intervals": {
+    "method": "split conformal on chronologically split district-month transitions; calibration = destination year <= 2018",
+    "features": [
+      "risk",
+      "I",
+      "D",
+      "S",
+      "M",
+      "F",
+      "anomaly_days",
+      "longest_run",
+      "max_concurrent_vars",
+      "anomaly_rate",
+      "spatial_coherence"
+    ],
+    "ridge_alpha": 1.0,
+    "n_transitions": 3056,
+    "n_calibration": 2096,
+    "n_test": 960,
+    "test_years": [
+      2019,
+      2023
+    ],
+    "models": {
+      "persistence": {
+        "rmse_calibration": 20.64,
+        "rmse_test": 23.09,
+        "mae_test": 16.9,
+        "level_90": {
+          "alpha": 0.1,
+          "conformal_quantile": 39.3,
+          "mean_width": 69.8,
+          "coverage_test": 0.886,
+          "coverage_by_starting_band": {
+            "Low": {
+              "n": 378,
+              "coverage": 0.884
+            },
+            "Moderate": {
+              "n": 190,
+              "coverage": 0.937
+            },
+            "High": {
+              "n": 249,
+              "coverage": 0.9
+            },
+            "Extreme": {
+              "n": 143,
+              "coverage": 0.804
+            }
+          }
+        },
+        "level_80": {
+          "alpha": 0.2,
+          "conformal_quantile": 30.3,
+          "mean_width": 56.7,
+          "coverage_test": 0.716,
+          "coverage_by_starting_band": {
+            "Low": {
+              "n": 378,
+              "coverage": 0.78
+            },
+            "Moderate": {
+              "n": 190,
+              "coverage": 0.732
+            },
+            "High": {
+              "n": 249,
+              "coverage": 0.598
+            },
+            "Extreme": {
+              "n": 143,
+              "coverage": 0.727
+            }
+          }
+        }
+      },
+      "ridge": {
+        "rmse_calibration": 16.26,
+        "rmse_test": 19.12,
+        "mae_test": 15.41,
+        "largest_standardised_coefficients": [
+          [
+            "anomaly_rate",
+            16.83
+          ],
+          [
+            "anomaly_days",
+            -11.82
+          ],
+          [
+            "F",
+            -10.19
+          ],
+          [
+            "I",
+            6.47
+          ]
+        ],
+        "level_90": {
+          "alpha": 0.1,
+          "conformal_quantile": 29.0,
+          "mean_width": 58.0,
+          "coverage_test": 0.829,
+          "coverage_by_starting_band": {
+            "Low": {
+              "n": 378,
+              "coverage": 0.849
+            },
+            "Moderate": {
+              "n": 190,
+              "coverage": 0.747
+            },
+            "High": {
+              "n": 249,
+              "coverage": 0.847
+            },
+            "Extreme": {
+              "n": 143,
+              "coverage": 0.853
+            }
+          }
+        },
+        "level_80": {
+          "alpha": 0.2,
+          "conformal_quantile": 20.9,
+          "mean_width": 41.7,
+          "coverage_test": 0.686,
+          "coverage_by_starting_band": {
+            "Low": {
+              "n": 378,
+              "coverage": 0.775
+            },
+            "Moderate": {
+              "n": 190,
+              "coverage": 0.632
+            },
+            "High": {
+              "n": 249,
+              "coverage": 0.647
+            },
+            "Extreme": {
+              "n": 143,
+              "coverage": 0.594
+            }
+          }
+        }
+      }
+    },
+    "verdict": "the fitted carry model reaches test RMSE 19.12 against 23.09 for plain persistence, so its point forecast is the better one; yet its conformal band covers only 0.829 of held-out transitions against 0.886 for the persistence band at the same nominal 90%: a chronological split breaks the exchangeability the coverage guarantee assumes, so the measured shortfall is reported rather than smoothed. The wider persistence band is the conservative interval to quote",
+    "latest_forward_intervals": [
+      {
+        "location": "Mbale",
+        "region": "Eastern",
+        "as_of": "2023-12",
+        "risk_now": 78.0,
+        "band": "High",
+        "next_point": 78.0,
+        "next_ridge": 58.8,
+        "pi80_lo": 47.7,
+        "pi80_hi": 100.0,
+        "pi90_lo": 38.7,
+        "pi90_hi": 100.0
+      },
+      {
+        "location": "Gulu",
+        "region": "Northern",
+        "as_of": "2023-12",
+        "risk_now": 49.5,
+        "band": "Moderate",
+        "next_point": 49.5,
+        "next_ridge": 48.4,
+        "pi80_lo": 19.2,
+        "pi80_hi": 79.8,
+        "pi90_lo": 10.2,
+        "pi90_hi": 88.8
+      },
+      {
+        "location": "Lira",
+        "region": "Northern",
+        "as_of": "2023-12",
+        "risk_now": 46.9,
+        "band": "Moderate",
+        "next_point": 46.9,
+        "next_ridge": 48.6,
+        "pi80_lo": 16.6,
+        "pi80_hi": 77.2,
+        "pi90_lo": 7.6,
+        "pi90_hi": 86.2
+      },
+      {
+        "location": "Arua",
+        "region": "Northern",
+        "as_of": "2023-12",
+        "risk_now": 44.1,
+        "band": "Moderate",
+        "next_point": 44.1,
+        "next_ridge": 49.1,
+        "pi80_lo": 13.8,
+        "pi80_hi": 74.4,
+        "pi90_lo": 4.8,
+        "pi90_hi": 83.4
+      },
+      {
+        "location": "Jinja",
+        "region": "Eastern",
+        "as_of": "2023-12",
+        "risk_now": 44.1,
+        "band": "Moderate",
+        "next_point": 44.1,
+        "next_ridge": 49.1,
+        "pi80_lo": 13.8,
+        "pi80_hi": 74.4,
+        "pi90_lo": 4.8,
+        "pi90_hi": 83.4
+      },
+      {
+        "location": "Masindi",
+        "region": "Northern",
+        "as_of": "2023-12",
+        "risk_now": 44.1,
+        "band": "Moderate",
+        "next_point": 44.1,
+        "next_ridge": 49.1,
+        "pi80_lo": 13.8,
+        "pi80_hi": 74.4,
+        "pi90_lo": 4.8,
+        "pi90_hi": 83.4
+      },
+      {
+        "location": "Kampala",
+        "region": "Central",
+        "as_of": "2023-12",
+        "risk_now": 41.2,
+        "band": "Low",
+        "next_point": 41.2,
+        "next_ridge": 49.6,
+        "pi80_lo": 10.9,
+        "pi80_hi": 71.5,
+        "pi90_lo": 1.9,
+        "pi90_hi": 80.5
+      },
+      {
+        "location": "Kumi",
+        "region": "Eastern",
+        "as_of": "2023-12",
+        "risk_now": 41.2,
+        "band": "Low",
+        "next_point": 41.2,
+        "next_ridge": 49.6,
+        "pi80_lo": 10.9,
+        "pi80_hi": 71.5,
+        "pi90_lo": 1.9,
+        "pi90_hi": 80.5
+      },
+      {
+        "location": "Luweero",
+        "region": "Central",
+        "as_of": "2023-12",
+        "risk_now": 41.2,
+        "band": "Low",
+        "next_point": 41.2,
+        "next_ridge": 49.6,
+        "pi80_lo": 10.9,
+        "pi80_hi": 71.5,
+        "pi90_lo": 1.9,
+        "pi90_hi": 80.5
+      },
+      {
+        "location": "Mbarara",
+        "region": "Western",
+        "as_of": "2023-12",
+        "risk_now": 41.2,
+        "band": "Low",
+        "next_point": 41.2,
+        "next_ridge": 49.6,
+        "pi80_lo": 10.9,
+        "pi80_hi": 71.5,
+        "pi90_lo": 1.9,
+        "pi90_hi": 80.5
+      },
+      {
+        "location": "Mityana",
+        "region": "Central",
+        "as_of": "2023-12",
+        "risk_now": 41.2,
+        "band": "Low",
+        "next_point": 41.2,
+        "next_ridge": 49.6,
+        "pi80_lo": 10.9,
+        "pi80_hi": 71.5,
+        "pi90_lo": 1.9,
+        "pi90_hi": 80.5
+      },
+      {
+        "location": "Mukono",
+        "region": "Central",
+        "as_of": "2023-12",
+        "risk_now": 41.2,
+        "band": "Low",
+        "next_point": 41.2,
+        "next_ridge": 49.6,
+        "pi80_lo": 10.9,
+        "pi80_hi": 71.5,
+        "pi90_lo": 1.9,
+        "pi90_hi": 80.5
+      },
+      {
+        "location": "Soroti",
+        "region": "Eastern",
+        "as_of": "2023-12",
+        "risk_now": 41.2,
+        "band": "Low",
+        "next_point": 41.2,
+        "next_ridge": 49.6,
+        "pi80_lo": 10.9,
+        "pi80_hi": 71.5,
+        "pi90_lo": 1.9,
+        "pi90_hi": 80.5
+      },
+      {
+        "location": "Tororo",
+        "region": "Eastern",
+        "as_of": "2023-12",
+        "risk_now": 41.2,
+        "band": "Low",
+        "next_point": 41.2,
+        "next_ridge": 49.6,
+        "pi80_lo": 10.9,
+        "pi80_hi": 71.5,
+        "pi90_lo": 1.9,
+        "pi90_hi": 80.5
+      },
+      {
+        "location": "Wakiso",
+        "region": "Central",
+        "as_of": "2023-12",
+        "risk_now": 41.2,
+        "band": "Low",
+        "next_point": 41.2,
+        "next_ridge": 49.6,
+        "pi80_lo": 10.9,
+        "pi80_hi": 71.5,
+        "pi90_lo": 1.9,
+        "pi90_hi": 80.5
+      },
+      {
+        "location": "FortPortal",
+        "region": "Western",
+        "as_of": "2023-12",
+        "risk_now": 38.7,
+        "band": "Low",
+        "next_point": 38.7,
+        "next_ridge": 49.8,
+        "pi80_lo": 8.4,
+        "pi80_hi": 69.0,
+        "pi90_lo": 0.0,
+        "pi90_hi": 78.0
+      }
+    ]
+  },
   "latest_nowcast_top8": [
     {
       "location": "Mbale",

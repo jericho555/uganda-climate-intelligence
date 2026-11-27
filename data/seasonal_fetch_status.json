@@ -1,0 +1,6 @@
+{
+  "fetched": true,
+  "n_districts": 19,
+  "failed_districts": [],
+  "note": "Seasonal forecast ingestion. If fetched=False, downstream modules will report 'outlook unavailable'."
+}

@@ -200,8 +200,8 @@
     }
   },
   "friedman": {
-    "friedman_chi2": 28.76666666666665,
-    "friedman_p": 8.71862809433121e-06,
+    "friedman_chi2": 33.78461538461539,
+    "friedman_p": 8.249551549837037e-07,
     "years": [
       2019,
       2020,
@@ -209,7 +209,7 @@
       2022,
       2023
     ],
-    "n_detectors": 24
+    "n_detectors": 26
   },
   "change_points": {
     "monthly_anom_count_bkps_index": [
@@ -267,6 +267,367 @@
         "q90_signed": 7.8
       },
       "reading": "carrying the current score forward one month, 80% of observed transitions moved it by at most the p80 value below; that is the width of the nowcast, not a model fit"
+    },
+    "prediction_intervals": {
+      "method": "split conformal on chronologically split district-month transitions; calibration = destination year <= 2018",
+      "features": [
+        "risk",
+        "I",
+        "D",
+        "S",
+        "M",
+        "F",
+        "anomaly_days",
+        "longest_run",
+        "max_concurrent_vars",
+        "anomaly_rate",
+        "spatial_coherence"
+      ],
+      "ridge_alpha": 1.0,
+      "n_transitions": 3056,
+      "n_calibration": 2096,
+      "n_test": 960,
+      "test_years": [
+        2019,
+        2023
+      ],
+      "models": {
+        "persistence": {
+          "rmse_calibration": 20.64,
+          "rmse_test": 23.09,
+          "mae_test": 16.9,
+          "level_90": {
+            "alpha": 0.1,
+            "conformal_quantile": 39.3,
+            "mean_width": 69.8,
+            "coverage_test": 0.886,
+            "coverage_by_starting_band": {
+              "Low": {
+                "n": 378,
+                "coverage": 0.884
+              },
+              "Moderate": {
+                "n": 190,
+                "coverage": 0.937
+              },
+              "High": {
+                "n": 249,
+                "coverage": 0.9
+              },
+              "Extreme": {
+                "n": 143,
+                "coverage": 0.804
+              }
+            }
+          },
+          "level_80": {
+            "alpha": 0.2,
+            "conformal_quantile": 30.3,
+            "mean_width": 56.7,
+            "coverage_test": 0.716,
+            "coverage_by_starting_band": {
+              "Low": {
+                "n": 378,
+                "coverage": 0.78
+              },
+              "Moderate": {
+                "n": 190,
+                "coverage": 0.732
+              },
+              "High": {
+                "n": 249,
+                "coverage": 0.598
+              },
+              "Extreme": {
+                "n": 143,
+                "coverage": 0.727
+              }
+            }
+          }
+        },
+        "ridge": {
+          "rmse_calibration": 16.26,
+          "rmse_test": 19.12,
+          "mae_test": 15.41,
+          "largest_standardised_coefficients": [
+            [
+              "anomaly_rate",
+              16.83
+            ],
+            [
+              "anomaly_days",
+              -11.82
+            ],
+            [
+              "F",
+              -10.19
+            ],
+            [
+              "I",
+              6.47
+            ]
+          ],
+          "level_90": {
+            "alpha": 0.1,
+            "conformal_quantile": 29.0,
+            "mean_width": 58.0,
+            "coverage_test": 0.829,
+            "coverage_by_starting_band": {
+              "Low": {
+                "n": 378,
+                "coverage": 0.849
+              },
+              "Moderate": {
+                "n": 190,
+                "coverage": 0.747
+              },
+              "High": {
+                "n": 249,
+                "coverage": 0.847
+              },
+              "Extreme": {
+                "n": 143,
+                "coverage": 0.853
+              }
+            }
+          },
+          "level_80": {
+            "alpha": 0.2,
+            "conformal_quantile": 20.9,
+            "mean_width": 41.7,
+            "coverage_test": 0.686,
+            "coverage_by_starting_band": {
+              "Low": {
+                "n": 378,
+                "coverage": 0.775
+              },
+              "Moderate": {
+                "n": 190,
+                "coverage": 0.632
+              },
+              "High": {
+                "n": 249,
+                "coverage": 0.647
+              },
+              "Extreme": {
+                "n": 143,
+                "coverage": 0.594
+              }
+            }
+          }
+        }
+      },
+      "verdict": "the fitted carry model reaches test RMSE 19.12 against 23.09 for plain persistence, so its point forecast is the better one; yet its conformal band covers only 0.829 of held-out transitions against 0.886 for the persistence band at the same nominal 90%: a chronological split breaks the exchangeability the coverage guarantee assumes, so the measured shortfall is reported rather than smoothed. The wider persistence band is the conservative interval to quote",
+      "latest_forward_intervals": [
+        {
+          "location": "Mbale",
+          "region": "Eastern",
+          "as_of": "2023-12",
+          "risk_now": 78.0,
+          "band": "High",
+          "next_point": 78.0,
+          "next_ridge": 58.8,
+          "pi80_lo": 47.7,
+          "pi80_hi": 100.0,
+          "pi90_lo": 38.7,
+          "pi90_hi": 100.0
+        },
+        {
+          "location": "Gulu",
+          "region": "Northern",
+          "as_of": "2023-12",
+          "risk_now": 49.5,
+          "band": "Moderate",
+          "next_point": 49.5,
+          "next_ridge": 48.4,
+          "pi80_lo": 19.2,
+          "pi80_hi": 79.8,
+          "pi90_lo": 10.2,
+          "pi90_hi": 88.8
+        },
+        {
+          "location": "Lira",
+          "region": "Northern",
+          "as_of": "2023-12",
+          "risk_now": 46.9,
+          "band": "Moderate",
+          "next_point": 46.9,
+          "next_ridge": 48.6,
+          "pi80_lo": 16.6,
+          "pi80_hi": 77.2,
+          "pi90_lo": 7.6,
+          "pi90_hi": 86.2
+        },
+        {
+          "location": "Arua",
+          "region": "Northern",
+          "as_of": "2023-12",
+          "risk_now": 44.1,
+          "band": "Moderate",
+          "next_point": 44.1,
+          "next_ridge": 49.1,
+          "pi80_lo": 13.8,
+          "pi80_hi": 74.4,
+          "pi90_lo": 4.8,
+          "pi90_hi": 83.4
+        },
+        {
+          "location": "Jinja",
+          "region": "Eastern",
+          "as_of": "2023-12",
+          "risk_now": 44.1,
+          "band": "Moderate",
+          "next_point": 44.1,
+          "next_ridge": 49.1,
+          "pi80_lo": 13.8,
+          "pi80_hi": 74.4,
+          "pi90_lo": 4.8,
+          "pi90_hi": 83.4
+        },
+        {
+          "location": "Masindi",
+          "region": "Northern",
+          "as_of": "2023-12",
+          "risk_now": 44.1,
+          "band": "Moderate",
+          "next_point": 44.1,
+          "next_ridge": 49.1,
+          "pi80_lo": 13.8,
+          "pi80_hi": 74.4,
+          "pi90_lo": 4.8,
+          "pi90_hi": 83.4
+        },
+        {
+          "location": "Kampala",
+          "region": "Central",
+          "as_of": "2023-12",
+          "risk_now": 41.2,
+          "band": "Low",
+          "next_point": 41.2,
+          "next_ridge": 49.6,
+          "pi80_lo": 10.9,
+          "pi80_hi": 71.5,
+          "pi90_lo": 1.9,
+          "pi90_hi": 80.5
+        },
+        {
+          "location": "Kumi",
+          "region": "Eastern",
+          "as_of": "2023-12",
+          "risk_now": 41.2,
+          "band": "Low",
+          "next_point": 41.2,
+          "next_ridge": 49.6,
+          "pi80_lo": 10.9,
+          "pi80_hi": 71.5,
+          "pi90_lo": 1.9,
+          "pi90_hi": 80.5
+        },
+        {
+          "location": "Luweero",
+          "region": "Central",
+          "as_of": "2023-12",
+          "risk_now": 41.2,
+          "band": "Low",
+          "next_point": 41.2,
+          "next_ridge": 49.6,
+          "pi80_lo": 10.9,
+          "pi80_hi": 71.5,
+          "pi90_lo": 1.9,
+          "pi90_hi": 80.5
+        },
+        {
+          "location": "Mbarara",
+          "region": "Western",
+          "as_of": "2023-12",
+          "risk_now": 41.2,
+          "band": "Low",
+          "next_point": 41.2,
+          "next_ridge": 49.6,
+          "pi80_lo": 10.9,
+          "pi80_hi": 71.5,
+          "pi90_lo": 1.9,
+          "pi90_hi": 80.5
+        },
+        {
+          "location": "Mityana",
+          "region": "Central",
+          "as_of": "2023-12",
+          "risk_now": 41.2,
+          "band": "Low",
+          "next_point": 41.2,
+          "next_ridge": 49.6,
+          "pi80_lo": 10.9,
+          "pi80_hi": 71.5,
+          "pi90_lo": 1.9,
+          "pi90_hi": 80.5
+        },
+        {
+          "location": "Mukono",
+          "region": "Central",
+          "as_of": "2023-12",
+          "risk_now": 41.2,
+          "band": "Low",
+          "next_point": 41.2,
+          "next_ridge": 49.6,
+          "pi80_lo": 10.9,
+          "pi80_hi": 71.5,
+          "pi90_lo": 1.9,
+          "pi90_hi": 80.5
+        },
+        {
+          "location": "Soroti",
+          "region": "Eastern",
+          "as_of": "2023-12",
+          "risk_now": 41.2,
+          "band": "Low",
+          "next_point": 41.2,
+          "next_ridge": 49.6,
+          "pi80_lo": 10.9,
+          "pi80_hi": 71.5,
+          "pi90_lo": 1.9,
+          "pi90_hi": 80.5
+        },
+        {
+          "location": "Tororo",
+          "region": "Eastern",
+          "as_of": "2023-12",
+          "risk_now": 41.2,
+          "band": "Low",
+          "next_point": 41.2,
+          "next_ridge": 49.6,
+          "pi80_lo": 10.9,
+          "pi80_hi": 71.5,
+          "pi90_lo": 1.9,
+          "pi90_hi": 80.5
+        },
+        {
+          "location": "Wakiso",
+          "region": "Central",
+          "as_of": "2023-12",
+          "risk_now": 41.2,
+          "band": "Low",
+          "next_point": 41.2,
+          "next_ridge": 49.6,
+          "pi80_lo": 10.9,
+          "pi80_hi": 71.5,
+          "pi90_lo": 1.9,
+          "pi90_hi": 80.5
+        },
+        {
+          "location": "FortPortal",
+          "region": "Western",
+          "as_of": "2023-12",
+          "risk_now": 38.7,
+          "band": "Low",
+          "next_point": 38.7,
+          "next_ridge": 49.8,
+          "pi80_lo": 8.4,
+          "pi80_hi": 69.0,
+          "pi90_lo": 0.0,
+          "pi90_hi": 78.0
+        }
+      ]
     },
     "latest_nowcast_top8": [
       {
@@ -360,6 +721,464 @@
     ],
     "note": "This is a monitoring/prioritisation NOWCAST. The forward-lead skill equals the measured lag-1 persistence; it is NOT a causal forecast. Predictive skill requires coupling exposure, soil moisture and impact data that a weather-only feature space omits."
   },
+  "wb_climate_check": {
+    "source_note": "World Bank indicator series retrieved through api.worldbank.org by fetch_wb_climate.py; the Climate Change Knowledge Portal pages themselves return HTTP 403 to this environment, so no value here was read off a portal chart.",
+    "agreement_vs_ours_spei6_mean": {
+      "n_years": 16,
+      "years": [
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "pearson_r": 0.057,
+      "pearson_p": 0.832630302880017,
+      "spearman_rho": 0.094,
+      "spearman_p": 0.7288144270239805,
+      "sign_agreement": 0.562,
+      "mean_abs_diff": 1.108,
+      "wb_range": [
+        -0.83,
+        2.43
+      ],
+      "ours_range": [
+        -1.26,
+        1.21
+      ],
+      "reading": "correlation of year-to-year movement; the two series are not on the same scale or inputs, so the level difference is not an error term"
+    },
+    "agreement_vs_ours_spei6_min": {
+      "n_years": 16,
+      "years": [
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "pearson_r": 0.097,
+      "pearson_p": 0.720883073626835,
+      "spearman_rho": 0.05,
+      "spearman_p": 0.8533318126227727,
+      "sign_agreement": 0.562,
+      "mean_abs_diff": 3.856,
+      "wb_range": [
+        -0.83,
+        2.43
+      ],
+      "ours_range": [
+        -4.75,
+        -0.99
+      ],
+      "reading": "correlation of year-to-year movement; the two series are not on the same scale or inputs, so the level difference is not an error term"
+    },
+    "dry_year_check": {
+      "wb_driest5": [
+        {
+          "year": 2005,
+          "wb_spei": -1.69,
+          "ours_spei6_min": null,
+          "register_drought_same_or_adjacent_year": [],
+          "in_evaluation_window": false
+        },
+        {
+          "year": 1993,
+          "wb_spei": -1.45,
+          "ours_spei6_min": null,
+          "register_drought_same_or_adjacent_year": [],
+          "in_evaluation_window": false
+        },
+        {
+          "year": 2000,
+          "wb_spei": -1.2,
+          "ours_spei6_min": null,
+          "register_drought_same_or_adjacent_year": [],
+          "in_evaluation_window": false
+        },
+        {
+          "year": 2004,
+          "wb_spei": -0.84,
+          "ours_spei6_min": null,
+          "register_drought_same_or_adjacent_year": [],
+          "in_evaluation_window": false
+        },
+        {
+          "year": 2009,
+          "wb_spei": -0.83,
+          "ours_spei6_min": -4.75,
+          "register_drought_same_or_adjacent_year": [
+            "UG-003 2010-12-01 Drought"
+          ],
+          "in_evaluation_window": true
+        }
+      ],
+      "wb_years_le_minus_1": [
+        1993,
+        2000,
+        2005
+      ],
+      "wb_min_in_evaluation_window": -0.83,
+      "wb_argmin_in_evaluation_window": 2009,
+      "register_drought_years": [
+        2010,
+        2016,
+        2018,
+        2020
+      ],
+      "reading": "the Bank's index is a national annual mean: it can sit above the -1 severe-drought threshold in a year the register records droughts, because those droughts are seasonal and district-local"
+    },
+    "precip_normal_check": {
+      "wb_normal_mm": 1180.0,
+      "wb_normal_years": 33,
+      "wb_constant_across_years": true,
+      "wb_source": null,
+      "era5_mean_annual_mm": 1588.8,
+      "era5_complete_year_loc_rows": 256,
+      "era5_years": [
+        2008,
+        2023
+      ],
+      "era5_year_min": 1180.1,
+      "era5_year_max": 1965.7,
+      "era5_driest_site": [
+        "Mbarara",
+        720.4
+      ],
+      "era5_wettest_site": [
+        "Mbale",
+        5077.0
+      ],
+      "pct_of_normal": 134.6,
+      "reading": "different products, different baselines, different sampling of the country: this is a scale sanity check on the reanalysis, not a validation of either number"
+    },
+    "portal_indicators": {
+      "EN.CLC.SPEI.XD": {
+        "name": "wb_spei",
+        "label": null,
+        "source": null,
+        "years": {
+          "1990": -0.4936,
+          "1991": -0.0328,
+          "1992": -0.6241,
+          "1993": -1.4467,
+          "1994": 0.7186,
+          "1995": 0.0697,
+          "1996": 0.9837,
+          "1997": 0.7829,
+          "1998": -0.4492,
+          "1999": 0.4008,
+          "2000": -1.1999,
+          "2001": 0.0361,
+          "2002": -0.2275,
+          "2003": -0.5378,
+          "2004": -0.8387,
+          "2005": -1.6862,
+          "2006": 0.393,
+          "2007": 1.3808,
+          "2008": -0.1392,
+          "2009": -0.8307,
+          "2010": 0.9599,
+          "2011": 0.0926,
+          "2012": 1.237,
+          "2013": 1.4969,
+          "2014": -0.4522,
+          "2015": 0.854,
+          "2016": 0.4702,
+          "2017": 1.3363,
+          "2018": 0.568,
+          "2019": 2.426,
+          "2020": 1.8783,
+          "2021": 1.1892,
+          "2022": 1.3381,
+          "2023": 0.3376
+        },
+        "n_values": 34
+      },
+      "AG.LND.PRCP.MM": {
+        "name": "wb_precip_normal_mm",
+        "label": null,
+        "source": null,
+        "years": {
+          "1990": 1180.0,
+          "1991": 1180.0,
+          "1992": 1180.0,
+          "1993": 1180.0,
+          "1994": 1180.0,
+          "1995": 1180.0,
+          "1996": 1180.0,
+          "1997": 1180.0,
+          "1998": 1180.0,
+          "1999": 1180.0,
+          "2000": 1180.0,
+          "2001": 1180.0,
+          "2002": 1180.0,
+          "2003": 1180.0,
+          "2004": 1180.0,
+          "2005": 1180.0,
+          "2006": 1180.0,
+          "2007": 1180.0,
+          "2008": 1180.0,
+          "2009": 1180.0,
+          "2010": 1180.0,
+          "2011": 1180.0,
+          "2012": 1180.0,
+          "2013": 1180.0,
+          "2014": 1180.0,
+          "2015": 1180.0,
+          "2016": 1180.0,
+          "2017": 1180.0,
+          "2018": 1180.0,
+          "2019": 1180.0,
+          "2020": 1180.0,
+          "2021": 1180.0,
+          "2022": 1180.0
+        },
+        "n_values": 33
+      },
+      "EN.CLC.MDAT.ZS": {
+        "name": "wb_pop_affected_drought_flood_pct",
+        "label": null,
+        "source": null,
+        "years": {
+          "2009": 0.851203469913909
+        },
+        "n_values": 1
+      },
+      "CC.FLD.TOTL.ZS": {
+        "name": "wb_pop_exposed_flood_pct",
+        "label": null,
+        "source": null,
+        "years": {
+          "2020": 12.93208547
+        },
+        "n_values": 1
+      },
+      "CC.TNET.FLD.ZS": {
+        "name": "wb_transport_exposed_flood_pct",
+        "label": null,
+        "source": null,
+        "years": {
+          "2019": 7.02819626888121
+        },
+        "n_values": 1
+      },
+      "CC.THHZ.RANK.RF": {
+        "name": "wb_thinkhazard_river_flood_level",
+        "label": null,
+        "source": null,
+        "years": {
+          "2010": 1.0
+        },
+        "n_values": 1
+      },
+      "CC.THHZ.RANK.UF": {
+        "name": "wb_thinkhazard_urban_flood_level",
+        "label": null,
+        "source": null,
+        "years": {
+          "2010": 1.0
+        },
+        "n_values": 1
+      }
+    }
+  },
+  "drought_ew_summary": {
+    "as_of_month": "2023-12-01",
+    "status_counts": {
+      "Normal": 9,
+      "Watch": 4,
+      "Warning": 2,
+      "Alert": 1
+    },
+    "districts_flagged_declining_3mo": [],
+    "validation_vs_register": {
+      "n_drought_events": 4,
+      "hits": 34,
+      "false_alarms": 837,
+      "misses": 0,
+      "hit_rate": 1.0
+    },
+    "note": "Threshold-based drought early warning using district SPI-6 severity, trajectory, and decline run. Status tiers: Normal (no concern), Watch (mild drought or deteriorating), Warning (moderate+ drought or 3+ month decline), Alert (severe/extreme drought sustained).",
+    "limitations": [
+      "District SPI-12 infeasible on 16-year ERA5 window; only SPI-3/SPI-6 computed",
+      "SPI nowcast is a condition indicator, not a probabilistic forecast",
+      "Validation uses documented drought events; small sample (4 droughts) limits statistical power"
+    ]
+  },
+  "yield_forecast_summary": {
+    "yield_years": [
+      1961,
+      2024
+    ],
+    "yield_trend_pct_per_year": 1.1,
+    "growing_months": [
+      3,
+      4,
+      5,
+      9,
+      10,
+      11
+    ],
+    "model": {
+      "n": 16,
+      "years": "2008-2023",
+      "slope": 9.244,
+      "intercept": 0.533,
+      "r_squared": 0.076,
+      "pearson_r": 0.275,
+      "pearson_p": 0.302,
+      "spearman_r": 0.4,
+      "spearman_p": 0.125,
+      "slope_95ci": [
+        -9.255,
+        27.744
+      ],
+      "rmse": 15.27,
+      "fitted": [
+        4.155047439857236,
+        -0.626747472192234,
+        8.020966414808159,
+        6.761889779589624,
+        0.5375734147238131,
+        5.12860497577,
+        2.176058229121012,
+        -0.6701771901642081,
+        -7.917451191429752,
+        -3.8479614320159605,
+        -0.9843926441388221,
+        -0.5582806662541552,
+        5.525153930556229,
+        -5.375705280409236,
+        -3.615309106915541,
+        -0.19495400126910511
+      ],
+      "years_list": [
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "yield_anomaly": [
+        7.458521801230766,
+        17.28492627674134,
+        13.198403963976624,
+        15.990414557959465,
+        13.535558835024197,
+        10.87187347982832,
+        13.853774257583495,
+        13.057231386846446,
+        1.5537313411807752,
+        -9.39628643281365,
+        -34.67062382480339,
+        -31.156546477783476,
+        -17.925327862806206,
+        -2.4596939056348077,
+        -0.6255369858631177,
+        -2.056105211029724
+      ],
+      "spi": [
+        0.3918229166666667,
+        -0.1254375,
+        0.8100104166666666,
+        0.6738125,
+        0.0005104166666666891,
+        0.49713541666666666,
+        0.17775,
+        -0.1301354166666667,
+        -0.91409375,
+        -0.47388541666666667,
+        -0.164125,
+        -0.11803124999999999,
+        0.5400312500000001,
+        -0.6391458333333334,
+        -0.44871875,
+        -0.0787291666666667
+      ],
+      "verdict": "model_fitted"
+    },
+    "skill_check": {
+      "holdout_rmse": 14.35,
+      "climatology_rmse": 10.97,
+      "skill_ratio": 1.308,
+      "verdict": "climatology_beats_model"
+    },
+    "projection": {
+      "current_spi": -0.079,
+      "projected_anomaly_pct": -0.19,
+      "prediction_interval_95": [
+        -30.13,
+        29.74
+      ],
+      "p_below_normal": 0.135,
+      "threshold_pct": -17.05
+    },
+    "projection_year": 2023,
+    "note": "National-scale yield forecast from growing-season SPI. District-level yield projection is not identifiable from available data (FAOSTAT provides only national annual totals).",
+    "limitations": [
+      "National scale only; no district-level yield data",
+      "Few overlapping years (16) -> wide confidence intervals",
+      "Correlation does not imply causation; technology trend removed by detrending",
+      "Skill check: climatology_beats_model"
+    ]
+  },
+  "seasonal_outlook_summary": {
+    "available": true,
+    "n_districts": 19,
+    "n_months_forecast": 7,
+    "forecast_class_counts": {
+      "below_normal": 112,
+      "unknown": 21
+    },
+    "escalated_status_counts": {
+      "Normal": 63,
+      "Warning": 28,
+      "Alert": 21,
+      "unknown": 21
+    },
+    "n_districts_escalated": 63,
+    "note": "Seasonal climate outlook integrated with drought early warning. Escalation rule: if forecast is 'below normal' AND EW status is Watch/Warning, escalate one tier (bounded by Alert).",
+    "limitations": [
+      "Seasonal forecast skill over East Africa is modest (precipitation particularly)",
+      "Statistical downscaling assumes forecast bias is stationary",
+      "Tercile classification uses fixed thresholds (+/-10%) rather than historical distribution",
+      "Escalation rule is heuristic; not validated against historical outcomes"
+    ]
+  },
   "benchmark_top": [
     {
       "detector": "LSTMAE",
@@ -418,34 +1237,6 @@
       "f1_seed_std": 0.0
     },
     {
-      "detector": "Ensemble+5dPersist",
-      "precision": 0.1259411362080766,
-      "recall": 0.0564590365142681,
-      "f1": 0.0779661016949152,
-      "roc_auc": 0.506815630348977,
-      "pr_auc": 0.1170182299616449,
-      "mcc": 0.0104893161522199,
-      "f1_lo": 0.0670190830721179,
-      "f1_hi": 0.0892523206192728,
-      "pr_auc_lo": 0.1087485614578616,
-      "pr_auc_hi": 0.1160649401323038,
-      "f1_seed_std": 0.0
-    },
-    {
-      "detector": "Ensemble+Persist+Region",
-      "precision": 0.1223513328776486,
-      "recall": 0.0549248235655108,
-      "f1": 0.0758153324862346,
-      "roc_auc": 0.506815630348977,
-      "pr_auc": 0.1170182299616449,
-      "mcc": 0.0078787536765276,
-      "f1_lo": 0.0646774032206066,
-      "f1_hi": 0.0867771279760194,
-      "pr_auc_lo": 0.1084900913714794,
-      "pr_auc_hi": 0.1157962785073135,
-      "f1_seed_std": 0.0
-    },
-    {
       "detector": "LOF",
       "precision": 0.1334702258726899,
       "recall": 0.0598343050015342,
@@ -460,17 +1251,45 @@
       "f1_seed_std": 0.0
     },
     {
-      "detector": "SARIMAX",
-      "precision": 0.1218343600273785,
-      "recall": 0.0546179809757594,
-      "f1": 0.0754237288135593,
-      "roc_auc": 0.5053722750549883,
-      "pr_auc": 0.1163149002634605,
-      "mcc": 0.0074963152093954,
-      "f1_lo": 0.0653107127683605,
-      "f1_hi": 0.0863523134168312,
-      "pr_auc_lo": 0.1085668563922784,
-      "pr_auc_hi": 0.1158951847750966,
+      "detector": "TemporalIF",
+      "precision": 0.1204654346338124,
+      "recall": 0.0540042957962565,
+      "f1": 0.0745762711864406,
+      "roc_auc": 0.5186819876047036,
+      "pr_auc": 0.116669670625378,
+      "mcc": 0.0064986482284538,
+      "f1_lo": 0.0633797003615246,
+      "f1_hi": 0.0860274597788367,
+      "pr_auc_lo": 0.1084655586266486,
+      "pr_auc_hi": 0.1157686539093705,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "Ensemble+Persist+Region",
+      "precision": 0.1189336978810663,
+      "recall": 0.0533906106167536,
+      "f1": 0.073697585768742,
+      "roc_auc": 0.5054657806559797,
+      "pr_auc": 0.1166294797360636,
+      "mcc": 0.005386201830891,
+      "f1_lo": 0.0636184522755254,
+      "f1_hi": 0.0843784364074028,
+      "pr_auc_lo": 0.1084264928820098,
+      "pr_auc_hi": 0.1155551596618589,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "Ensemble+5dPersist",
+      "precision": 0.1238877481177275,
+      "recall": 0.0555385087450138,
+      "f1": 0.0766949152542372,
+      "roc_auc": 0.5054657806559797,
+      "pr_auc": 0.1166294797360636,
+      "mcc": 0.0089928156808076,
+      "f1_lo": 0.0656833774606916,
+      "f1_hi": 0.0876112531660023,
+      "pr_auc_lo": 0.108572187475406,
+      "pr_auc_hi": 0.1159074431839422,
       "f1_seed_std": 0.0
     }
   ],

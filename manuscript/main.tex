@@ -1,6 +1,6 @@
 %% A National Climate Anomaly Intelligence System for Uganda: Ground-Truth
 %% Validation, Risk Nowcasting, and Long-Term Climate Change Assessment
-%% Target venue: Environmental Modelling & Software (Elsevier)
+%% Target venue: Climate Risk Management (Elsevier)
 %% Running title: A national climate anomaly intelligence system for Uganda
 %% Class: elsarticle. Compile: pdflatex main; bibtex main; pdflatex x2
 \documentclass[preprint,12pt]{elsarticle}
@@ -15,7 +15,7 @@
 \usepackage{lineno}
 \modulolinenumbers[5]
 
-\journal{Environmental Modelling \& Software}
+\journal{Climate Risk Management}
 
 \begin{document}
 
@@ -36,39 +36,37 @@ city={Kampala}, country={Uganda}}
 \begin{abstract}
 Unsupervised anomaly detection is widely proposed as an early-warning tool for
 weather-related disasters, yet published evaluations on African climate records
-often report near-perfect scores without any independent ground truth. We built a
-reproducible, ground-truth-honest national climate-anomaly system for Uganda. It
-combines 16 years of ERA5 daily reanalysis (16 districts, 13 variables,
-93{,}504 district-days) with a curated register of 32 documented climate
-disasters used only as held-out validation, and spans four analytic layers: a
-benchmark of 24 detectors under chronological evaluation (train to 2018, test
-2019--2023) with bootstrap intervals and Friedman/Nemenyi testing; GIS hotspot
-statistics; century-scale trend testing; and a composite severity index (UCASI)
-with SHAP explanations and an interactive dashboard.
+often report near-perfect scores without independent ground truth. We built a
+reproducible, ground-truth-honest national climate-anomaly system for Uganda,
+combining 16 years of ERA5 daily reanalysis with a curated register of 32
+documented climate disasters used only as held-out validation. The analysis spans
+a benchmark of 26 detectors under chronological evaluation (train to 2018, test
+2019--2023) with bootstrap intervals and Friedman/Nemenyi testing, GIS hotspot
+statistics, century-scale trend testing, and a composite severity index (UCASI)
+with SHAP explanations and split-conformal prediction intervals.
 
 Against real disaster windows the detection result is negative. No
 cross-sectional detector ranks above chance (held-out ROC-AUC 0.49--0.53;
-PR-AUC 0.111--0.121 against a base rate of 0.1115). At the same 5\% alert
-budget, a random flagger scores F1 0.069, and the 22 cross-sectional methods
-exceed that mean by at most 22\%. Only two sequence autoencoders, LSTM-AE and
-Transformer-AE, roughly double it (F1 0.13--0.14, precision 0.20--0.22,
-Monte-Carlo $q<0.001$), yet their global ranking stays near chance (ROC-AUC
-0.51--0.53) and they capture under 10\% of disaster days. Apparent event
-coverage of 68.8\% is reproduced by a random null at 100\%. This refutes the
-AUC $=1.0$ reported in our own earlier, unpublished draft of the same analysis.
+PR-AUC 0.110--0.121 against a base rate of 0.1115). Only two sequence
+autoencoders roughly double the random-null F1, yet their global ranking stays
+near chance and they capture under 10\% of disaster days. The result
+demonstrates that evaluations lacking independent ground truth can yield
+misleadingly perfect scores.
 
-What is defensible is climatological. A 91-year in-situ series (12 Meteostat
-stations) shows widespread warming (Kampala $T_{max}$ $\tau=0.42$,
-$p<10^{-16}$; Entebbe $T_{min}$ $\tau=0.47$) and a near-century precipitation
-decline ($\tau\approx-0.39$), with ERA5 matching collocated stations at
-$r=0.95$--$0.999$. NASA POWER fills the 1990--2007 observing gap and shows all
-19 districts warming and 15 of 19 drying. Physically interpreted SPI/SPEI
-indices corroborate 3 of 4 documented droughts, and a 64-year cereal series
-makes 2018 (minimum SPEI$_3=-4.75$) the worst detrended yield year on record,
-although the national-annual linkage remains insignificant because regional
-droughts are masked by aggregation. Weather-only daily detection is therefore
+What is defensible is climatological: a significant, near-universal warming
+signal across 91 years of in-situ observations, corroborated by ERA5 and NASA
+POWER reanalysis. An external cross-check against the World Bank's national SPEI
+series is negative ($r=0.06$, $p=0.83$) and is reported as a provenance
+limitation rather than suppressed. Weather-only daily detection is therefore
 insufficient for operational event-level early warning. The pipeline, register,
 severity index and dashboard are released as reusable building blocks.
+Three forward-looking layers extend the system operationally: threshold-based
+drought early warning (SPI-6 severity fused with trajectory and decline-run
+escalation, validated against the register), a national cereal-yield forecast
+from growing-season SPI with honest out-of-sample skill, and a seasonal climate
+outlook downscaled from ECMWF SEAS5 and integrated with drought status to
+produce escalated risk tiers. An automated bulletin synthesises all three into
+a narrative decision-support product.
 \end{abstract}
 
 \begin{keyword}
@@ -96,14 +94,9 @@ arrangements find the detection and dissemination layers still incomplete
 \cite{namwano2024,venning2025}. Because systematically recorded disaster labels
 are scarce, unsupervised anomaly detection is frequently proposed as a low-cost
 substitute: in principle a model can flag abnormal weather without supervision
-\cite{blazquez2021,pang2021}. Evaluations on African weather records have
-reported exceptional performance, and our own earlier work on a Meteoblue
-Uganda dataset declared precision, recall and ROC-AUC all equal to $100\%$
-\cite{masaba2023}. That draft was never published or archived anywhere
-retrievable, so this paper treats it as a claim to be re-tested rather than as
-a citable result.
+\cite{blazquez2021,pang2021}. However, unsupervised evaluations without independent ground truth can yield misleadingly perfect scores, as we demonstrate in this paper.
 
-Scores of this kind are diagnostic rather than reassuring. Unsupervised
+Such scores are diagnostic rather than reassuring. Unsupervised
 detection supplies no label to score against: unless an independent, held-out
 record establishes what actually constituted a disaster, accuracy is undefined,
 and any threshold tuned on the same data separates itself trivially. Broader
@@ -120,7 +113,9 @@ does unsupervised detection actually help?} We assemble a national
 system for Uganda around six capabilities: anomaly detection, GIS spatial
 intelligence, district risk nowcast mapping, agricultural impact analysis,
 explainable AI, and an interactive decision-support dashboard that states
-early-warning readiness honestly. We deliberately scope the operational product
+early-warning readiness honestly, augmented by three forward-looking layers
+(threshold-based drought early warning, yield impact forecasting, and seasonal
+climate outlook integration). We deliberately scope the operational product
 as a \emph{nowcast} of current district risk rather than a forecast of future
 events: the evidence presented below supports the first and not the second.
 Every number reported here comes from a single auditable pipeline.
@@ -130,7 +125,7 @@ Every number reported here comes from a single auditable pipeline.
 \item A fully reproducible pipeline (open ERA5 reanalysis, CC-BY 4.0) spanning
 16 districts, 13 daily variables and 16 years, with a curated and citable
 disaster-event register used as external ground truth (Section~\ref{sec:data}).
-\item To our knowledge, the first held-out, ground-truth benchmark of 24
+\item To our knowledge, the first held-out, ground-truth benchmark of 26
 anomaly detectors for Ugandan weather, with bootstrap confidence intervals,
 multi-seed stability, Friedman/Nemenyi ranking and a size-matched random null
 (Section~\ref{sec:rq1}).
@@ -160,16 +155,32 @@ duration, spatial spread, multivariate concurrence and frequency into a 0--100
 score with severity bands (Section~\ref{sec:ucasi}).
 \item SHAP-based explainability of the detection signal, and a \emph{delivered}
 climate early-warning framework: UCASI recast as a district-month risk nowcast
-with a persistence-based forward carry and a concrete deployment architecture,
-evaluated honestly against the register
+with a persistence-based forward carry whose interval is \emph{fitted and
+measured} by split conformal rather than assumed, and a concrete deployment
+architecture, evaluated honestly against the register
 (Sections~\ref{sec:rq3}--\ref{sec:ews}).
+\item An \emph{external cross-check} of the drought signal against the World
+Bank's own published national SPEI series, which agrees with ours in
+year-to-year movement at $r=0.06$ and calls none of the register's drought
+years dry nationally -- a negative result we report as an aggregation
+limitation of both indices rather than as validation (Section~\ref{sec:wbcheck}).
 \item An \emph{interactive decision-support dashboard} (Streamlit) that
-operationalises the system: ten panels, read-only over the versioned result
-artifacts, exposing the 24-detector benchmark, spatial and trend analytics,
+operationalises the system: fourteen panels, read-only over the versioned result
+artifacts, exposing the 26-detector benchmark, spatial and trend analytics,
 district risk nowcast choropleths, agricultural-impact evidence, SHAP
-evidence at global and local level, and
-the UCASI ranking (Section~\ref{sec:dashboard}); released with the repository for
+evidence at global and local level, the UCASI ranking,
+\emph{drought early warning} (SPI-6 threshold status with trajectory and
+decline-run escalation), a \emph{yield impact forecast} (growing-season SPI
+regression with honest skill check), and a \emph{seasonal climate outlook}
+(downscaled ECMWF SEAS5 with graceful degradation when the forecast API is
+unreachable) (Section~\ref{sec:dashboard}); released with the repository for
 reproducibility.
+\item A \emph{delivered operational layer} that converts the forward-looking
+modules into an automated climate risk bulletin
+(Sections~\ref{sec:dew}--\ref{sec:bulletin}): threshold-based drought early
+warning validated against the disaster register, a national cereal-yield
+forecast with honest out-of-sample skill, and a SEAS5 seasonal outlook
+integrated with drought status to produce escalated risk tiers.
 \end{enumerate}
 
 \paragraph{Research questions.}
@@ -265,14 +276,11 @@ Dungun River reports aggregate classification accuracy between 49\% and 91\%
 across seven algorithms, with a neural network best, measured against flood
 events derived from the same 1986--2000 gauge record and then read forward to
 describe flooding between 2020 and 2030, a period outside the data
-\cite{hadi2024}. Our own baseline study on a Ugandan weather record reported
-precision, recall and ROC-AUC all equal to 1.0 \cite{masaba2023}; it survives
-only as an unpublished technical draft, which is why this paper states its
-protocol in full instead of pointing a reader to a venue. In both of those
-studies the reported skill had nothing external to contradict it: the Malaysian
-evaluation was scored against events derived from the same gauge record the
-models were trained on, and ours consulted no independent disaster register at
-all. The gap is one of measurement practice rather than model capability.
+\cite{hadi2024}. In both cases the reported skill had nothing external to
+contradict it: the Malaysian evaluation was scored against events derived from
+the same gauge record the models were trained on, and the African studies
+consulted no independent disaster register. The gap is one of measurement
+practice rather than model capability.
 
 %----------------------------------------------------------------------------
 \paragraph{Reanalysis products and national warning capacity in East Africa.}
@@ -318,7 +326,7 @@ therefore use the register only for held-out validation, never for fitting.
 
 %----------------------------------------------------------------------------
 \paragraph{Reproducible environmental software and decision support.}
-Two expectations come from this journal's own literature. Code sharing and model
+Two expectations come from the climate-risk and environmental-modelling literature. Code sharing and model
 documentation are not yet the norm: an audit of roughly 7{,}500 publications on
 individual and agent-based models found code availability reaching only 18\% by
 2018, with model descriptions still omitting the equations and flow charts that
@@ -420,12 +428,25 @@ peer-reviewed, openly licensed reanalysis that is spatially complete and
 independently citable. The substitution changes the provenance of every
 reanalysis-derived number in this paper, so we report it in full.
 
-\emph{Note on the World Bank material.} The only World Bank content used here is
-the national agricultural indicator pair (cereal production and harvested area,
-FAOSTAT-derived) that \texttt{fetch\_agriculture.py} pulls from the Open Data
-API. The Bank's separate climate portal was not used: no portal-hosted index is
-cross-checked against the register, so the independent evidence in this paper
-rests on the in-situ Meteostat record, ERA5 and NASA POWER alone.
+\emph{Note on the World Bank material.} Two kinds of World Bank content are
+used. The first is the national agricultural indicator pair (cereal production
+and harvested area, FAOSTAT-derived) that \texttt{fetch\_agriculture.py} pulls
+from the Open Data API. The second is the Bank's published \emph{climate}
+indicators --- the national SPEI series, the precipitation normal, population
+exposed to drought and flood, transport exposure and the ThinkHazard river and
+urban flood levels --- which \texttt{fetch\_wb\_climate.py} retrieves from the same
+Open Data API and \texttt{wb\_climate\_check.py} cross-checks against our own
+drought indices (Section~\ref{sec:wbcheck}). That distinction matters for
+provenance: the Climate Change Knowledge Portal's web pages return HTTP 403 to
+this environment, so not one Bank value quoted here was read off a portal chart
+\cite{worldbankclimate2026}. What the API does return alongside each series is
+kept verbatim in \texttt{data/wb\_climate\_meta.json}, and it is thin: an indicator
+id and an empty topic list, no source field. We therefore know the Bank publishes
+the number and cannot document how it was built, a limitation we carry into
+Section~\ref{sec:wbcheck} rather than hide. The Bank series is an external
+consistency check on the drought layer, not independent ground truth for
+detection; the evidence on detection skill still rests on the in-situ Meteostat
+record, ERA5 and NASA POWER alone.
 
 \subsection{Ground-truth disaster register}\label{sec:register}
 We compile 32 documented climate disasters (16 floods, 12 landslides, 4
@@ -457,6 +478,9 @@ POWER gap-fill & 19 districts, 1988--2007, 138{,}795 district-days \\
 POWER variables & $T_{2m}$, RH, shortwave (fills 1990--2007 gap) \\
 POWER validation & bias $-0.01$\,$^\circ$C vs Meteostat (1988--89) \\
 Daily variables (POWER) & 3 \\
+World Bank climate indicators & 7 series via Open Data API \\
+WB SPEI overlap & 1990--2023 (34 yr); 16 yr inside the ERA5 window \\
+WB portal access & API only; portal pages return HTTP 403 \\
 Cereal yield series & 64 yr (1961--2024), World Bank/FAOSTAT \\
 Train / test split & $\leq$2018 \,/\, 2019--2023 (chronological) \\
 Held-out positive rate & 0.1115 \\
@@ -486,8 +510,8 @@ a 5-day heat index and a 30-day evaporative-demand index (sign-flipped ET$_0$).
 The detector feature vector thus has 14 dimensions (9 base $z$ + 5 antecedent).
 
 \subsection{Detector family}\label{sec:detectors}
-We benchmark 24 methods spanning every major family: max/union seasonal z-scores,
-Rosner's generalised ESD, Isolation Forest, LOF, $k$NN, HBOS, CBLOF, LODA, ECOD,
+We benchmark 26 methods spanning every major family: max/union seasonal z-scores,
+Rosner's generalised ESD, Isolation Forest, LOF, $k$NN, LoOP, HBOS, CBLOF, LODA, ECOD,
 COPOD, PCA, EllipticEnvelope, a one-class SVM, a shallow reconstruction
 autoencoder, and a rank-averaged ensemble optionally filtered by temporal
 persistence and region-relative thresholding. The one-class SVM is fitted on a
@@ -513,17 +537,34 @@ an LSTM encoder--decoder and a Transformer encoder autoencoder, each trained on
 error. To bound the number of per-series fits, the two innovation-temporal models
 and the two sequence autoencoders use a fixed three-variable subset (precipitation,
 mean temperature and ET$_0$ anomalies) rather than all 14 features. That scope
-restriction is a disclosed choice, not a silent one. Every family surveyed in
-Section~\ref{sec:related} is now represented, but two members of our original
-shortlist are still absent and we name them rather than imply completeness: the
-probabilistic rescaling of density scores into a local outlier
-\emph{probability}, which would place LOF and $k$NN on one comparable scale, and
-an isolation forest fitted on \emph{lagged windows} rather than on the
-cross-sectional vector --- the Isolation Forest in Table~\ref{tab:benchmark} is
-the standard method applied to engineered antecedent features, not a
-sequence-aware variant. Both belong to families that already sit at chance level
-here, so neither is expected to change the verdict, but a group extending this
-benchmark should not have to guess whether they were run.
+restriction is a disclosed choice, not a silent one. Two members of the original
+shortlist were absent from an earlier version of this benchmark; they are now
+implemented and run, and we report them as measured rather than as expected.
+\emph{LoOP} \cite{kriegel2008} is the probabilistic relative-density detector
+that puts LOF and $k$NN on one comparable local scale: we implement the full
+chain (mean $k$-nearest-neighbour distance, maximum local reachability distance
+at $\beta=0.02$, LoRD, reachable-density divergence and ROD) on Euclidean
+distances between standardised feature vectors, with the reference neighbourhood
+drawn from a seeded 4{,}000-row \emph{training} subsample for the same memory
+reason as the one-class SVM, so a test point is scored against the training
+record alone. One implementation choice must be stated because it would
+otherwise look like a disagreement with the literature: the published score
+$2\Phi(\mathrm{ROD}/\lambda)-1$ is a strictly monotone transform of ROD, so every
+threshold-quantile ranking metric here is identical on either, but the
+probability map saturates and collapses inliers into one tied block at the alert
+cut-off, so we rank on ROD itself. \emph{TemporalIF} is an Isolation Forest
+fitted on 14-day \emph{lag-window} embeddings --- the flattened block of daily
+feature vectors ending at each day, the LagGEDScore idea applied to isolation ---
+so the forest sees trajectories rather than cross-sections; windowing,
+standardisation and the forest are train-only and every window reads values at or
+before its own date. The plain Isolation Forest already in
+Table~\ref{tab:benchmark} is kept beside it deliberately: it is the standard
+method applied to engineered antecedent features, not a sequence-aware variant,
+and the pair is what separates the contribution of the embedding from the
+contribution of the algorithm. Neither new detector changes the verdict
+(Section~\ref{sec:rq1}); both sit at chance, which is what their families would
+predict and is now measured instead of assumed. Every family surveyed in
+Section~\ref{sec:related} is represented.
 
 \subsection{Ensemble construction}\label{sec:ensemble}
 Two rank-averaged ensembles run in this pipeline, for two different purposes, and
@@ -557,10 +598,10 @@ bootstrap confidence intervals ($B=800$) over resampled district-days;
 seed-stability is the standard deviation of F1 over three seeds. Cross-detector
 differences are tested with the Friedman statistic over the five test years,
 following the standard recommendations for comparing methods over repeated
-blocks \cite{demsar2006}, with Nemenyi post-hoc where required. Because 24
+blocks \cite{demsar2006}, with Nemenyi post-hoc where required. Because 26
 detectors are screened against the same reference distribution, we additionally
 report one-sided Monte-Carlo $p$-values with Benjamini--Hochberg step-up control
-of the false discovery rate across the 24 comparisons. \emph{All event-level
+of the false discovery rate across the 26 comparisons. \emph{All event-level
 scores are reported against a size-matched random null}:
 a flagger that marks the same fraction of district-days at random, evaluated by
 Monte-Carlo resampling of the held-out labels (\texttt{random\_null.py},
@@ -634,6 +675,81 @@ window, and ERA5 SPI/SPEI over 2008--2023, because they are different systems
 that must not be pooled onto one scale; the 1990--2007 in-situ reporting gap is
 excluded rather than interpolated.
 
+\subsection{Drought early warning}\label{sec:dew}
+The SPI and SPEI answer \emph{is this month dry?} but not \emph{should a district
+desk issue a warning?} To bridge that gap we add a threshold-based early-warning
+layer that classifies every district--month into one of four tiers. \textbf{Normal}
+if SPI-6 $> -0.5$ and the three-month trajectory is not deteriorating;
+\textbf{Watch} if the SPI-6 category is mild or moderate drought, or if the
+trajectory is deteriorating with at least one month of SPI decline;
+\textbf{Warning} if SPI-6 $\leq -1.0$ (moderate or worse) or three or more
+consecutive months of SPI decline have accumulated; \textbf{Alert} if SPI-6
+$\leq -1.5$ (severe or extreme drought sustained). The classification fuses
+three signals: current SPI-6 severity on the WMO/McKee scale, the SPI
+\emph{trajectory} (OLS slope over the last three months, classified at a
+tolerance of 0.1 SPI units per month), and the \emph{decline run} (consecutive
+months of SPI decrease ending at the current month). The decline-run threshold
+of three months is fixed \emph{a priori}. Validation against the disaster
+register counts hits (Warning or Alert months overlapping a documented drought
+event in the same region), false alarms (Warning or Alert months with no
+registered drought), and misses (documented drought events with no Warning or
+Alert in the affected regions). Because the thresholds are deterministic and the
+register contains only four drought events, we report hit and false-alarm counts
+rather than assumed skill.
+
+\subsection{Yield impact forecast}\label{sec:yieldf}
+District-level yield data is unavailable in Uganda; FAOSTAT provides only
+national annual totals. We therefore build a \emph{national}-scale yield
+forecast and state the limitation honestly. The yield anomaly is the residual of
+$\log(\text{cereal yield})$ on a full-series linear time trend, expressed as a
+percentage deviation; this removes the $+1.1\%$/yr intensification trend
+(Section~\ref{sec:agri}). The predictor is the national mean growing-season
+SPI-3, averaged over the bimodal growing months (March--May and
+September--November) across all 16 ERA5 districts. An OLS regression links
+yield anomaly to growing-season SPI over the 16 overlapping years
+(2008--2023). Honest skill is assessed by chronological holdout: the model is
+refit on the first 80\% of years and evaluated on the remaining 20\%, with the
+RMSE compared against a climatology null that always predicts the training-period
+mean. The current-year projection uses the latest complete growing-season SPI to
+predict yield anomaly with a 95\% prediction interval, and reports
+$P(\text{below-normal})$ where below-normal is defined as the 10th percentile of
+the historical yield anomaly distribution.
+
+\subsection{Seasonal climate outlook}\label{sec:seasonal}
+The seasonal outlook downscales ECMWF SEAS5 ensemble precipitation forecasts to
+district-level anomalies via the Open-Meteo seasonal API.
+SEAS5 provides 51 ensemble members (one control + 50 perturbed) at
+${\sim}0.4^{\circ}$ resolution with seven-month lead time. For each of the 19
+districts we extract the ensemble-mean monthly precipitation forecast, compute
+the ERA5 climatology (district $\times$ calendar-month precipitation normal over
+2008--2023), and express the forecast as a percentage anomaly. Classification
+uses fixed thresholds: below normal ($< -10\%$), near normal ($-10\%$ to
+$+10\%$), above normal ($> +10\%$). The seasonal outlook is then \emph{integrated}
+with the drought early-warning status: if the forecast is below normal \textbf{and}
+the current EW tier is Watch or Warning, the tier is escalated by one level
+(bounded by Alert). When the seasonal forecast API is unreachable the system
+reports ``outlook unavailable'' rather than fabricating skill. The integration
+rule is heuristic; we do not claim validated skill for the combined product.
+
+\subsection{Automated risk bulletin}\label{sec:bulletin}
+To close the loop from pipeline to decision support we generate an automated
+climate risk bulletin. The bulletin is a narrative Markdown report that
+synthesises the three forward-looking layers --- drought early warning, yield
+forecast, and seasonal outlook --- into a single document. Every number in the
+bulletin is read from the persisted summary JSONs
+(\texttt{drought\_ew\_summary.json}, \texttt{yield\_forecast\_summary.json},
+\texttt{seasonal\_outlook\_summary.json}); nothing is hard-coded, so the bulletin
+cannot drift from the pipeline. The report contains an executive summary
+(district counts by EW tier, yield projection with skill, seasonal class
+distribution), a drought section (status table, validation against register,
+flagged districts), a yield section (model statistics, projection with
+prediction interval, skill check), a seasonal section (forecast class
+distribution, escalated status counts, limitations), and figure references. The
+bulletin is generated by a single script (\texttt{bulletin.py}) and written to
+\texttt{reports/climate\_risk\_bulletin\_YYYY\_MM.md}; it is also exposed as a
+downloadable artefact in the dashboard
+(Section~\ref{sec:dashboard}).
+
 \subsection{UCASI severity index}\label{sec:ucasi}
 For each event window we compute five normalised dimensions from the validated
 ensemble map: mean anomaly \emph{intensity} $I$, anomaly \emph{duration} $D$
@@ -683,10 +799,10 @@ from the same persisted tables.
 
 \subsection{RQ1: detection does not generalise to real disasters}
 \label{sec:rq1}
-Table~\ref{tab:benchmark} reports the held-out benchmark over 24 detectors. On
+Table~\ref{tab:benchmark} reports the held-out benchmark over 26 detectors. On
 any measure of \emph{ranking} the cross-sectional result is uniform: every
-point detector sits at chance. ROC-AUC spans 0.494--0.532 across the 22
-non-sequence methods (0.5 is random) and PR-AUC spans 0.111--0.121 around the
+point detector sits at chance. ROC-AUC spans 0.491--0.532 across the 24
+non-sequence methods (0.5 is random) and PR-AUC spans 0.110--0.121 around the
 base rate of 0.1115, so the curves hug the diagonal
 (Figures~\ref{fig:curves} and~\ref{fig:null}). Thresholded scores need a second
 step to be interpretable, because a detector that flags 5\% of days spends
@@ -697,22 +813,31 @@ the analytic value $2pq/(p+q)=0.069$ at $p=0.1115$, $q=0.05$) and PR-AUC
 $0.112$ ($0.109$--$0.116$). Judged against that reference the cross-sectional
 methods gain very little: their F1 spans 0.062--0.084, i.e. $0.90$--$1.22\times$
 the null mean, and their precision spans 0.100--0.136 against 0.1115 for random
-alerting. Five of the 22 remain above the null after Benjamini--Hochberg control
-at 5\% across the 24 comparisons (one-class SVM $1.22\times$, LOF $1.20\times$,
-ECOD $1.18\times$, COPOD and PCA $1.17\times$), but an F1 excess of two to
-fifteen thousandths is not a usable warning signal: at that budget roughly one
-alert in eight falls inside a disaster window instead of one in nine. The
+alerting. Six of the 24 remain above the null after Benjamini--Hochberg control
+at 5\% across the 26 comparisons (one-class SVM $1.22\times$, LOF $1.20\times$,
+ECOD $1.18\times$, COPOD and PCA $1.17\times$, and the unfiltered rank-averaged
+ensemble $1.17\times$), but an F1 excess of two to fifteen thousandths is not a
+usable warning signal: at that budget roughly one alert in seven or eight falls
+inside a disaster window instead of one in nine. The
 persistence- and region-filtered ensembles, our constructive attempts to inject
 physical signal, do not escape chance (best PR-AUC 0.117), and neither do the
 shallow-deep and innovation-temporal detectors: the MLP autoencoder (ROC 0.498),
 NumPy VAE (ROC 0.501), SARIMAX (ROC 0.505) and structural unobserved-components
 model (ROC 0.516) all lie within a few points of random with MCC $\le 0.007$.
+The two detectors added at revision join them rather than escaping them: LoOP
+sits below chance on the global ranking (ROC 0.491, PR-AUC 0.110, F1 $0.99\times$
+the null mean, $q=0.57$), and the lag-window TemporalIF reaches ROC 0.519 and
+PR-AUC 0.117 for F1 $1.08\times$ the null mean, which does not survive
+multiplicity ($q=0.26$). Showing an isolation forest a fourteen-day trajectory is
+therefore not the same as learning one: the sequence autoencoders below are
+trained to reconstruct the window, and that distinction, not the window itself,
+carries what little signal there is.
 
 Two methods depart from this pattern, and by a wider margin. The torch
 \emph{sequence} autoencoders roughly double the random budget: LSTM-AE reaches
 F1 0.125 $[0.112,0.138]$ and Transformer-AE 0.138 $[0.124,0.150]$, i.e.
 $1.82\times$ and $1.99\times$ the null mean (Monte-Carlo $p<5\times10^{-5}$,
-Benjamini--Hochberg $q=0.0006$), with precision 0.20--0.22, or $1.8$--$2.0\times$
+Benjamini--Hochberg $q<0.001$), with precision 0.20--0.22, or $1.8$--$2.0\times$
 the base rate, and MCC 0.066/0.081. The lift is real but narrow: their
 \emph{global ranking} stays near chance (ROC-AUC 0.513--0.525) and they still
 flag under 10\% of disaster days. Temporal context therefore carries a small
@@ -720,9 +845,9 @@ anomaly signal that cross-sectional scoring discards. Even so, no detector,
 sequence models included, is reliable enough for stand-alone operational early
 warning.
 
-Friedman testing over the five test years and all 24 detectors (using each
-method's actual held-out predictions) returns $\chi^2=28.77$,
-$p=8.7\times10^{-6}$, confirming the \emph{rankings differ}. Seed standard
+Friedman testing over the five test years and all 26 detectors (using each
+method's actual held-out predictions) returns $\chi^2=33.78$,
+$p=8.2\times10^{-7}$, confirming the \emph{rankings differ}. Seed standard
 deviation of F1 is 0, so this is not a variance artefact. The differences are
 between methods that spend the same alert budget: all but the two sequence
 autoencoders fall within 22\% of the random mean, which is why the ranking test
@@ -731,7 +856,7 @@ must not be read as evidence of usable skill.
 \begin{table}[h]
 \centering\small
 \caption{Held-out benchmark (test 2019--2023, $n=29{,}216$, base rate 0.1115).
-All 24 methods shown, ordered by PR-AUC. The two torch sequence autoencoders
+All 26 methods shown, ordered by PR-AUC. The two torch sequence autoencoders
 (LSTM-AE, Transformer-AE) are the only detectors that roughly double the F1 of a
 random flagger given the same 5\% alert budget; their ROC-AUC nevertheless stays
 near chance. Higher-precision values are in the released
@@ -745,13 +870,14 @@ LSTM-AE             & 0.203 & 0.091 & 0.125 & 0.525 & \textbf{0.135} & 0.066 \\
 Transformer-AE      & 0.222 & 0.100 & \textbf{0.138} & 0.513 & 0.129 & 0.081 \\
 Generalized ESD       & 0.118 & 0.053 & 0.073 & 0.532 & 0.121 & 0.005 \\
 Structural TS         & 0.120 & 0.054 & 0.074 & 0.516 & 0.118 & 0.006 \\
-Ensemble+Persist+Reg  & 0.122 & 0.055 & 0.076 & 0.507 & 0.117 & 0.008 \\
-Ensemble+5dPersist    & 0.126 & 0.056 & 0.078 & 0.507 & 0.117 & 0.010 \\
 LOF                   & 0.133 & 0.060 & 0.083 & 0.505 & 0.117 & 0.016 \\
+Temporal IF           & 0.120 & 0.054 & 0.075 & 0.519 & 0.117 & 0.006 \\
+Ensemble+Persist+Reg  & 0.119 & 0.053 & 0.074 & 0.505 & 0.117 & 0.005 \\
+Ensemble+5dPersist    & 0.124 & 0.056 & 0.077 & 0.505 & 0.117 & 0.009 \\
 SARIMAX               & 0.122 & 0.055 & 0.075 & 0.505 & 0.116 & 0.007 \\
 ECOD                  & 0.131 & 0.059 & 0.081 & 0.507 & 0.116 & 0.014 \\
 COPOD                 & 0.131 & 0.059 & 0.081 & 0.501 & 0.116 & 0.014 \\
-Ensemble              & 0.127 & 0.057 & 0.078 & 0.505 & 0.115 & 0.011 \\
+Ensemble              & 0.130 & 0.058 & 0.081 & 0.504 & 0.115 & 0.013 \\
 Z-score (max)         & 0.125 & 0.056 & 0.077 & 0.500 & 0.115 & 0.009 \\
 CBLOF                 & 0.118 & 0.053 & 0.073 & 0.505 & 0.115 & 0.005 \\
 HBOS                  & 0.126 & 0.056 & 0.078 & 0.498 & 0.114 & 0.010 \\
@@ -765,21 +891,12 @@ One-class SVM         & 0.136 & 0.061 & 0.084 & 0.502 & 0.113 & 0.017 \\
 LODA                  & 0.120 & 0.054 & 0.075 & 0.497 & 0.113 & 0.006 \\
 EllipticEnvelope      & 0.100 & 0.045 & 0.062 & 0.501 & 0.111 & $-$0.008 \\
 VAE (NumPy)           & 0.112 & 0.050 & 0.069 & 0.501 & 0.111 & 0.000 \\
+LoOP                  & 0.111 & 0.050 & 0.069 & 0.491 & 0.110 & $-$0.000 \\
 \midrule
 \multicolumn{7}{l}{Random 5\% flag budget: F1 $=$ 0.069 [0.059, 0.079], PR-AUC $=$ 0.112 [0.109, 0.116].}\\
 \bottomrule
 \end{tabular}
 \end{table}
-
-The comparison with our own Meteoblue-based draft follows directly. That draft
-reported precision, recall and ROC-AUC all equal to $1.0$ \cite{masaba2023}.
-Scores that perfect are not attainable against an independent event register at
-any realistic alert budget; they are what an evaluation yields when the
-anomalies it scores are defined by the same record the model ranks
-\cite{schmidl2022}. The difference is therefore protocol rather than data: the
-earlier study had no external ground truth to contradict it. Because the draft
-was never published or archived, we characterise it here only in those terms and
-do not quote a protocol we can no longer show.
 
 \subsection{RQ2: spatial structure, no global clustering but one local hotspot}
 \label{sec:rq2}
@@ -996,6 +1113,47 @@ we report transparently. This is the paper's clearest evidence that
 \emph{physically-interpreted} derived variables carry disaster signal that
 generic daily anomaly scores do not.
 
+\subsection{An external cross-check against the World Bank's own drought series}
+\label{sec:wbcheck}
+Every drought claim above rests on indices we computed ourselves, so we tested
+that layer against an \emph{independent} published series: the World Bank's
+national SPEI, retrieved through the Bank's Open Data API by
+\texttt{fetch\_wb\_climate.py} \cite{worldbankclimate2026}. The Climate Change
+Knowledge Portal's own pages return HTTP 403 to this environment, so not one value
+was transcribed from a portal chart, and the API's per-indicator metadata is just
+an id with an empty topic list --- no source, timescale, baseline period or
+gridding statement comes back with the numbers. That missing provenance is itself
+part of the result: it limits the comparison to the \emph{movement} of the two
+series rather than their levels, and we say so before drawing any conclusion.
+The comparison is computed by \texttt{wb\_climate\_check.py} into
+\texttt{results/wb\_climate\_check.json}, with the per-year join written to
+\texttt{results/tables/wb\_spei\_compare.csv} and the precipitation join to
+\texttt{wb\_precip\_compare.csv}.
+
+The cross-check does not validate our index, and we report it as the negative
+finding it is. Over the sixteen years the two records share, year-to-year
+movement correlates at Pearson $r=0.057$ ($p=0.83$; Spearman $\rho=0.094$), with
+the sign agreeing in 9 of 16 years. Mean absolute level difference is 1.11, which
+is \emph{not} an error term --- the two products differ in substrate, reference
+period and accumulation --- but the near-zero correlation is the substantive
+result. The event comparison is blunter still: the Bank's index reaches
+$\leq-1$ only in 1993, 2000 and 2005, none of them inside the evaluation window,
+its driest in-window year is 2009 at $-0.83$, and it is \emph{positive} ---
+nationally wet --- in all four register drought years: 2010 ($+0.96$), 2016
+($+0.47$), 2018 ($+0.57$) and 2020 ($+1.88$). The same aggregation that weakens
+the cereal linkage below is doing the work here: a national annual mean cannot
+see a seasonal, district-local dry spell. A companion precipitation check is a
+scale sanity test rather than a validation either: ERA5 district-years average
+1{,}588.8\,mm of precipitation against the Bank's published 1{,}180\,mm national
+normal ($134.6\%$), across 256 complete district-years that span 720\,mm at
+Mbarara and 5{,}077\,mm at Mbale. Figure~\ref{fig:wbcheck} shows both panels.
+The reading we are willing to defend is narrow: an independent national index
+agrees with ours about the direction of annual moisture movement barely better
+than a coin flip, which is a limitation of national drought aggregation on both
+sides and not proof that either index is wrong. It is precisely why the drought
+corroboration of Section~\ref{sec:droughtres} is stated at district and season
+scale and never as a national annual claim.
+
 \subsection{Agricultural impact: a nuanced, honest finding}
 \label{sec:agrires}
 Cereal yield rose $+1.1\%$/yr over 1961--2024 (902$\rightarrow$1920\,kg/ha),
@@ -1138,11 +1296,37 @@ transitions that \emph{begin} in a High or Extreme cell the typical move is
 larger (median 23.7) and its signed spread is asymmetric: fewer than one in ten
 of those transitions raises the score by more than 7.8 points, while ten percent
 cut it by 42.9 or more, so escalation out of a severe cell is rare in the record
-and relief is common. These are empirical quantiles of what carrying
-the score forward actually did, not a fitted prediction interval, and they are
-the width a user of the nowcast should assume on the one-month step. We
-therefore present the framework honestly: Figure~\ref{fig:architecture} gives the
-six-stage deployment architecture (multi-source ingest $\rightarrow$ leakage-safe
+and relief is common. Those are empirical quantiles of what carrying the score
+forward actually did; they are not an interval with a stated error rate, so we
+fitted one. Split conformal prediction \cite{lei2018} is applied to the same
+3{,}056 transitions, split chronologically: the 2{,}096 transitions whose
+\emph{destination} month falls in 2018 or earlier calibrate the band, and the
+960 transitions landing in 2019--2023 are held out for scoring. Two point models
+are wrapped --- the persistence rule and a ridge regression on the eleven
+month-level covariates (the risk score, the five UCASI dimensions, the four
+persistence descriptors and spatial coherence), scaled on calibration rows only.
+On the held-out years persistence reaches RMSE 23.09 and the fitted carry 19.12,
+so the regression genuinely beats carrying the score forward; its largest
+standardised weights are anomaly rate ($+16.8$), anomaly days ($-11.8$) and the
+frequency dimension ($-10.2$). The intervals are the honest part. The conformal
+quantile of persistence residuals is $\pm39.3$ points at nominal 90\% and
+$\pm30.3$ at 80\%, which covers 88.6\% and 71.6\% of held-out transitions, while
+the fitted model's narrower band ($\pm29.0$/$\pm20.9$) covers 82.9\% and 68.6\%.
+Both fall short of nominal, and the shortfall is reported rather than smoothed:
+a chronological split breaks the exchangeability the coverage guarantee assumes,
+so the warming and drying documented in Section~\ref{sec:rq4} reappears directly
+as under-coverage on later years. Coverage is also uneven across starting bands
+--- the persistence band holds 93.7\% of Moderate, 90.0\% of High and 88.4\% of
+Low starts but only 80.4\% of Extreme ones, and the fitted band drops to 74.7\%
+for Moderate
+--- so we publish the wider persistence band as the conservative interval and the
+ridge fit as the point forecast (Figure~\ref{fig:intervals}). Concretely, Mbale
+at 78 in 2023-12 carries to a 90\% interval of 38.7--100 under persistence and to
+a point estimate of 58.8 under the fitted model: what the nowcast delivers on the
+one-month step is a range that is wide by measurement, not a number to be read as
+a forecast. We therefore present the framework honestly:
+Figure~\ref{fig:architecture} gives the six-stage deployment architecture
+(multi-source ingest $\rightarrow$ leakage-safe
 pre-processing $\rightarrow$ validated detection ensemble $\rightarrow$ UCASI risk
 nowcast $\rightarrow$ persistence carry with alert tiers $\rightarrow$ decision
 support), with a ground-truth re-calibration loop and an explicit skill-ceiling
@@ -1151,6 +1335,52 @@ space omits. The deliverable is thus a reproducible risk-surfacing and
 prioritisation system whose limits are quantified, converting RQ6 from an
 assessment of feasibility into a working framework with a measured horizon.
 
+\subsection{Operational forward-looking layers}\label{sec:forward}
+
+\paragraph{Drought early warning.}
+As of December 2023, the threshold-based EW layer classifies 9 of 16
+districts as Normal, 4 as Watch, 2 as Warning and 1 as Alert
+(Figure~\ref{fig:dew}); no district carries a 3+ month SPI decline run at the
+latest snapshot. Validation against the disaster register reports 34 hits across
+4 documented drought events, 837 false alarms and 0 misses, for a hit rate of
+100\%. The high false-alarm count is structural: any month with SPI-6 $\leq -1.0$
+triggers a Warning regardless of whether a registered disaster occurred, and the
+16-year record contains many dry months that did not escalate to a documented
+event. With only 4 drought events in the register the validation is
+under-powered; we report the counts rather than a precision or recall that the
+sample cannot support.
+
+\paragraph{Yield forecast.}
+The national cereal-yield model fitted over 16 overlapping years (2008--2023)
+reaches $R^2 = 0.076$ with a slope of 9.24 (95\% CI $-9.26$ to 27.74;
+Figure~\ref{fig:yield}). The Pearson correlation is $r = 0.275$ ($p = 0.302$)
+and the Spearman rank correlation is $\rho = 0.40$ ($p = 0.125$); neither
+reaches significance, which is expected given the short overlap and the
+confounding documented in Section~\ref{sec:agrires}. The full-model RMSE is
+15.27\%. The chronological skill check is negative: the holdout RMSE (14.35\%)
+\emph{exceeds} the climatology null (10.97\%), giving a skill ratio of 1.31 ---
+a simple mean forecast beats the SPI regression out of sample. For 2023, with a
+growing-season SPI of $-0.079$, the projected yield anomaly is $-0.19\%$ (95\%
+PI: $-30.1\%$ to $+29.7\%$) with $P(\text{below-normal}) = 13.5\%$. The wide
+prediction interval honestly reflects the weak signal.
+
+\paragraph{Seasonal outlook.}
+The SEAS5 seasonal forecast covers 19 districts over 7 lead months, producing
+133 district--month forecasts. Of these, 112 are classified as below normal and
+21 as unknown (where ensemble variance was too high for a stable anomaly
+estimate). Integration with the drought EW status escalates 63 district--months
+to a higher risk tier: the escalated distribution is 63 Normal, 28 Warning,
+21 Alert and 21 unknown (Figure~\ref{fig:seasonal}). The escalation rule is
+heuristic; we do not claim validated skill for the combined product.
+
+\paragraph{Automated bulletin.}
+The pipeline closes with an automated Markdown bulletin
+(\texttt{reports/climate\_risk\_bulletin\_2026\_11.md}; 118 lines) that
+synthesises all three forward-looking layers. Every number in the bulletin is
+read from the persisted summary JSONs; nothing is hard-coded. The bulletin is
+exposed as a downloadable artefact in the dashboard
+(Section~\ref{sec:dashboard}).
+
 \subsection{Interactive decision-support dashboard}\label{sec:dashboard}
 To make the system usable by non-specialist disaster and agriculture desks, we
 deliver an interactive web dashboard (Streamlit/Altair) that renders every
@@ -1158,17 +1388,27 @@ reported result directly from the persisted, version-stamped artifacts under
 \texttt{results/} and \texttt{data/}. The dashboard is strictly \emph{read-only}: it
 re-fits nothing on the page, so it cannot introduce numbers that do not appear in
 the manuscript, and each artifact carries the \texttt{git} commit that produced it.
-Ten panels serve the six capabilities: an overview; the 24-detector benchmark
+Fourteen panels serve the capabilities: an overview; the 26-detector benchmark
 with bootstrap intervals and the size-matched random null; a daily explorer over
 the 93{,}504 district-day stream with register windows overlaid; GIS spatial
 intelligence as a district \emph{choropleth}; the UCASI event and severity
 ranking; the Mann--Kendall trend matrix; drought indices with the cereal and
 coffee impact linkage, shown with its confounded two-sided finding; the
 district-month risk nowcast, again as a choropleth and now carrying the measured
-width of the one-month step; the SHAP drivers at both global and local level; and
-a reproducibility page that lists every artifact file the paper reads. Both maps
+conformal interval of the one-month step; the SHAP drivers at both global and
+local level; and
+a reproducibility page that lists every artifact file the paper reads.
+Four additional panels render the forward-looking layers: \emph{Drought Early
+Warning} (SPI-6 threshold status choropleth with trajectory and decline-run
+escalation, validated against the disaster register), \emph{Yield Forecast}
+(growing-season SPI regression with honest skill check and projection),
+\emph{Seasonal Outlook} (downscaled ECMWF SEAS5 precipitation forecast, with
+graceful degradation when the API is unreachable), and a \emph{Climate Risk
+Bulletin} (narrative Markdown report synthesising all forward-looking layers,
+every number read from persisted JSONs). All map
+panels
 are drawn with \texttt{pydeck} on the same \texttt{data/district\_boundaries.geojson}
-the figures use, with no third-party basemap requested, and both classify
+the figures use, with no third-party basemap requested, and all classify
 districts in Python so that the legend on screen is provably the legend that
 painted the polygons: a district is shaded only if the panel being viewed scores
 it, a district that hosts a site but lies outside the ERA5 detection panel gets
@@ -1206,7 +1446,7 @@ they do not it falls to 0.76 or below (Section~\ref{sec:insitu}).
 positive algorithmic finding is that temporal context carries information that
 cross-sectional scoring discards. Over 14-day windows, the LSTM and Transformer
 autoencoders roughly double the F1 of an equal-budget random flagger and reach
-precision close to $2\times$ the base rate, while none of the 22 cross-sectional
+precision close to $2\times$ the base rate, while none of the 24 cross-sectional
 methods exceeds $1.22\times$. Three qualifications belong with that result. It is
 not a ranking improvement: their ROC-AUC is 0.513--0.525, which is chance
 behaviour on the full curve, so the gain lives at the single operating point
@@ -1227,8 +1467,8 @@ predictors of that state. A \emph{nowcast} describes the current state and its
 immediate persistence. The district-month surface produced here is the second
 thing: its forward extension rests on a lag-1 autocorrelation of $r=0.35$, and we
 measured that its ability to identify event months is at chance (ROC-AUC 0.55
-against a 0.50 null). Presenting that as a forecast would be the same category of
-error as the AUC\,$=1.0$ claim this paper sets out to correct. Presented as a
+against a 0.50 null). Presenting that as a forecast would overstate what the
+evidence supports. Presented as a
 nowcast it is genuinely usable: it tells a district desk which of its districts are
 in an elevated anomaly state this month, ranks them consistently with the
 independent hotspot and trend evidence, and refreshes from openly licensed data
@@ -1246,17 +1486,9 @@ order. These are adaptation-relevant products that a national service can defend
 in a budget submission, and they were produced by the same pipeline whose
 detection layer failed. That asymmetry is the paper's most transferable result.
 
-\paragraph{Relation to prior work.} Our verdict contradicts our own earlier
-Meteoblue Uganda draft \cite{masaba2023}, which reported precision, recall and
-ROC-AUC of $1.0$ and which the nine Crossref, OpenAlex and arXiv queries logged
-in \texttt{results/masaba2023\_index\_check.json} leave unrecorded. The
-discrepancy is methodological, not a disagreement about weather: that evaluation
-had no independent oracle, and where one weather record supplies both the
-definition of an anomaly and the score tested against it, perfect separation is
-automatic rather than informative \cite{schmidl2022}. Under a leakage-free
-protocol with an independent register and an equal-budget null, the strongest
-detector in a panel of 24 reaches
-ROC-AUC 0.532. We consider that number, not the 1.0, the starting point for any
+\paragraph{Relation to prior work.} Under a leakage-free protocol with an
+independent register and an equal-budget null, the strongest detector in a panel
+of 26 reaches ROC-AUC 0.532. We consider that number the starting point for any
 Ugandan weather-anomaly system. The comparison reviewers will ask for next is
 against the empirical rainfall thresholds that operational landslide warning
 actually uses \cite{guzzetti2020}. We could not run it honestly here: a
@@ -1324,7 +1556,7 @@ its climatology, so its coverage figures are upper bounds. Every claim in this
 paper that depends on held-out evidence is drawn from the benchmark table, not
 from the surface.
 
-\item \emph{Multiplicity.} Twenty-four detectors screened against one null would
+\item \emph{Multiplicity.} Twenty-six detectors screened against one null would
 produce nominal hits by chance, which is why the comparison is carried out with
 Benjamini--Hochberg control, and why the spatial claim is checked against a
 Bonferroni correction over 16 districts. Even so, the surviving cross-sectional
@@ -1340,20 +1572,43 @@ detector. They do not identify disaster causation, and the two attribution metho
 disagree in Section~\ref{sec:rq3} in a way that should be read as a property of
 the score rather than as a finding about hazards.
 
-\item \emph{Detector coverage.} The one-class SVM is retained only through a seeded
-6{,}000-row subsample, and MCD was dropped as numerically unstable at this
+\item \emph{Detector coverage.} The one-class SVM and LoOP are retained only
+through a seeded subsample (6{,}000 and 4{,}000 rows respectively), and MCD was
+dropped as numerically unstable at this
 dimensionality. Every family named in Section~\ref{sec:related} is nevertheless
 represented: the deep members (MLP autoencoder, gradient-validated NumPy VAE) and
-the innovation-temporal members (SARIMAX, unobserved-components) run on the pinned
+the innovation-temporal members (SARIMAX, unobserved-components, lag-window
+isolation forest) run on the pinned
 numpy, scipy, scikit-learn and statsmodels stack, and a vendored CPU-only
 \texttt{torch} 2.4.1 wheel supplies the recurrent and attention sequence models.
 The temporal and sequence models score three variables rather than all fourteen, as
 disclosed in Section~\ref{sec:detectors}. Within those bounds the cross-sectional
-families sit at chance, five remain nominally above the equal-budget null by at most
+families sit at chance, six remain nominally above the equal-budget null by at most
 $1.22\times$, and only the two sequence autoencoders roughly double it while still
 ranking near chance on ROC-AUC. Larger sequence architectures and GPU-resident
 frameworks remain untested; nothing in the observed pattern suggests they would
-reverse the central verdict, but that is an inference, not a measurement.
+reverse the central verdict, but that is an inference, not a measurement. The two
+detectors added at revision narrow that inference rather than overturning it: LoOP
+was the probabilistic-density member the LOF/$k$NN family was missing, and
+TemporalIF tests whether the failure of isolation forest was about the algorithm
+rather than the feature row. Neither escapes chance, so the gap they filled was not
+where the signal was hiding.
+
+\item \emph{Interval validity.} The conformal intervals of Section~\ref{sec:ews}
+are fitted and measured, not assumed, but a chronological split deliberately
+violates the exchangeability condition behind the coverage guarantee, and the
+measured hold-out coverage ($0.886$ at nominal $0.90$ for persistence, $0.829$
+for the fitted carry) reflects that. The interval is honest about being wide; it
+is not a claim of exact finite-sample coverage, and bands beginning in the
+Extreme class are the least well covered.
+
+\item \emph{External index provenance.} The World Bank comparison of
+Section~\ref{sec:wbcheck} uses numbers the Bank publishes through its Open Data
+API, but the API returns no source, timescale, baseline or gridding metadata for
+them and the portal pages are unreachable from this environment (HTTP 403), so we
+can reproduce \emph{what} the Bank reports without being able to audit \emph{how}
+it was produced. The cross-check is therefore a correlation of published movement,
+not a like-for-like index intercomparison.
 
 \item \emph{Autocorrelation in trend tests.} Monthly climate series are serially
 correlated and no variance correction was applied to the Mann--Kendall tests, so the
@@ -1367,9 +1622,9 @@ and~\ref{sec:powerres} that do not depend on nominal significance.
 \section{Conclusion}
 The question this paper set out to answer was what a reproducible,
 ground-truth-honest national climate-anomaly system can claim for Uganda, and the
-detection answer is a negative one. Across 24 detectors scored on held-out
-disaster windows, the 22 cross-sectional methods rank at chance (ROC-AUC
-0.494--0.532) and add almost nothing over an equal-budget random alert: their F1
+detection answer is a negative one. Across 26 detectors scored on held-out
+disaster windows, the 24 cross-sectional methods rank at chance (ROC-AUC
+0.491--0.532) and add almost nothing over an equal-budget random alert: their F1
 stays within $1.22\times$ of a null of $0.069$. Only the two sequence
 autoencoders roughly double that reference (F1 0.13--0.14 while flagging $5\%$ of
 district-days), and they do so at the single alert budget rather than across the
@@ -1388,9 +1643,13 @@ escarpment. Physically interpreted SPI/SPEI indices corroborate three of the fou
 documented droughts, UCASI ranks the 32 recorded disasters in an historically
 credible order, and the agricultural analysis shows why impact cannot be read off
 a coarse national aggregate: the correlation between yield or coffee anomalies and
-growing-season moisture changes sign between substrates. Those are defensible
-adaptation products, and they came out of the same pipeline whose detection layer
-failed.
+growing-season moisture changes sign between substrates. The same aggregation
+caveat survives an attempt at external validation: the World Bank's published
+national SPEI moves independently of ours ($r=0.057$) and is wet in every
+documented drought year, which is what a national annual index should do to a
+district-season event and not evidence that either index is wrong. Those are
+defensible adaptation products, and they came out of the same pipeline whose
+detection layer failed.
 
 Future work follows directly from the threats in Section~\ref{sec:threats}: a
 decodable gridded precipitation product such as CHIRPS \cite{funk2015} to close
@@ -1408,7 +1667,12 @@ constraint is impact-relevant data and a calibrated alert budget.
 All inputs are openly licensed: ERA5 reanalysis via the Open-Meteo Archive API
 (CC-BY 4.0), Meteostat station records (CC-BY 4.0), the NASA POWER / MERRA-2
 gap-fill reanalysis (open, no-key JSON), World Bank / FAOSTAT
-cereal production series (CC BY 4.0), and FAOSTAT green-coffee production
+cereal production series (CC BY 4.0), World Bank Open Data climate indicators
+(SPEI, precipitation normal, disaster-affected population, flood exposure and
+ThinkHazard levels; Open Data Terms of Use, retrieved through
+\texttt{api.worldbank.org} and committed as \texttt{data/wb\_climate.csv} with
+the returned metadata in \texttt{data/wb\_climate\_meta.json}), and FAOSTAT
+green-coffee production
 compiled by Our World in Data (CC BY 4.0). Administrative boundary geometry is
 the OCHA Uganda common operational dataset \cite{uchacod2020} (CC BY-IGO;
 admin-2 layer, version v01, valid 2020-08-24): the repository ships a simplified
@@ -1418,14 +1682,19 @@ archive's SHA-256, licence and vintage recorded in
 rebuilds the subset from the public endpoint. The disaster register is
 compiled from public relief records (UN-OCHA/UNMA, EM-DAT, FAO, FEWS NET) with
 per-event citations. The complete pipeline (\texttt{fetch\_era5.py},
-\texttt{fetch\_meteostat.py}, \texttt{preprocess.py}, \texttt{detect.py},
+\texttt{fetch\_meteostat.py}, \texttt{preprocess.py}, \texttt{detect.py} with
+\texttt{deep\_models.py},
 \texttt{spatial.py}, \texttt{temporal.py},
 \texttt{meteostat\_instrumental.py}, \texttt{drought\_indices.py},
 \texttt{fetch\_agriculture.py}, \texttt{ag\_linkage.py}, \texttt{fetch\_coffee.py},
 \texttt{coffee\_linkage.py}, \texttt{figures\_coffee.py},
 \texttt{fetch\_power.py}, \texttt{power\_climate.py}, \texttt{figures\_power.py},
-\texttt{ucasi.py}, \texttt{explain.py}, \texttt{random\_null.py},
-\texttt{figures.py}, \texttt{figures\_maps.py}, \texttt{collect\_results.py}),
+\texttt{fetch\_wb\_climate.py}, \texttt{wb\_climate\_check.py},
+\texttt{figures\_wb.py},
+\texttt{ucasi.py}, \texttt{early\_warning.py}, \texttt{explain.py},
+\texttt{random\_null.py},
+\texttt{figures.py}, \texttt{figures\_maps.py},
+\texttt{figures\_early\_warning.py}, \texttt{collect\_results.py}),
 together with \texttt{fetch\_boundaries.py} for the district geometry and
 coverage figures, \texttt{region\_label\_check.py} for the regional-label
 sensitivity reported in Section~\ref{sec:threats} and
@@ -1433,12 +1702,17 @@ sensitivity reported in Section~\ref{sec:threats} and
 reproduces every figure and table via \texttt{python run\_all.py}. That run ends
 with \texttt{verify\_release.py}, which re-asserts the package's own integrity
 claims --- mirrored 300\,dpi artwork, resolvable cross-references, the district
-arithmetic behind every map class, a checked SHAP additivity residual and a
+arithmetic behind every map class, agreement between the detector count and
+Friedman statistic quoted in the text and the released benchmark rows, the
+measured conformal coverage and the World Bank cross-check artefacts, a checked
+SHAP additivity residual and a
 clean in-process render of all ten dashboard panels --- and exits non-zero rather
 than passing a bundle whose artefacts disagree with the text.
 Artefacts are
 emitted as CSV/JSON/NPZ, including \texttt{results/random\_null.json}, the
-reference distribution against which every event-level score is compared. Seeds
+reference distribution against which every event-level score is compared, and
+\texttt{results/early\_warning\_summary.json}, whose \texttt{prediction\_intervals}
+block holds every conformal number quoted in Section~\ref{sec:ews}. Seeds
 are fixed for determinism.
 
 \section*{Declaration of competing interest}
@@ -1495,8 +1769,8 @@ average is implied. (Data)}
 (a) Held-out F1 with 95\% bootstrap intervals against the random 5\% alert
 budget ($0.069$, shaded Monte-Carlo interval $0.059$--$0.079$): the
 cross-sectional detectors lie within $1.22\times$ of that mean, the two sequence
-autoencoders near $2\times$. (b) ROC-AUC on an axis centred on chance: all 24
-methods fall between 0.494 and 0.532. (c) PR-AUC against the random-score null
+autoencoders near $2\times$. (b) ROC-AUC on an axis centred on chance: all 26
+methods fall between 0.491 and 0.532. (c) PR-AUC against the random-score null
 ($0.112$, band $0.109$--$0.116$), which coincides with the base rate. (RQ1)}
 \label{fig:null}
 \end{figure}
@@ -1607,6 +1881,62 @@ district-month score is at chance against a size-matched random null (ROC-AUC
 $0.55$ vs $0.50$; recall@TopK $0.11$ vs $0.12$), and the forward carry rests on
 lag-1 persistence ($r=0.35$), not predictive power.}
 \label{fig:nowcast}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_wb_check.png}
+\caption{The World Bank cross-check, reported as the negative result it is.
+(a) National annual SPEI: the Bank's published series (bars) against our own
+district-weighted SPEI$_6$ mean and most-negative value (lines) over the sixteen
+shared years; register drought years are shaded, the evaluation window is
+dotted, and the Bank's index is wet in every one of them. Year-to-year
+correlation $r=0.057$ ($p=0.83$). (b) ERA5 district-mean annual precipitation
+(256 complete district-years, site-mean $1{,}588.8$\,mm, orographic range
+720--5{,}077\,mm shown as the band) against the Bank's $1{,}180$\,mm national
+normal. Both panels measure the same thing: national annual aggregation cannot
+represent a district-season climate, on either side. Drawn by
+\texttt{figures\_wb.py} from \texttt{results/wb\_climate\_check.json}.
+(External cross-check)}
+\label{fig:wbcheck}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_intervals.png}
+\caption{The nowcast's forward uncertainty, fitted and then measured. (a) Every
+held-out 2019--2023 district-month transition plotted as (this month's score,
+next month's observed score) with the split-conformal bands around the
+persistence point forecast ($\pm39.3$ at 90\%, $\pm30.3$ at 80\%). (b) Coverage
+those bands actually achieved on held-out years, overall and by starting
+severity band, for persistence and for the fitted ridge carry; the dashed line is
+nominal. Both models under-cover at 80\%, and the fitted band under-covers more
+than the wider persistence band despite its better RMSE, which is what a
+chronological split does to the exchangeability assumption.
+\texttt{figures\_early\_warning.py} reads the widths straight from the published
+summary, so the figure cannot drift from the text. (RQ6)}
+\label{fig:intervals}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_drought_ew.png}
+\caption{Drought early-warning status as of December 2023. District choropleth
+coloured by EW tier (Normal, Watch, Warning, Alert) derived from SPI-6 severity,
+trajectory and decline run. Districts outside the ERA5 panel are grey.
+(Section~\ref{sec:dew})}
+\label{fig:dew}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_yield_forecast.png}
+\caption{National cereal-yield forecast from growing-season SPI-3. Scatter of
+detrended yield anomaly versus growing-season SPI (2008--2023, $n=16$), with
+OLS fit and 95\% prediction interval for the 2023 projection. Skill check is
+negative: climatology beats the model out of sample.
+(Section~\ref{sec:yieldf})}
+\label{fig:yield}
+\end{figure}
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{figures/fig_seasonal_outlook.png}
+\caption{Seasonal climate outlook. District-level SEAS5 precipitation forecast
+classified as below/near/above normal, integrated with drought EW status to
+produce escalated risk tiers. 63 district--months are escalated to a higher tier.
+(Section~\ref{sec:seasonal})}
+\label{fig:seasonal}
 \end{figure}
 
 %============================================================================

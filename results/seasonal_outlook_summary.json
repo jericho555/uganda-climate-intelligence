@@ -1,0 +1,23 @@
+{
+  "available": true,
+  "n_districts": 19,
+  "n_months_forecast": 7,
+  "forecast_class_counts": {
+    "below_normal": 112,
+    "unknown": 21
+  },
+  "escalated_status_counts": {
+    "Normal": 63,
+    "Warning": 28,
+    "Alert": 21,
+    "unknown": 21
+  },
+  "n_districts_escalated": 63,
+  "note": "Seasonal climate outlook integrated with drought early warning. Escalation rule: if forecast is 'below normal' AND EW status is Watch/Warning, escalate one tier (bounded by Alert).",
+  "limitations": [
+    "Seasonal forecast skill over East Africa is modest (precipitation particularly)",
+    "Statistical downscaling assumes forecast bias is stationary",
+    "Tercile classification uses fixed thresholds (+/-10%) rather than historical distribution",
+    "Escalation rule is heuristic; not validated against historical outcomes"
+  ]
+}

@@ -3,8 +3,9 @@
 Usage:  python run_all.py
 Order:  see STAGES below -- fetch -> preprocess -> detect -> random-null
         reference -> spatial/temporal -> climate layers -> impact layers ->
-        UCASI -> early warning -> explainability -> figures -> digest ->
-        release gate.
+        UCASI -> early warning -> explainability -> figures ->
+        drought EW -> yield forecast -> seasonal outlook -> bulletin ->
+        digest -> release gate.
 
 The final stage (``verify_release``) re-checks the deliverables themselves --
 figure mirrors and resolution, cross-references, artefact arithmetic, dashboard
@@ -25,6 +26,7 @@ STAGES = [
     ("fetch_agriculture", "World Bank cereal production/area/yield (impact layer)"),
     ("fetch_coffee", "OWID/FAOSTAT Ugandan green-coffee production (signature export impact layer)"),
     ("fetch_power", "NASA POWER daily T2M/RH/solar 1988-2007 (independent gap-fill)"),
+    ("fetch_wb_climate", "World Bank climate indicators (SPEI, precipitation normal, exposure) via api.worldbank.org"),
     ("fetch_boundaries", "OCHA Uganda COD district polygons + site->district join"),
     ("disaster_register", "Disaster ground-truth register"),
     ("preprocess", "Seasonal anomalies + labels"),
@@ -37,6 +39,7 @@ STAGES = [
     ("meteostat_instrumental", "Century in-situ trends + ERA5 cross-validation"),
     ("power_climate", "POWER reliability + continuous temp/RH trends across dark period"),
     ("drought_indices", "SPI / SPEI derived drought indices + register validation"),
+    ("wb_climate_check", "Our SPEI/precipitation against the World Bank indicator series"),
     ("ag_linkage", "Growing-season drought vs detrended cereal yield (impact novel finding)"),
     ("coffee_linkage", "Coffee production anomaly vs moisture across substrates (confounding demo)"),
     ("ucasi", "Uganda Climate Anomaly Severity Index"),
@@ -47,7 +50,16 @@ STAGES = [
     ("figures_power", "Gap-fill + drought/yield figures"),
     ("figures_maps", "Study-area, risk, gap-fill and null-comparison maps"),
     ("figures_coffee", "Coffee production + sign-flip correlation figure"),
-    ("figures_early_warning", "EWS architecture + risk-nowcast figures"),
+    ("figures_early_warning", "EWS architecture + risk-nowcast + conformal-interval figures"),
+    ("figures_wb", "World Bank SPEI and precipitation cross-check figure"),
+    ("fetch_seasonal", "ECMWF SEAS5 seasonal forecast via Open-Meteo"),
+    ("drought_early_warning", "Threshold SPI drought early warning"),
+    ("yield_forecast", "National growing-season SPI -> cereal-yield forecast"),
+    ("seasonal_outlook", "Seasonal outlook downscale + drought EW integration"),
+    ("figures_drought_ew", "Drought early-warning district map"),
+    ("figures_yield", "Yield-impact forecast figure"),
+    ("figures_seasonal", "Seasonal outlook figure"),
+    ("bulletin", "Automated climate risk bulletin (Markdown)"),
     ("collect_results", "Results digest + event-recall/lead-time (RQ5)"),
     ("check_ref_index", "Crossref/OpenAlex/arXiv check on the refuted baseline draft"),
     ("verify_release", "Release gate: figure, manuscript, artefact and dashboard integrity"),

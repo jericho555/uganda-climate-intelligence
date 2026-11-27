@@ -46,6 +46,13 @@ Thumbs.db
 
 # --- Local scratch ---
 _sizes.py
+_probe*
+_run_ew*
+_bak*
+_mk_*
+_cite*
+_ew_*
+_verify*
 _install_deep*.bat
 _install_torch.bat
 _install_webpkgs.bat
@@ -55,7 +62,12 @@ _check*.py
 _smoke_*.py
 _regen.py
 _mkzip.bat
+_build_overleaf*
+_*log
 _cm.txt
 uganda_ems_overleaf.zip
 results/*.log
+results/**/*.log
+results/_*
+results/tables/_*
 *.tmp

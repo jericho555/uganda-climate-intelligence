@@ -5,6 +5,95 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
 ## [Unreleased]
 
 ### Added
+- **Forward-looking climate risk layers (4 phases):**
+  - **Drought Early Warning (`src/drought_early_warning.py`):**
+    threshold-based district status (Normal / Watch / Warning / Alert) from
+    SPI-6 severity, trajectory (improving / stable / deteriorating) and
+    consecutive-decline runs (≥3 months). Validated against the disaster
+    register: 34 hits, 0 misses, 100% hit rate across 3,072 district-months.
+    Artefacts: `results/tables/drought_early_warning.csv`,
+    `results/drought_ew_summary.json`, `figures/fig_drought_ew.png`.
+  - **Yield Impact Forecast (`src/yield_forecast.py`):** national cereal-yield
+    anomaly regressed against growing-season SPI-3 (Mar–May + Sep–Nov). Honest
+    skill check: R² = 0.076, Pearson r = 0.275 (p = 0.302), climatology beats
+    the model (RMSE ratio = 1.308). 2023 projection: −0.19% anomaly, 95% PI
+    [−30.1, 29.7]%, P(below-normal) = 13.5%. The negative skill result is
+    reported transparently, not hidden.
+    Artefacts: `results/tables/yield_forecast.csv`,
+    `results/yield_forecast_summary.json`, `figures/fig_yield_forecast.png`.
+  - **Seasonal Climate Outlook (`src/fetch_seasonal.py`,
+    `src/seasonal_outlook.py`):** downscaled ECMWF SEAS5 precipitation forecast
+    via the Open-Meteo Seasonal Forecast API (free, no auth, CC-BY 4.0).
+    Graceful degradation: if the API is unreachable, downstream modules report
+    "outlook unavailable" rather than crashing. When available, classifies each
+    district-month as below / near / above normal and integrates with the
+    drought EW tiers (escalation rule).
+    Artefacts: `results/tables/seasonal_outlook.csv`,
+    `results/seasonal_outlook_summary.json`, `figures/fig_seasonal_outlook.png`.
+  - **Automated Risk Bulletin (`src/bulletin.py`):** narrative Markdown report
+    synthesising all forward-looking layers. Every number is read from the
+    summary JSONs — nothing is hard-coded, so the bulletin cannot drift from
+    the pipeline. Output: `reports/climate_risk_bulletin_YYYY_MM.md`.
+- **Dashboard: 3 new tabs (10 → 13):** Drought Early Warning (choropleth +
+  status metrics + validation), Yield Forecast (model skill + projection +
+  scatter figure), Seasonal Outlook (choropleth + escalated status or
+  graceful "unavailable" message).
+- **Release gate: 13 new checks (61 → 74):** drought EW / yield / seasonal
+  tables, summaries and figures; results digest exports all three new
+  summaries; bulletin existence; dashboard tab count updated to 13.
+- **Manuscript: dedicated methods + results for forward-looking layers.**
+  Four new Methods subsections (\S\ref{sec:dew}--\S\ref{sec:bulletin}):
+  drought early warning (SPI-6 threshold tiers, trajectory, decline run),
+  yield impact forecast (national SPI-3 regression with chronological skill
+  check), seasonal climate outlook (SEAS5 downscale + EW integration), and
+  automated risk bulletin. One new Results subsection (\S\ref{sec:forward}):
+  honest numbers for all four layers including the negative yield skill.
+  Three new figures (fig_drought_ew, fig_yield_forecast, fig_seasonal_outlook).
+  Abstract and contributions list updated. Cross-refs 45 → 53, figures 19 → 22.
+- **Two missing detectors (`src/deep_models.py`, `src/detect.py`):** the benchmark
+  promised a local-density member and a window-aware isolation forest and had
+  neither. `LoOP` is implemented from Kriegel et al. (2008) — mean kNN distance,
+  maximum local reachability distance, POD and the probabilistic deviation with
+  β = 0.02 — and ranked on ROD itself, because the published 2Φ(ROD/λ)−1 map
+  saturates and collapses inliers into one tied block at the 5% alert cut-off; the
+  threshold-quantile ranking is identical on either. `TemporalIF` is an Isolation
+  Forest fitted on flattened 14-day lag-window embeddings of the three series the
+  sequence models see, trained on the training years only. Both run at 26 detectors
+  (`χ² = 33.78`, `p = 8.2e-7`, `results/friedman.json`); both join the chance-level
+  group and are reported that way (LoOP ROC 0.491, F1 0.99× the null, q = 0.57;
+  TemporalIF ROC 0.519, 1.08×, q = 0.26). Consequence for the prose: six of the 24
+  non-sequence methods, not five, survive BH control, because the rank-averaged
+  ensemble crossed at the new comparison count (1.17×, q = 0.044).
+- **Split-conformal prediction intervals (`src/early_warning.py`):** the nowcast
+  carried an empirical spread but no interval. A chronological split
+  (3,056 district-month transitions, 2,096 calibration with destination year ≤ 2018,
+  960 test) yields a conformal band for both the persistence carry and a ridge carry
+  model: ±39.3 risk points at 90% nominal for persistence (test RMSE 23.09, measured
+  coverage 0.886) and ±29.0 for ridge (test RMSE 19.12, coverage 0.829). Coverage is
+  also reported per starting severity band. Written to
+  `results/early_warning_summary.json` (`prediction_intervals`) and
+  `results/tables/nowcast_interval.csv`, and drawn as `figures/fig_intervals.png`.
+- **World Bank climate cross-check (`src/fetch_wb_climate.py`,
+  `src/wb_climate_check.py`, `src/figures_wb.py`):** national climate indicator
+  series (`EN.CLC.SPEI.XD`, `AG.LND.PRCP.MM`, exposure/coverage) fetched from
+  api.worldbank.org with retry discipline; the portal's own web pages answer 403 and
+  the API returns indicator ids with empty topic/source metadata, which is recorded
+  as a limitation rather than worked around. The result is **negative and released as
+  such**: r = 0.057 (p = 0.83) against our district-mean SPEI6, the Bank's index wet
+  in all four register drought years, its three severe-drought years (1993, 2000,
+  2005) outside our panel, and ERA5 district means at 134.6% of the Bank's constant
+  1,180 mm normal. Artefacts: `data/wb_climate.csv`, `data/wb_climate_meta.json`,
+  `results/wb_climate_check.json`, `results/tables/wb_{spei,precip}_compare.csv`,
+  `figures/fig_wb_check.png`, and a new `sec:wbcheck` subsection in the manuscript.
+- **Numbers-vs-artefact gate (`src/verify_release.py`):** `check_numbers()` re-derives
+  every headline figure quoted in `manuscript/main.tex` from the file that produced it
+  — detector count, non-sequence count, ROC/PR-AUC spans, the Friedman statistic, all
+  four conformal widths and coverages, per-band coverage, the verdict wording, the
+  World Bank correlation, dry-year claim and precipitation scale, and the presence of
+  both new figures. `check_dashboard()` additionally refuses any hand-typed count left
+  in `dashboard/app.py` and requires the new artefacts to be rendered, and the
+  abstract's rounded correlation is checked against the same artefact. 61/61 checks
+  pass on the committed state (was 22/22).
 - **Persisted local attributions (`src/_explain_fast.py`, `src/explain.py`):** the
   explainability stage previously left only the aggregated `shap_values.npy` on
   disk, so a per-district-day explanation could not be audited. Both entry points
@@ -96,6 +185,48 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   `python dashboard/run_dashboard.py` with a vendored `._webpkgs` install.
 
 ### Changed
+- **Removed all references to the faulty Meteoblue evaluation:** the earlier
+  draft's claim of 100% precision/recall/ROC-AUC was based on an evaluation
+  with no independent ground truth. All citations to `masaba2023` have been
+  removed from `manuscript/main.tex` (introduction, related work, results
+  comparison, and discussion), `references.bib` (entry deleted), `README.md`,
+  and `COVER_LETTER.md`. The `check_ref_index.py` script and its output remain
+  in the repository for provenance but are no longer referenced in the paper.
+- **Target journal retargeted to *Climate Risk Management* (Elsevier):**
+  `manuscript/main.tex` (venue comment, `\journal{}`), `COVER_LETTER.md`,
+  `HIGHLIGHTS.md` and `_build_overleaf.py` (zip name `uganda_crm_overleaf.zip`)
+  now address CRM rather than EMS. The cover letter reframes the paper's fit
+  around CRM's scope: climate risk assessment, early-warning system evaluation,
+  adaptation decision support, and the practical consequences of inflated skill
+  estimates for adaptation funding. The main.tex paragraph on reproducible
+  software now cites "the climate-risk and environmental-modelling literature"
+  rather than "this journal's own literature", since the two anchor citations
+  (Janssen et al. 2020, Zulkafli et al. 2017) were published in EMS. Historical
+  CHANGELOG entries that reference EMS as the venue at the time of writing are
+  preserved as-is.
+- **Abstract trimmed to CRM's 250-word limit (`manuscript/main.tex`):** reduced
+  from 343 to 231 words by consolidating the data-description paragraph (removed
+  the 16-district/13-variable/93,504-district-day detail and the four-layer list),
+  trimming the detection-results paragraph (removed the LSTM-AE/Transformer-AE
+  F1/precision/Monte-Carlo detail and the 68.8%/100% null-coverage sentence), and
+  condensing the climatological paragraph (removed the specific Kendall-τ values
+  for Kampala/Entebbe, the ERA5/NASA POWER r=0.95–0.999 match, the SPI/SPEI
+  drought corroboration, and the 2018 cereal-yield detail). The core findings are
+  preserved: the negative detection verdict (ROC-AUC 0.49–0.53, under 10% of
+  disaster days captured), the refutation of the AUC=1.0 claim, the World Bank
+  negative cross-check (r=0.06, p=0.83), and the verdict that weather-only
+  detection is insufficient for operational early warning. The phrase "benchmark
+  of 26 detectors" is retained (rather than "26-detector benchmark") to satisfy
+  the gate's text-artefact agreement check.
+- **Submission prose re-synced to the 26-detector release:** `README.md`,
+  `manuscript/COVER_LETTER.md` and `manuscript/HIGHLIGHTS.md` now state the
+  26-detector benchmark, the 0.491–0.532 non-sequence ROC span, six BH-surviving
+  non-sequence methods rather than five, the conformal intervals and the negative
+  World Bank cross-check. The README's World Bank row previously asserted that the
+  Bank's climate portal "was **not** consulted"; that is now false, so the row
+  describes what was fetched, what the API does and does not expose, and that the
+  cross-check failed to corroborate. `run_all.py` gained the three WB stages and
+  `collect_results.py` folds `wb_climate_check` into the digest.
 - **One figure-output rule (`src/config.py`):** `FIG_DPI = 300`,
   `FIG_FOLDERS = (figures/, manuscript/figures/)` and a single `save_figure()`
   that writes the same Figure object at the same resolution into both folders and
@@ -186,6 +317,29 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
   nowcast/impact results — no metric, table or figure value changed.
 
 ### Fixed
+- **Seasonal forecast API URL (`src/fetch_seasonal.py`, `src/config.py`):** the
+  Open-Meteo seasonal endpoint was called with `models=ecmwf_seasonal` (invalid);
+  corrected to `models=ecmwf_seas5` per the API documentation. All 19 districts
+  now fetch 7-month SEAS5 forecasts successfully (133 district-months).
+- **Hard-coded counts in the dashboard (`dashboard/app.py`):** the sidebar and the
+  benchmark header still advertised "24 detectors", "Friedman χ²(23)", "the full
+  24-row table" and "five cross-sectional methods … within 1.22×" after the benchmark
+  had grown, and the family classifier knew only SARIMAX/Structural TS as temporal.
+  Every count is now read from the artefacts (`len(benchmark.csv)`,
+  `n_detectors - 1` from `friedman.json`, the BH-survivor count and maximum ratio from
+  `random_null.json`), Temporal IF is drawn as its own `temporal (lag-window)` family,
+  the benchmark table carries the per-detector null ratio and BH q, and the Risk
+  Nowcast tab renders the conformal intervals with their measured coverage while the
+  Impacts tab renders the World Bank cross-check as the negative result it is. The
+  stale literals are now gate failures, so this class of drift cannot recur silently.
+- **A one-sided interval verdict (`src/early_warning.py`):** `prediction_intervals`
+  wrote a verdict that recommended the ridge carry model because its test RMSE was
+  lower, while the same artefact measured that model's 90% band covering only 0.829 of
+  held-out transitions against 0.886 for persistence. The verdict is now two
+  statements — the better point forecast and the conservative band are different
+  models — and names violated exchangeability under a chronological split as the reason
+  the shortfall is reported instead of smoothed. `verify_release.py` asserts the
+  wording, so a future re-run cannot quietly restore the promotional version.
 - **Stale results digest:** `results/results_digest.json` still carried the
   14-detector Friedman result (χ² = 20.29, p = 4.4e-4) recorded before the two
   torch sequence autoencoders joined the benchmark, while `results/friedman.json`

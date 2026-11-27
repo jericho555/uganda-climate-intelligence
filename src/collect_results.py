@@ -50,7 +50,9 @@ def event_recall_leadtime():
 def main():
     digest = {}
     for name in ["spatial_stats", "ucasi_summary", "explain_summary", "friedman",
-                 "change_points", "early_warning_summary"]:
+                 "change_points", "early_warning_summary", "wb_climate_check",
+                 "drought_ew_summary", "yield_forecast_summary",
+                 "seasonal_outlook_summary"]:
         p = RESULTS / f"{name}.json"
         digest[name] = json.loads(p.read_text()) if p.exists() else None
 

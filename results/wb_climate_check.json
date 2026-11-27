@@ -1,0 +1,284 @@
+{
+  "source_note": "World Bank indicator series retrieved through api.worldbank.org by fetch_wb_climate.py; the Climate Change Knowledge Portal pages themselves return HTTP 403 to this environment, so no value here was read off a portal chart.",
+  "agreement_vs_ours_spei6_mean": {
+    "n_years": 16,
+    "years": [
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023
+    ],
+    "pearson_r": 0.057,
+    "pearson_p": 0.832630302880017,
+    "spearman_rho": 0.094,
+    "spearman_p": 0.7288144270239805,
+    "sign_agreement": 0.562,
+    "mean_abs_diff": 1.108,
+    "wb_range": [
+      -0.83,
+      2.43
+    ],
+    "ours_range": [
+      -1.26,
+      1.21
+    ],
+    "reading": "correlation of year-to-year movement; the two series are not on the same scale or inputs, so the level difference is not an error term"
+  },
+  "agreement_vs_ours_spei6_min": {
+    "n_years": 16,
+    "years": [
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023
+    ],
+    "pearson_r": 0.097,
+    "pearson_p": 0.720883073626835,
+    "spearman_rho": 0.05,
+    "spearman_p": 0.8533318126227727,
+    "sign_agreement": 0.562,
+    "mean_abs_diff": 3.856,
+    "wb_range": [
+      -0.83,
+      2.43
+    ],
+    "ours_range": [
+      -4.75,
+      -0.99
+    ],
+    "reading": "correlation of year-to-year movement; the two series are not on the same scale or inputs, so the level difference is not an error term"
+  },
+  "dry_year_check": {
+    "wb_driest5": [
+      {
+        "year": 2005,
+        "wb_spei": -1.69,
+        "ours_spei6_min": null,
+        "register_drought_same_or_adjacent_year": [],
+        "in_evaluation_window": false
+      },
+      {
+        "year": 1993,
+        "wb_spei": -1.45,
+        "ours_spei6_min": null,
+        "register_drought_same_or_adjacent_year": [],
+        "in_evaluation_window": false
+      },
+      {
+        "year": 2000,
+        "wb_spei": -1.2,
+        "ours_spei6_min": null,
+        "register_drought_same_or_adjacent_year": [],
+        "in_evaluation_window": false
+      },
+      {
+        "year": 2004,
+        "wb_spei": -0.84,
+        "ours_spei6_min": null,
+        "register_drought_same_or_adjacent_year": [],
+        "in_evaluation_window": false
+      },
+      {
+        "year": 2009,
+        "wb_spei": -0.83,
+        "ours_spei6_min": -4.75,
+        "register_drought_same_or_adjacent_year": [
+          "UG-003 2010-12-01 Drought"
+        ],
+        "in_evaluation_window": true
+      }
+    ],
+    "wb_years_le_minus_1": [
+      1993,
+      2000,
+      2005
+    ],
+    "wb_min_in_evaluation_window": -0.83,
+    "wb_argmin_in_evaluation_window": 2009,
+    "register_drought_years": [
+      2010,
+      2016,
+      2018,
+      2020
+    ],
+    "reading": "the Bank's index is a national annual mean: it can sit above the -1 severe-drought threshold in a year the register records droughts, because those droughts are seasonal and district-local"
+  },
+  "precip_normal_check": {
+    "wb_normal_mm": 1180.0,
+    "wb_normal_years": 33,
+    "wb_constant_across_years": true,
+    "wb_source": null,
+    "era5_mean_annual_mm": 1588.8,
+    "era5_complete_year_loc_rows": 256,
+    "era5_years": [
+      2008,
+      2023
+    ],
+    "era5_year_min": 1180.1,
+    "era5_year_max": 1965.7,
+    "era5_driest_site": [
+      "Mbarara",
+      720.4
+    ],
+    "era5_wettest_site": [
+      "Mbale",
+      5077.0
+    ],
+    "pct_of_normal": 134.6,
+    "reading": "different products, different baselines, different sampling of the country: this is a scale sanity check on the reanalysis, not a validation of either number"
+  },
+  "portal_indicators": {
+    "EN.CLC.SPEI.XD": {
+      "name": "wb_spei",
+      "label": null,
+      "source": null,
+      "years": {
+        "1990": -0.4936,
+        "1991": -0.0328,
+        "1992": -0.6241,
+        "1993": -1.4467,
+        "1994": 0.7186,
+        "1995": 0.0697,
+        "1996": 0.9837,
+        "1997": 0.7829,
+        "1998": -0.4492,
+        "1999": 0.4008,
+        "2000": -1.1999,
+        "2001": 0.0361,
+        "2002": -0.2275,
+        "2003": -0.5378,
+        "2004": -0.8387,
+        "2005": -1.6862,
+        "2006": 0.393,
+        "2007": 1.3808,
+        "2008": -0.1392,
+        "2009": -0.8307,
+        "2010": 0.9599,
+        "2011": 0.0926,
+        "2012": 1.237,
+        "2013": 1.4969,
+        "2014": -0.4522,
+        "2015": 0.854,
+        "2016": 0.4702,
+        "2017": 1.3363,
+        "2018": 0.568,
+        "2019": 2.426,
+        "2020": 1.8783,
+        "2021": 1.1892,
+        "2022": 1.3381,
+        "2023": 0.3376
+      },
+      "n_values": 34
+    },
+    "AG.LND.PRCP.MM": {
+      "name": "wb_precip_normal_mm",
+      "label": null,
+      "source": null,
+      "years": {
+        "1990": 1180.0,
+        "1991": 1180.0,
+        "1992": 1180.0,
+        "1993": 1180.0,
+        "1994": 1180.0,
+        "1995": 1180.0,
+        "1996": 1180.0,
+        "1997": 1180.0,
+        "1998": 1180.0,
+        "1999": 1180.0,
+        "2000": 1180.0,
+        "2001": 1180.0,
+        "2002": 1180.0,
+        "2003": 1180.0,
+        "2004": 1180.0,
+        "2005": 1180.0,
+        "2006": 1180.0,
+        "2007": 1180.0,
+        "2008": 1180.0,
+        "2009": 1180.0,
+        "2010": 1180.0,
+        "2011": 1180.0,
+        "2012": 1180.0,
+        "2013": 1180.0,
+        "2014": 1180.0,
+        "2015": 1180.0,
+        "2016": 1180.0,
+        "2017": 1180.0,
+        "2018": 1180.0,
+        "2019": 1180.0,
+        "2020": 1180.0,
+        "2021": 1180.0,
+        "2022": 1180.0
+      },
+      "n_values": 33
+    },
+    "EN.CLC.MDAT.ZS": {
+      "name": "wb_pop_affected_drought_flood_pct",
+      "label": null,
+      "source": null,
+      "years": {
+        "2009": 0.851203469913909
+      },
+      "n_values": 1
+    },
+    "CC.FLD.TOTL.ZS": {
+      "name": "wb_pop_exposed_flood_pct",
+      "label": null,
+      "source": null,
+      "years": {
+        "2020": 12.93208547
+      },
+      "n_values": 1
+    },
+    "CC.TNET.FLD.ZS": {
+      "name": "wb_transport_exposed_flood_pct",
+      "label": null,
+      "source": null,
+      "years": {
+        "2019": 7.02819626888121
+      },
+      "n_values": 1
+    },
+    "CC.THHZ.RANK.RF": {
+      "name": "wb_thinkhazard_river_flood_level",
+      "label": null,
+      "source": null,
+      "years": {
+        "2010": 1.0
+      },
+      "n_values": 1
+    },
+    "CC.THHZ.RANK.UF": {
+      "name": "wb_thinkhazard_urban_flood_level",
+      "label": null,
+      "source": null,
+      "years": {
+        "2010": 1.0
+      },
+      "n_values": 1
+    }
+  }
+}

@@ -41,7 +41,7 @@ from sklearn.metrics import (precision_score, recall_score, f1_score,
                              matthews_corrcoef)
 from scipy import stats
 from deep_models import (DeepAE, NumpyVAE, sarimax_scores, structural_scores,
-                         ensure_torch, seq_ae_scores)
+                         ensure_torch, seq_ae_scores, temporal_if_scores)
 
 
 # ----------------------------------------------------------------------------
@@ -184,6 +184,83 @@ class OneClassSVMWrap:
         return -self.model.decision_function((X - self.mu_) / self.sd_)
 
 
+class LoOP:
+    """Local Outlier Probability (Kriegel et al. 2008), the probabilistic
+    relative-density detector that sits beside LOF in the method family.
+
+    Chain, on Euclidean distances between standardised feature vectors:
+      avgkNN_k(p)         mean distance from p to its k nearest neighbours
+      maxLoReachDist(p)   the largest neighbour distance d_k whose neighbourhood
+                          is still sparser than beta*d_k (a local radius)
+      LoRD(p)             mean maxLoReachDist over p's beta-nearest set, with
+                          p's own value folded in at unit weight
+      RDD(p)              inverse of the mean distance-to-neighbour normalised by
+                          that neighbour's LoRD (the reachable density)
+      ROD(p)              mean of RDD(o)/RDD(p) over the beta-nearest set
+    The published score is 2*Phi(ROD/lambda)-1, a Gaussian error-function map of
+    ROD onto [0,1]. That map is strictly monotone, so every threshold-quantile
+    ranking metric (ROC-AUC, PR-AUC, and the fixed-budget flags) is identical on
+    ROD; we therefore rank on ROD itself, which carries no ties, instead of on a
+    probability that saturates at 1.0 for inliers and would collapse them into
+    one tied block at the cut-off.
+
+    LoOP is defined on a single sample. In this held-out benchmark the reference
+    sample is TRAIN: standardisation, neighbour sets, LoRD and RDD are estimated
+    there, and a TEST point is scored against the training record alone, so
+    nothing from the evaluation window enters fit(). The all-pairs step is
+    quadratic, so the reference set is a seeded subsample -- the same disclosed
+    scope choice as OneClassSVM, not a silent one.
+    """
+    def __init__(self, beta=0.02, cap=4000, kmax=400):
+        self.beta, self.cap, self.kmax = beta, cap, kmax
+
+    @staticmethod
+    def _max_lo_reach_dist(D, beta):
+        """D: (n, K) neighbour distances sorted ascending. Column j holds d_{j+1}
+        and avgkNN_{j+1}; the local radius is the largest d_k with
+        avgkNN_k > beta * d_k, floored at the first neighbour distance."""
+        ks = np.arange(1, D.shape[1] + 1)
+        avg = np.cumsum(D, axis=1) / ks
+        cand = np.where(avg > beta * D, D, 0.0)
+        m = cand.max(axis=1)
+        return np.where(m > 0, m, np.maximum(D[:, 0], 1e-9))
+
+    def fit(self, X):
+        rng = np.random.default_rng(C.SEED)
+        if len(X) > self.cap:
+            idx = rng.choice(len(X), size=self.cap, replace=False)
+            sub = np.asarray(X)[idx]
+        else:
+            sub = np.asarray(X)
+        self.mu_ = sub.mean(0)
+        self.sd_ = sub.std(0, ddof=1)
+        self.sd_[self.sd_ < 1e-9] = 1.0
+        Z = np.nan_to_num((sub - self.mu_) / self.sd_, nan=0.0, posinf=0.0, neginf=0.0)
+        n = len(Z)
+        self.nb_ = max(5, min(int(round(self.beta * n)), n - 2))
+        self.K_ = min(n - 1, max(self.kmax, self.nb_ + 1))
+        nn = NearestNeighbors(n_neighbors=self.K_ + 1).fit(Z)
+        D, I = nn.kneighbors(Z)
+        D, I = D[:, 1:], I[:, 1:]                    # drop the self-match
+        b = self.nb_
+        self.mld_ = self._max_lo_reach_dist(D, self.beta)
+        self.lord_ = (self.mld_[I[:, :b]].sum(1) + self.mld_) / (b + 1)
+        self.rdd_ = 1.0 / np.maximum(
+            (D[:, :b] / self.lord_[I[:, :b]]).mean(1), 1e-12)
+        self.nn_ = nn
+        return self
+
+    def decision_function(self, X):
+        Z = np.nan_to_num((np.asarray(X) - self.mu_) / self.sd_,
+                          nan=0.0, posinf=0.0, neginf=0.0)
+        D, I = self.nn_.kneighbors(Z, n_neighbors=self.K_)
+        b = self.nb_
+        mld = self._max_lo_reach_dist(D, self.beta)
+        lord = (self.mld_[I[:, :b]].sum(1) + mld) / (b + 1)
+        rdd = 1.0 / np.maximum((D[:, :b] / self.lord_[I[:, :b]]).mean(1), 1e-12)
+        return self.rdd_[I[:, :b]].mean(1) / rdd
+
+
 def _deepae():
     # genuine multi-layer NN via sklearn (torch/TF backends uninstallable here)
     return DeepAE(hidden=(16, 8, 4))
@@ -210,6 +287,7 @@ DETECTORS = {
     "AutoEncoder": _ae,
     "GeneralizedESD": lambda: GeneralizedESD(),
     "OneClassSVM": lambda: OneClassSVMWrap(),
+    "LoOP": lambda: LoOP(),
     "DeepAE": _deepae,
     "VAE": _vae,
 }
@@ -366,6 +444,19 @@ def main():
             add_eval(tname, ts, (ts >= np.quantile(ts, 1 - C.CONTAMINATION)).astype(int))
         except Exception as e:
             print(f"[skip temporal] {tname}: {e!r}")
+
+    # temporal Isolation Forest: same three series, but embedded as 14-day lag
+    # windows so the forest sees trajectories rather than daily cross-sections
+    try:
+        ts = temporal_if_scores(tr, te, TEMP_FEATS)
+        ts = np.nan_to_num(ts, nan=0.0,
+                           posinf=np.max(ts[np.isfinite(ts)]) if np.isfinite(ts).any() else 0.0,
+                           neginf=0.0)
+        scores_all["TemporalIF"] = ts
+        add_eval("TemporalIF", ts,
+                 (ts >= np.quantile(ts, 1 - C.CONTAMINATION)).astype(int))
+    except Exception as e:
+        print(f"[skip temporal] TemporalIF: {e!r}")
 
     # ---- deep SEQUENCE autoencoders (torch LSTM-AE / Transformer-AE) ----
     # The torch backend now works (CPU wheel vendored in ._torchpkgs), so these

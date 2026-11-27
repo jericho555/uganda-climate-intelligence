@@ -1,8 +1,9 @@
 """Figures for the RQ6 early-warning deliverable.
 
-Two products, both drawn from real pipeline outputs (no hard-coded values):
+Three products, all drawn from real pipeline outputs (no hard-coded values):
   fig_ews_architecture.png  -- the operational deployment architecture (schematic)
   fig_risk_nowcast.png      -- the district-month risk nowcast surface + honest skill
+  fig_intervals.png         -- measured coverage of the split-conformal carry intervals
 Run after early_warning.py. Every figure is written into both figures/ and
 manuscript/figures/ by config.save_figure, at the resolution pinned there.
 The map panel shares the district geometry layer used by every other map in the
@@ -171,9 +172,89 @@ def fig_risk_nowcast():
     C.save_figure(fig, "fig_risk_nowcast")
 
 
+def fig_intervals():
+    """What the conformal carry intervals are worth, measured on held-out years.
+
+    Panel (a) shows the one-month carry itself: every 2019-2023 district-month
+    transition plotted as (this month's score, next month's observed score), with
+    the bands the conformal quantiles draw around the persistence point forecast.
+    Panel (b) reports the coverage those bands actually achieved, overall and
+    inside each starting band, for both point models. The widths come from the
+    published summary, so the figure cannot drift from the paper's numbers; only
+    the scatter points are recomputed, through the same carry_table() the
+    calibration used.
+    """
+    import early_warning as EW
+    sm = json.loads((RESULTS / "early_warning_summary.json").read_text())
+    pi = sm.get("prediction_intervals") or {}
+    if not pi.get("models"):
+        raise RuntimeError("early_warning_summary.json has no prediction_intervals "
+                           "-- run src/early_warning.py first")
+    dm = pd.read_csv(RESULTS / "tables/risk_district_month.csv")
+    X, y, tgt_year, _ = EW.carry_table(dm)
+    test = tgt_year >= C.EVAL_TEST_YEARS[0]
+    now = X[:, EW.CARRY_FEATS.index("risk")]
+    pm = pi["models"]["persistence"]
+
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.4),
+                             gridspec_kw={"width_ratios": [1.2, 1]})
+    ax = axes[0]
+    xg = np.linspace(0, 100, 400)
+    for lvl, col in (("level_90", "#cfe0f3"), ("level_80", "#74a9cf")):
+        q = pm[lvl]["conformal_quantile"]
+        ax.fill_between(xg, np.clip(xg - q, 0, 100), np.clip(xg + q, 0, 100),
+                        color=col, alpha=0.6, lw=0,
+                        label=f"{lvl[-2:]}% band ($\\pm${q:.1f})")
+    ax.plot(xg, xg, "k--", lw=0.8, label="perfect carry")
+    ax.scatter(now[test], y[test], s=9, alpha=0.35, color="#251c70",
+               edgecolor="none", label="held-out transition")
+    ax.set_xlim(0, 100); ax.set_ylim(0, 100)
+    ax.set_xlabel("this month's risk score (persistence point forecast)")
+    ax.set_ylabel("next month's observed risk score")
+    ax.set_title(f"(a) The one-month carry, {C.EVAL_TEST_YEARS[0]}-"
+                 f"{C.EVAL_TEST_YEARS[1]}\n"
+                 f"90% band covers {pm['level_90']['coverage_test']:.1%} of "
+                 f"{pi['n_test']} held-out transitions", fontsize=9)
+    ax.legend(fontsize=7, loc="lower right")
+
+    ax = axes[1]
+    bands = [b for b in ["Low", "Moderate", "High", "Extreme"]
+             if any(b in pi["models"][m][lvl]["coverage_by_starting_band"]
+                    for m in pi["models"] for lvl in ("level_80", "level_90"))]
+    cats = ["all"] + bands
+    xpos = np.arange(len(cats))
+    series = [("persistence", "level_90", "#2c7fb8", "persistence, 90%"),
+              ("ridge", "level_90", "#a63603", "fitted carry, 90%"),
+              ("persistence", "level_80", "#92c5de", "persistence, 80%"),
+              ("ridge", "level_80", "#f4a582", "fitted carry, 80%")]
+    w = 0.2
+    for i, (m, lvl, col, lab) in enumerate(series):
+        rec = pi["models"][m][lvl]
+        vals = [rec["coverage_test"]] + [rec["coverage_by_starting_band"]
+                                         .get(b, {}).get("coverage", np.nan)
+                                         for b in bands]
+        ax.bar(xpos + (i - 1.5) * w, vals, w, color=col, label=lab)
+    ax.axhline(0.90, color="#2c7fb8", lw=0.9, ls=":")
+    ax.axhline(0.80, color="#a63603", lw=0.9, ls=":")
+    ns = [pi["n_test"]] + [pm["level_90"]["coverage_by_starting_band"]
+                           .get(b, {}).get("n", 0) for b in bands]
+    ax.set_xticks(xpos)
+    ax.set_xticklabels([f"{c}\n(n={m:,})" for c, m in zip(cats, ns)], fontsize=7.5)
+    ax.set_ylim(0, 1.34)
+    ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    ax.set_ylabel("measured coverage")
+    ax.set_xlabel("starting risk band of the origin month")
+    ax.set_title("(b) Coverage against nominal\n"
+                 "dotted lines mark the 0.90 / 0.80 targets", fontsize=9)
+    ax.legend(fontsize=6.5, loc="upper center", ncol=2, framealpha=0.95)
+
+    fig.tight_layout()
+    C.save_figure(fig, "fig_intervals")
+
+
 def main():
     made = []
-    for f in (fig_architecture, fig_risk_nowcast):
+    for f in (fig_architecture, fig_risk_nowcast, fig_intervals):
         try:
             f(); made.append(f.__name__)
         except Exception as e:
