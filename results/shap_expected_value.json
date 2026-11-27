@@ -1,0 +1,10 @@
+{
+  "expected_value": 0.49955877485775635,
+  "n_rows": 1200,
+  "rows": "held-out (test) district-days, first 1200 in split order",
+  "columns": "the 9 base z-scored features, in config.FEATURES order",
+  "model": "RandomForest surrogate of the ensemble flag, seed 42",
+  "surrogate_holdout_auc": 0.9172642093294376,
+  "output_scale": "surrogate probability of the anomaly class",
+  "additivity_max_abs_error": 4.440892098500626e-14
+}

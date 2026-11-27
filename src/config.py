@@ -15,6 +15,30 @@ MANUSCRIPT = ROOT / "manuscript"
 for _d in (DATA, RESULTS, FIGURES, MANUSCRIPT, DATA / "raw", RESULTS / "tables"):
     _d.mkdir(parents=True, exist_ok=True)
 
+# Every figure the manuscript includes is also kept in figures/ so the release
+# carries the artwork its own generator produced. One resolution everywhere:
+# Elsevier asks for >=300 dpi for halftone and combination artwork.
+FIG_DPI = 300
+FIG_FOLDERS = (FIGURES, MANUSCRIPT / "figures")
+
+
+def save_figure(fig, name):
+    """Write ``fig`` as ``<name>.png`` into every folder that must carry it.
+
+    Both copies come from the same Figure object at the same dpi, so the working
+    directory and the manuscript bundle cannot drift apart -- a stale copy in
+    manuscript/figures/ would otherwise be submitted without anyone noticing.
+    """
+    import matplotlib.pyplot as plt
+    written = []
+    for folder in FIG_FOLDERS:
+        folder.mkdir(parents=True, exist_ok=True)
+        path = folder / f"{name}.png"
+        fig.savefig(path, dpi=FIG_DPI, bbox_inches="tight")
+        written.append(path)
+    plt.close(fig)
+    return written
+
 # ----------------------------------------------------------------------------
 # Study period and spatial units
 # ----------------------------------------------------------------------------

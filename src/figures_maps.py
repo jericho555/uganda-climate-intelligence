@@ -19,7 +19,6 @@ drawn over the district that contains that point, per data/district_lookup.csv.
 Districts the pipeline does not observe are rendered as no-data, never as zero.
 """
 import json
-import shutil
 import sys
 import warnings
 from pathlib import Path
@@ -30,7 +29,7 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
-from config import DATA, RESULTS, FIGURES, MANUSCRIPT
+from config import DATA, RESULTS
 
 import matplotlib
 matplotlib.use("Agg")
@@ -39,9 +38,9 @@ from matplotlib import patches as mp
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 
-plt.rcParams.update({"figure.dpi": 200, "font.size": 8, "axes.grid": True,
+plt.rcParams.update({"font.size": 8, "axes.grid": True,
                      "grid.alpha": 0.25, "axes.spines.top": False,
-                     "axes.spines.right": False, "savefig.bbox": "tight"})
+                     "axes.spines.right": False})   # dpi/bbox owned by config.save_figure
 
 REGION_COLOR = {"Central": "#b6a3cf", "Eastern": "#8fc4cd",
                 "Northern": "#d9bd85", "Western": "#9dc9a5"}
@@ -187,10 +186,10 @@ def _label(ax, lon, lat, text):
 
 
 def _save(fig, name):
-    for folder in (FIGURES, MANUSCRIPT / "figures"):
-        folder.mkdir(parents=True, exist_ok=True)
-        fig.savefig(folder / f"{name}.png")
-    plt.close(fig)
+    # config.save_figure writes the same artwork into figures/ and
+    # manuscript/figures/ at the pinned resolution, so the release and the paper
+    # always carry the identical map.
+    C.save_figure(fig, name)
     print("wrote", name)
 
 

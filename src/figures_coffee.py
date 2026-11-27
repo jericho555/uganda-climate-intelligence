@@ -24,8 +24,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import stats
 
-plt.rcParams.update({"figure.dpi": 150, "font.size": 9, "axes.grid": True,
-                     "grid.alpha": 0.3, "savefig.bbox": "tight"})
+plt.rcParams.update({"font.size": 9, "axes.grid": True,
+                     "grid.alpha": 0.3})            # dpi/bbox owned by config.save_figure
 MF = C.MANUSCRIPT / "figures"
 MF.mkdir(parents=True, exist_ok=True)
 
@@ -97,8 +97,8 @@ def fig_coffee():
     ax1.legend(loc="lower left", fontsize=7)
 
     fig.tight_layout()
-    fig.savefig(MF / "fig_coffee.png"); plt.close(fig)
-    print("wrote", MF / "fig_coffee.png")
+    written = C.save_figure(fig, "fig_coffee")
+    print("wrote", ", ".join(str(p) for p in written))
 
 
 if __name__ == "__main__":

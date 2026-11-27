@@ -200,8 +200,8 @@
     }
   },
   "friedman": {
-    "friedman_chi2": 20.285714285714278,
-    "friedman_p": 0.0004385404670545834,
+    "friedman_chi2": 28.76666666666665,
+    "friedman_p": 8.71862809433121e-06,
     "years": [
       2019,
       2020,
@@ -209,7 +209,7 @@
       2022,
       2023
     ],
-    "n_detectors": 14
+    "n_detectors": 24
   },
   "change_points": {
     "monthly_anom_count_bkps_index": [
@@ -217,7 +217,234 @@
     ],
     "bkp_months": []
   },
+  "early_warning_summary": {
+    "weights": {
+      "I": 0.3,
+      "D": 0.2,
+      "S": 0.2,
+      "M": 0.15,
+      "F": 0.15
+    },
+    "construction": "district-month UCASI recombination of the validated daily anomaly stream; forward carry = persistence rule",
+    "band_counts": {
+      "Low": 1467,
+      "Moderate": 704,
+      "High": 593,
+      "Extreme": 308
+    },
+    "skill_vs_event_months": {
+      "n_district_months": 3072,
+      "n_event_months": 378,
+      "k_selected": 378,
+      "auc": 0.55,
+      "auc_null_mean": 0.501,
+      "recall_at_k": 0.111,
+      "recall_null_mean": 0.122,
+      "recall_null_p95": 0.148
+    },
+    "persistence": {
+      "lag1_mean_tau": 0.291,
+      "lag1_min": 0.134,
+      "lag1_max": 0.448,
+      "pooled_lag1_r": 0.349,
+      "n_districts": 16
+    },
+    "carry_uncertainty": {
+      "all_district_months": {
+        "n_transitions": 3056,
+        "median_abs_change": 8.2,
+        "p80_abs_change": 32.3,
+        "p95_abs_change": 44.8,
+        "q10_signed": -33.0,
+        "q90_signed": 31.6
+      },
+      "from_high_or_extreme": {
+        "n_transitions": 900,
+        "median_abs_change": 23.7,
+        "p80_abs_change": 38.6,
+        "p95_abs_change": 48.1,
+        "q10_signed": -42.9,
+        "q90_signed": 7.8
+      },
+      "reading": "carrying the current score forward one month, 80% of observed transitions moved it by at most the p80 value below; that is the width of the nowcast, not a model fit"
+    },
+    "latest_nowcast_top8": [
+      {
+        "location": "Mbale",
+        "region": "Eastern",
+        "year": 2023,
+        "month": 12,
+        "risk": 78.0,
+        "band": "High",
+        "anomaly_days": 7,
+        "longest_run": 7,
+        "max_concurrent_vars": 2
+      },
+      {
+        "location": "Gulu",
+        "region": "Northern",
+        "year": 2023,
+        "month": 12,
+        "risk": 49.5,
+        "band": "Moderate",
+        "anomaly_days": 0,
+        "longest_run": 0,
+        "max_concurrent_vars": 5
+      },
+      {
+        "location": "Lira",
+        "region": "Northern",
+        "year": 2023,
+        "month": 12,
+        "risk": 46.9,
+        "band": "Moderate",
+        "anomaly_days": 0,
+        "longest_run": 0,
+        "max_concurrent_vars": 4
+      },
+      {
+        "location": "Jinja",
+        "region": "Eastern",
+        "year": 2023,
+        "month": 12,
+        "risk": 44.1,
+        "band": "Moderate",
+        "anomaly_days": 0,
+        "longest_run": 0,
+        "max_concurrent_vars": 3
+      },
+      {
+        "location": "Masindi",
+        "region": "Northern",
+        "year": 2023,
+        "month": 12,
+        "risk": 44.1,
+        "band": "Moderate",
+        "anomaly_days": 0,
+        "longest_run": 0,
+        "max_concurrent_vars": 3
+      },
+      {
+        "location": "Arua",
+        "region": "Northern",
+        "year": 2023,
+        "month": 12,
+        "risk": 44.1,
+        "band": "Moderate",
+        "anomaly_days": 0,
+        "longest_run": 0,
+        "max_concurrent_vars": 3
+      },
+      {
+        "location": "Kumi",
+        "region": "Eastern",
+        "year": 2023,
+        "month": 12,
+        "risk": 41.2,
+        "band": "Low",
+        "anomaly_days": 0,
+        "longest_run": 0,
+        "max_concurrent_vars": 2
+      },
+      {
+        "location": "Kampala",
+        "region": "Central",
+        "year": 2023,
+        "month": 12,
+        "risk": 41.2,
+        "band": "Low",
+        "anomaly_days": 0,
+        "longest_run": 0,
+        "max_concurrent_vars": 2
+      }
+    ],
+    "note": "This is a monitoring/prioritisation NOWCAST. The forward-lead skill equals the measured lag-1 persistence; it is NOT a causal forecast. Predictive skill requires coupling exposure, soil moisture and impact data that a weather-only feature space omits."
+  },
   "benchmark_top": [
+    {
+      "detector": "LSTMAE",
+      "precision": 0.2026009582477755,
+      "recall": 0.0908254065664314,
+      "f1": 0.1254237288135593,
+      "roc_auc": 0.5249015049708748,
+      "pr_auc": 0.1346284144974774,
+      "mcc": 0.0663586670849449,
+      "f1_lo": 0.1121770070648683,
+      "f1_hi": 0.1379360257836342,
+      "pr_auc_lo": 0.1153234006967969,
+      "pr_auc_hi": 0.1244798874429907,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "TransformerAE",
+      "precision": 0.2224503764544832,
+      "recall": 0.0997238416692236,
+      "f1": 0.1377118644067796,
+      "roc_auc": 0.5133056105973077,
+      "pr_auc": 0.1292140074405394,
+      "mcc": 0.0808248383085969,
+      "f1_lo": 0.124003239595979,
+      "f1_hi": 0.1501580723077096,
+      "pr_auc_lo": 0.1176536520349869,
+      "pr_auc_hi": 0.1273172985882247,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "GeneralizedESD",
+      "precision": 0.1177275838466803,
+      "recall": 0.0527769254372506,
+      "f1": 0.0728813559322033,
+      "roc_auc": 0.5316466455728591,
+      "pr_auc": 0.1210448353722138,
+      "mcc": 0.0045033142665708,
+      "f1_lo": 0.0623041667496961,
+      "f1_hi": 0.0840511891483033,
+      "pr_auc_lo": 0.1083572869655,
+      "pr_auc_hi": 0.1155801526540443,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "StructuralTS",
+      "precision": 0.1197809719370294,
+      "recall": 0.053697453206505,
+      "f1": 0.0741525423728813,
+      "roc_auc": 0.5155972721094437,
+      "pr_auc": 0.1175751637003728,
+      "mcc": 0.0059998147379831,
+      "f1_lo": 0.0627477604534295,
+      "f1_hi": 0.0848200369617523,
+      "pr_auc_lo": 0.1084449073343865,
+      "pr_auc_hi": 0.1156428792077935,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "Ensemble+5dPersist",
+      "precision": 0.1259411362080766,
+      "recall": 0.0564590365142681,
+      "f1": 0.0779661016949152,
+      "roc_auc": 0.506815630348977,
+      "pr_auc": 0.1170182299616449,
+      "mcc": 0.0104893161522199,
+      "f1_lo": 0.0670190830721179,
+      "f1_hi": 0.0892523206192728,
+      "pr_auc_lo": 0.1087485614578616,
+      "pr_auc_hi": 0.1160649401323038,
+      "f1_seed_std": 0.0
+    },
+    {
+      "detector": "Ensemble+Persist+Region",
+      "precision": 0.1223513328776486,
+      "recall": 0.0549248235655108,
+      "f1": 0.0758153324862346,
+      "roc_auc": 0.506815630348977,
+      "pr_auc": 0.1170182299616449,
+      "mcc": 0.0078787536765276,
+      "f1_lo": 0.0646774032206066,
+      "f1_hi": 0.0867771279760194,
+      "pr_auc_lo": 0.1084900913714794,
+      "pr_auc_hi": 0.1157962785073135,
+      "f1_seed_std": 0.0
+    },
     {
       "detector": "LOF",
       "precision": 0.1334702258726899,
@@ -233,101 +460,17 @@
       "f1_seed_std": 0.0
     },
     {
-      "detector": "Ensemble+5dPersist",
-      "precision": 0.1314168377823408,
-      "recall": 0.0589137772322798,
-      "f1": 0.0813559322033898,
-      "roc_auc": 0.5043625091337891,
-      "pr_auc": 0.1166091736124253,
-      "mcc": 0.014479984075986,
-      "f1_lo": 0.0701973949845101,
-      "f1_hi": 0.0933038251603585,
-      "pr_auc_lo": 0.1090862555536815,
-      "pr_auc_hi": 0.1163761031316928,
-      "f1_seed_std": 0.0
-    },
-    {
-      "detector": "Ensemble+Persist+Region",
-      "precision": 0.1230348598769651,
-      "recall": 0.0552316661552623,
-      "f1": 0.0762388818297331,
-      "roc_auc": 0.5043625091337891,
-      "pr_auc": 0.1166091736124253,
-      "mcc": 0.008377264045655,
-      "f1_lo": 0.0658875037082595,
-      "f1_hi": 0.0871408689227492,
-      "pr_auc_lo": 0.1086924013825236,
-      "pr_auc_hi": 0.1157551355849098,
-      "f1_seed_std": 0.0
-    },
-    {
-      "detector": "ECOD",
-      "precision": 0.1314168377823408,
-      "recall": 0.0589137772322798,
-      "f1": 0.0813559322033898,
-      "roc_auc": 0.5072305658863221,
-      "pr_auc": 0.1162006807974528,
-      "mcc": 0.014479984075986,
-      "f1_lo": 0.0708668077990145,
-      "f1_hi": 0.092008607660161,
-      "pr_auc_lo": 0.1091583148690082,
-      "pr_auc_hi": 0.1165423184347666,
-      "f1_seed_std": 0.0
-    },
-    {
-      "detector": "COPOD",
-      "precision": 0.1307323750855578,
-      "recall": 0.0586069346425283,
-      "f1": 0.0809322033898305,
-      "roc_auc": 0.5012166544516357,
-      "pr_auc": 0.1155997652353143,
-      "mcc": 0.0139811505855152,
-      "f1_lo": 0.0701420335907588,
-      "f1_hi": 0.0913130040945206,
-      "pr_auc_lo": 0.1090258234018871,
-      "pr_auc_hi": 0.1163229591973671,
-      "f1_seed_std": 0.0
-    },
-    {
-      "detector": "Ensemble",
-      "precision": 0.1314168377823408,
-      "recall": 0.0589137772322798,
-      "f1": 0.0813559322033898,
-      "roc_auc": 0.5035138778329581,
-      "pr_auc": 0.1153322532640477,
-      "mcc": 0.014479984075986,
-      "f1_lo": 0.0698702050077869,
-      "f1_hi": 0.0923111979166666,
-      "pr_auc_lo": 0.1091674957704982,
-      "pr_auc_hi": 0.1164747503085308,
-      "f1_seed_std": 0.0
-    },
-    {
-      "detector": "Zscore(max)",
-      "precision": 0.1245722108145106,
-      "recall": 0.0558453513347652,
-      "f1": 0.0771186440677966,
-      "roc_auc": 0.5003115651545549,
-      "pr_auc": 0.1145644314272558,
-      "mcc": 0.0094916491712784,
-      "f1_lo": 0.0661239644724185,
-      "f1_hi": 0.0868318644023832,
-      "pr_auc_lo": 0.1086388268128262,
-      "pr_auc_hi": 0.1159507021341142,
-      "f1_seed_std": 0.0
-    },
-    {
-      "detector": "CBLOF",
-      "precision": 0.1184120465434633,
-      "recall": 0.0530837680270021,
-      "f1": 0.0733050847457627,
-      "roc_auc": 0.5052234462918428,
-      "pr_auc": 0.114516492444516,
-      "mcc": 0.0050021477570416,
-      "f1_lo": 0.062195365168112,
-      "f1_hi": 0.0834399503040676,
-      "pr_auc_lo": 0.1084247846372684,
-      "pr_auc_hi": 0.1156976101844635,
+      "detector": "SARIMAX",
+      "precision": 0.1218343600273785,
+      "recall": 0.0546179809757594,
+      "f1": 0.0754237288135593,
+      "roc_auc": 0.5053722750549883,
+      "pr_auc": 0.1163149002634605,
+      "mcc": 0.0074963152093954,
+      "f1_lo": 0.0653107127683605,
+      "f1_hi": 0.0863523134168312,
+      "pr_auc_lo": 0.1085668563922784,
+      "pr_auc_hi": 0.1158951847750966,
       "f1_seed_std": 0.0
     }
   ],

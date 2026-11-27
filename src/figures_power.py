@@ -21,8 +21,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import stats
 
-plt.rcParams.update({"figure.dpi": 150, "font.size": 9, "axes.grid": True,
-                     "grid.alpha": 0.3, "savefig.bbox": "tight"})
+plt.rcParams.update({"font.size": 9, "axes.grid": True,
+                     "grid.alpha": 0.3})            # dpi/bbox owned by config.save_figure
 MF = C.MANUSCRIPT / "figures"
 MF.mkdir(parents=True, exist_ok=True)
 
@@ -68,7 +68,7 @@ def fig_gapfill():
     ax.set_xlabel("Mann-Kendall \u03c4 (relative humidity)")
     ax.set_title(f"Near-surface humidity, 1988-2007\n{nd}/{len(rh)} districts significantly drying")
     fig.tight_layout()
-    fig.savefig(MF / "fig_gapfill.png"); plt.close(fig)
+    C.save_figure(fig, "fig_gapfill")
     return f"gap-fill: {nd}/{len(rh)} drying"
 
 
@@ -141,7 +141,7 @@ def fig_drought_yield():
     ax.set_title("Yield anomaly vs drought: significant years,\nweak national-linear link (aggregation masks regional drought)")
     ax.legend(fontsize=6.5, loc="upper left")
     fig.tight_layout()
-    fig.savefig(MF / "fig_drought_yield.png"); plt.close(fig)
+    C.save_figure(fig, "fig_drought_yield")
     return f"drought/yield: {len(pts)} year-points, {len(drought_years)} register droughts"
 
 

@@ -155,6 +155,46 @@ def persistence(dm):
                 n_districts=int(len(a)))
 
 
+def carry_uncertainty(dm):
+    """Observed spread of the month-to-month carry, i.e. the honest uncertainty
+    envelope around the persistence nowcast.
+
+    The forward tier is produced by carrying the current score into the next week,
+    month and season. That rule needs an interval, not just a point: here it is the
+    empirical distribution of how far the district-month score actually moved in the
+    16-year record. No model is fitted and nothing is assumed -- if carries are
+    volatile we report a wide envelope.
+    """
+    deltas, hot = [], []
+    for _, g in dm.sort_values(["year", "month"]).groupby("location"):
+        r = g.risk.values
+        b = g.band.values
+        if len(r) < 2:
+            continue
+        d = np.diff(r)                       # d[i] = month i -> month i+1
+        deltas.append(d)
+        hot.append(d[np.isin(b[:-1], ["High", "Extreme"])])
+
+    def block(x):
+        if x is None or not len(x):
+            return None
+        a = np.abs(x)
+        return dict(n_transitions=int(len(x)),
+                    median_abs_change=round(float(np.median(a)), 1),
+                    p80_abs_change=round(float(np.quantile(a, 0.80)), 1),
+                    p95_abs_change=round(float(np.quantile(a, 0.95)), 1),
+                    q10_signed=round(float(np.quantile(x, 0.10)), 1),
+                    q90_signed=round(float(np.quantile(x, 0.90)), 1))
+
+    dd = np.concatenate(deltas) if deltas else np.array([])
+    cc = np.concatenate(hot) if hot else np.array([])
+    return dict(all_district_months=block(dd),
+                from_high_or_extreme=block(cc),
+                reading=("carrying the current score forward one month, 80% of "
+                         "observed transitions moved it by at most the p80 value "
+                         "below; that is the width of the nowcast, not a model fit"))
+
+
 def latest_nowcast(dm):
     """The current risk surface: highest-risk districts in the most recent complete month."""
     last = dm.sort_values(["year", "month"]).groupby("location").tail(1)
@@ -187,6 +227,7 @@ def main():
 
     skill = evaluate_skill(dm)
     pers = persistence(dm)
+    carry = carry_uncertainty(dm)
     nowcast = latest_nowcast(dm)
     band_counts = dm.band.value_counts().to_dict()
     # national monthly risk for the time-series figure
@@ -199,6 +240,7 @@ def main():
         band_counts={str(k): int(v) for k, v in band_counts.items()},
         skill_vs_event_months=skill,
         persistence= pers,
+        carry_uncertainty=carry,
         latest_nowcast_top8=nowcast,
         note=("This is a monitoring/prioritisation NOWCAST. The forward-lead skill "
               "equals the measured lag-1 persistence; it is NOT a causal forecast. "
@@ -213,6 +255,7 @@ def main():
     print("band counts:", band_counts)
     print("SKILL:", json.dumps(skill, indent=2))
     print("PERSISTENCE:", json.dumps(pers, indent=2))
+    print("CARRY UNCERTAINTY:", json.dumps(carry, indent=2))
     print("LATEST NOWCAST:")
     for r in nowcast:
         print(f"  {r['location']:<11} {r['region']:<9} risk={r['risk']:5.1f} {r['band']}")

@@ -30,6 +30,25 @@
     "pooled_lag1_r": 0.349,
     "n_districts": 16
   },
+  "carry_uncertainty": {
+    "all_district_months": {
+      "n_transitions": 3056,
+      "median_abs_change": 8.2,
+      "p80_abs_change": 32.3,
+      "p95_abs_change": 44.8,
+      "q10_signed": -33.0,
+      "q90_signed": 31.6
+    },
+    "from_high_or_extreme": {
+      "n_transitions": 900,
+      "median_abs_change": 23.7,
+      "p80_abs_change": 38.6,
+      "p95_abs_change": 48.1,
+      "q10_signed": -42.9,
+      "q90_signed": 7.8
+    },
+    "reading": "carrying the current score forward one month, 80% of observed transitions moved it by at most the p80 value below; that is the width of the nowcast, not a model fit"
+  },
   "latest_nowcast_top8": [
     {
       "location": "Mbale",

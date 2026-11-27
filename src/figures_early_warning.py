@@ -3,8 +3,10 @@
 Two products, both drawn from real pipeline outputs (no hard-coded values):
   fig_ews_architecture.png  -- the operational deployment architecture (schematic)
   fig_risk_nowcast.png      -- the district-month risk nowcast surface + honest skill
-Run after early_warning.py. Writes directly into manuscript/figures/ (the path
-main.tex includes from).
+Run after early_warning.py. Every figure is written into both figures/ and
+manuscript/figures/ by config.save_figure, at the resolution pinned there.
+The map panel shares the district geometry layer used by every other map in the
+paper (data/district_boundaries.geojson), so it is a choropleth, not a bubble plot.
 """
 import sys, json, warnings
 from pathlib import Path
@@ -21,8 +23,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Rectangle
 from matplotlib import gridspec
+from matplotlib import patches as mp
+from figures_maps import fill, district_of, _frame, _label, _map_axes
 
-plt.rcParams.update({"figure.dpi": 150, "font.size": 9, "savefig.bbox": "tight"})
+plt.rcParams.update({"font.size": 9})               # dpi/bbox owned by config.save_figure
 FIGDIR = MANUSCRIPT / "figures"
 FIGDIR.mkdir(parents=True, exist_ok=True)
 
@@ -103,8 +107,7 @@ def fig_architecture():
 
     ax.set_title("Uganda Climate Early-Warning Framework: operational deployment architecture",
                  fontsize=10.5, pad=10)
-    fig.savefig(FIGDIR / "fig_ews_architecture.png")
-    plt.close(fig)
+    C.save_figure(fig, "fig_ews_architecture")
 
 
 def fig_risk_nowcast():
@@ -116,30 +119,25 @@ def fig_risk_nowcast():
     fig = plt.figure(figsize=(11, 5.4))
     gs = gridspec.GridSpec(2, 2, width_ratios=[1.15, 1], hspace=0.32, wspace=0.26)
 
-    # ---- (a) district risk map (latest month) ----
+    # ---- (a) district risk map (latest month), as a district choropleth ----
     ax0 = fig.add_subplot(gs[:, 0])
+    _map_axes(ax0)
     last = dm.sort_values(["year", "month"]).groupby("location").tail(1)
     last = last.merge(ct[["location", "lat", "lon"]], on="location")
-    rmax = last.risk.max()
-    for _, r in last.iterrows():
-        c = BAND[str(r.band)]
-        frac = r.risk / rmax
-        ax0.add_patch(plt.Circle((r.lon, r.lat), radius=0.35 + 0.9*frac, color=c,
-                                 alpha=0.25 + 0.45*frac, zorder=1))
-        ax0.plot(r.lon, r.lat, "o", ms=5 + 16*frac, color=c, mec="k",
-                 mew=0.5, zorder=2)
-        ax0.annotate(f"{r.location} {r.risk:.0f}", (r.lon, r.lat), fontsize=6.0,
-                     xytext=(3, 3), textcoords="offset points", zorder=3)
-    ax0.set_xlim(29.2, 35.2); ax0.set_ylim(-1.8, 3.7)
-    ax0.set_aspect("equal")
-    ax0.set_xlabel("Longitude"); ax0.set_ylabel("Latitude")
+    colors = {district_of(loc): BAND[str(b)] for loc, b in
+              zip(last.location, last.band)}
+    fill(ax0, colors=colors)
+    _frame(ax0)
+    for _, r in last.nlargest(6, "risk").iterrows():
+        _label(ax0, r.lon, r.lat, f"{r.location} {r.risk:.0f}")
     lm = last[["year", "month"]].iloc[0]
-    ax0.set_title(f"(a) District risk nowcast, {int(lm.year)}-{int(lm.month):02d} "
-                  f"({len(last)} districts)", fontsize=9)
-    handles = [plt.Line2D([], [], marker="o", ls="", color=v, label=k)
-               for k, v in BAND.items()]
+    ax0.set_title(f"(a) District risk nowcast, {int(lm.year)}-{int(lm.month):02d}\n"
+                  f"({len(last)} of 135 districts observed; unobserved = grey)",
+                  fontsize=9)
+    handles = [mp.Patch(color=v, label=k) for k, v in BAND.items()]
+    handles.append(mp.Patch(color="#e9e9e6", label="not observed"))
     ax0.legend(handles=handles, fontsize=7, loc="lower left", title="risk band",
-               title_fontsize=7)
+               title_fontsize=7, framealpha=0.9)
 
     # ---- (b) national monthly risk with disaster windows ----
     ax1 = fig.add_subplot(gs[0, 1])
@@ -170,8 +168,7 @@ def fig_risk_nowcast():
     ax2.set_title(f"(c) Skill at chance (lag-1 persistence r={pe['pooled_lag1_r']:.2f})",
                   fontsize=9)
 
-    fig.savefig(FIGDIR / "fig_risk_nowcast.png")
-    plt.close(fig)
+    C.save_figure(fig, "fig_risk_nowcast")
 
 
 def main():
@@ -182,7 +179,8 @@ def main():
         except Exception as e:
             print(f"[fig skip] {f.__name__}: {e!r}")
     print("early-warning figures written:", made)
-    print("dir:", FIGDIR)
+    for folder in C.FIG_FOLDERS:
+        print("dir:", folder)
 
 
 if __name__ == "__main__":

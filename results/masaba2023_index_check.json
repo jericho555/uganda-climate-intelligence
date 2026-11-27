@@ -180,21 +180,21 @@
      "title_match": null
     },
     {
-     "title": "Anomaly detection using machine learning techniques",
-     "year": 2020,
-     "venue": "Malaya Journal of Matematik",
-     "type": "journal-article",
-     "doi": "10.26637/mjm0804/0139",
-     "authors": "Chellammal Suriyanarayanan, Saranya Kunasekaran",
-     "title_match": null
-    },
-    {
      "title": "Anomaly Detection using Machine Learning Techniques",
      "year": 2019,
      "venue": "2019 IEEE 5th International Conference for Convergence in Technology (I2CT)",
      "type": "proceedings-article",
      "doi": "10.1109/i2ct45611.2019.9033532",
      "authors": "Wankhede",
+     "title_match": null
+    },
+    {
+     "title": "Anomaly detection using machine learning techniques",
+     "year": 2020,
+     "venue": "Malaya Journal of Matematik",
+     "type": "journal-article",
+     "doi": "10.26637/mjm0804/0139",
+     "authors": "Chellammal Suriyanarayanan, Saranya Kunasekaran",
      "title_match": null
     },
     {

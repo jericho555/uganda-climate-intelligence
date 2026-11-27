@@ -17,8 +17,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, precision_recall_curve, auc
 
-plt.rcParams.update({"figure.dpi": 150, "font.size": 9, "axes.grid": True,
-                     "grid.alpha": 0.3, "savefig.bbox": "tight"})
+try:
+    import shap
+except Exception:                                   # figures.py still runs without it
+    shap = None
+
+plt.rcParams.update({"font.size": 9, "axes.grid": True,
+                     "grid.alpha": 0.3})           # dpi is pinned in config.save_figure
 ZCOLS = [f"{f}_z" for f in C.FEATURES]
 
 
@@ -39,7 +44,7 @@ def fig_benchmark():
     ax.set_ylim(0, 1.05); ax.set_ylabel("score")
     ax.set_title("Held-out anomaly-detection benchmark vs disaster ground-truth")
     ax.legend(fontsize=8)
-    fig.savefig(FIGURES / "fig_benchmark.png"); plt.close(fig)
+    C.save_figure(fig, "fig_benchmark")
 
 
 def fig_curves():
@@ -62,7 +67,7 @@ def fig_curves():
     axes[1].set(xlabel="Recall", ylabel="Precision", title="Precision-Recall (legend = AP)")
     for a in axes:
         a.legend(fontsize=7)
-    fig.savefig(FIGURES / "fig_roc_pr.png"); plt.close(fig)
+    C.save_figure(fig, "fig_roc_pr")
 
 
 def fig_map():
@@ -91,7 +96,7 @@ def fig_ucasi():
     axes[1].boxplot([g.UCASI.values for _, g in ev.groupby("type")])
     axes[1].set_xticks(range(1, len(types) + 1)); axes[1].set_xticklabels(types)
     axes[1].set_ylabel("UCASI"); axes[1].set_title("UCASI by event type")
-    fig.savefig(FIGURES / "fig_ucasi.png"); plt.close(fig)
+    C.save_figure(fig, "fig_ucasi")
 
 
 def fig_temporal():
@@ -110,7 +115,7 @@ def fig_temporal():
             ax.axvline(e.start, color="#2c7fb8", alpha=0.25, lw=0.7)
     ax.set_ylabel("district-days flagged")
     ax.set_title("National monthly anomaly burden; red = change points, blue = disaster events")
-    fig.savefig(FIGURES / "fig_temporal.png"); plt.close(fig)
+    C.save_figure(fig, "fig_temporal")
 
     tr = pd.read_csv(RESULTS / "tables/temporal_trends.csv").dropna(subset=["tau"])
     tr = tr[tr.variable == "precipitation_sum"].sort_values("tau")
@@ -120,23 +125,44 @@ def fig_temporal():
     ax.barh(tr.location, tr.tau, color=c)
     ax.set_xlabel("Mann-Kendall tau (precipitation, monthly)"); ax.axvline(0, color="k", lw=0.6)
     ax.set_title("Precipitation trends by district (red=wetting, blue=drying, p<.05)")
-    fig.savefig(FIGURES / "fig_mannkendall.png"); plt.close(fig)
+    C.save_figure(fig, "fig_mannkendall")
 
 
 def fig_shap():
+    """Global and local SHAP attribution for the detection signal.
+
+    Panel (a) ranks variables by mean |SHAP|. Panel (b) is a beeswarm: one point
+    per sampled district-day, positioned by that day's attribution to a variable
+    and coloured by the standardised value of that variable, so the sign of the
+    local effect is readable. Both panels come from the persisted attribution
+    matrix (results/shap_values.npy) and the rows it was computed on
+    (results/tables/shap_sample.csv); nothing is re-fitted here.
+    """
     sv = np.load(RESULTS / "shap_values.npy")
     si = pd.read_csv(RESULTS / "tables/shap_importance.csv")
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.2))
     axes[0].barh(si.variable[::-1], si.shap_mean_abs[::-1], color="#2c7fb8")
-    axes[0].set_xlabel("mean |SHAP|"); axes[0].set_title("Global feature importance (SHAP)")
-    try:
-        shap.summary_plot(sv, feature_names=C.FEATURES, show=False, max_display=9)
-        axes[1].get_subplots()  # no-op
-        fig2 = plt.gcf()
-        fig2.savefig(FIGURES / "fig_shap_beeswarm.png"); plt.close(fig2)
-    except Exception as e:
-        axes[1].text(0.5, 0.5, f"beeswarm skipped: {e!r}", ha="center")
-    fig.savefig(FIGURES / "fig_shap.png"); plt.close(fig)
+    axes[0].set_xlabel("mean $|$SHAP$|$")
+    axes[0].set_title("(a) Global importance: mean $|$SHAP$|$ per variable")
+
+    sample = RESULTS / "tables/shap_sample.csv"
+    if shap is None or not sample.exists():
+        axes[1].axis("off")
+        axes[1].text(0.0, 0.5, "local attribution unavailable\n"
+                     "(run _explain_fast.py first)", ha="left", fontsize=9)
+    else:
+        X = pd.read_csv(sample)
+        ev = json.loads((RESULTS / "shap_expected_value.json").read_text())
+        exp = shap.Explanation(
+            sv, base_values=np.full(len(sv), float(ev["expected_value"])),
+            data=X.values, feature_names=list(X.columns))
+        shap.plots.beeswarm(exp, max_display=len(X.columns), ax=axes[1],
+                            plot_size=None, show=False, color=plt.cm.coolwarm)
+        axes[1].set_title("(b) Local attribution: one point per district-day\n"
+                          "(colour = standardised variable value)")
+        axes[1].tick_params(labelsize=7)
+    fig.tight_layout()
+    C.save_figure(fig, "fig_shap")
 
 
 def fig_case():
@@ -154,11 +180,10 @@ def fig_case():
     ax.axvline(pd.Timestamp(top.start), color="k", ls=":", label=f"{top.event_id} onset")
     ax.set_title(f"Case study: {loc} (region {regs[0]}) around {top.type} event {top.event_id}, UCASI={top.UCASI}")
     ax.set_ylabel("precipitation (mm/day)"); ax.legend(fontsize=7, ncol=3)
-    fig.savefig(FIGURES / "fig_case_study.png"); plt.close(fig)
+    C.save_figure(fig, "fig_case_study")
 
 
 def main():
-    import shap
     figs = [fig_benchmark, fig_curves, fig_map, fig_ucasi, fig_temporal, fig_shap, fig_case]
     made = []
     for f in figs:
@@ -167,7 +192,8 @@ def main():
         except Exception as e:
             print(f"[fig skip] {f.__name__}: {e!r}")
     print("figures written:", made)
-    print("dir:", FIGURES)
+    for folder in C.FIG_FOLDERS:
+        print("dir:", folder)
 
 
 if __name__ == "__main__":
