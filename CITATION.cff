@@ -24,7 +24,7 @@ authors:
     orcid: "https://orcid.org/0009-0004-5620-996X"
     affiliation: "Department of Computer Science, Makerere University, Kampala, Uganda"
 repository-code: "https://github.com/jericho555/uganda-climate-intelligence"
-# doi: "10.5281/REPLACE-AFTER-ZENODO-RELEASE"   # uncomment only once minted
+doi: "10.5281/zenodo.24596524"
 license: MIT
 keywords:
   - climate intelligence
