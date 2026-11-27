@@ -19,9 +19,11 @@ STAGES = [
     ("fetch_agriculture", "World Bank cereal production/area/yield (impact layer)"),
     ("fetch_coffee", "OWID/FAOSTAT Ugandan green-coffee production (signature export impact layer)"),
     ("fetch_power", "NASA POWER daily T2M/RH/solar 1988-2007 (independent gap-fill)"),
+    ("fetch_boundaries", "OCHA Uganda COD district polygons + site->district join"),
     ("disaster_register", "Disaster ground-truth register"),
     ("preprocess", "Seasonal anomalies + labels"),
     ("detect", "Detector benchmark + evaluation"),
+    ("region_label_check", "Sensitivity of event labels to the boundary register's regions"),
     ("_recover", "Friedman + full-period ensemble map (idempotent fallback)"),
     ("random_null", "Size-matched random-flag null + BH-controlled Monte-Carlo tests"),
     ("spatial", "Moran's I / Getis-Ord hotspots"),
@@ -41,6 +43,7 @@ STAGES = [
     ("figures_coffee", "Coffee production + sign-flip correlation figure"),
     ("figures_early_warning", "EWS architecture + risk-nowcast figures"),
     ("collect_results", "Results digest + event-recall/lead-time (RQ5)"),
+    ("check_ref_index", "Crossref/OpenAlex/arXiv check on the refuted baseline draft"),
 ]
 
 

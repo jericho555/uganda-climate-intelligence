@@ -1,0 +1,410 @@
+{
+ "purpose": "Checks whether the unpublished baseline draft refuted in this paper (masaba2023) is recorded as published in any index.",
+ "target": {
+  "title": "Evaluation of Anomaly Detection Techniques Using Uganda Weather Dataset",
+  "author": "Jeremiah Masaba",
+  "year": "2023",
+  "normalised_title": "evaluation of anomaly detection techniques using uganda weather dataset"
+ },
+ "checked_on": "2026-11-27",
+ "method": "src/check_ref_index.py; stdlib HTTP GET against public APIs; title comparison is case/punctuation-insensitive. Levels: exact, substring, strong_overlap (generic wording plus the distinctive tokens uganda/weather and an anomaly term), weak_overlap (generic wording only -- recorded, not counted as a match).",
+ "n_queries": 10,
+ "n_answered": 9,
+ "indexes": [
+  "arxiv",
+  "crossref",
+  "openalex",
+  "semanticscholar"
+ ],
+ "nearest_indexed_records": {
+  "answered": true,
+  "http_status": 200,
+  "index_count": 102,
+  "n_scanned": 25,
+  "records": [
+   {
+    "title": "Transfer Learning Approach for Rainfall Class Amount Prediction Using Uganda's Lake Victoria Basin Weather Dataset",
+    "year": 2024,
+    "type": "conference-paper",
+    "doi": "https://doi.org/10.1109/ibdap62940.2024.10689700",
+    "venue": "International Conference on Big Data Analytics and Practices (IBDAP)",
+    "authors": "Tumusiime Andrew Gahwera, Odongo Steven Eyobu, Mugume Isaac",
+    "author_matches_target": false,
+    "title_match": null,
+    "title_word_overlap": 0.444
+   },
+   {
+    "title": "The Role of Indigenous Knowledge in Climate-Smart Agriculture: A Case Study of Weather Forecasting in Uganda",
+    "year": 2026,
+    "type": "article",
+    "doi": "https://doi.org/10.5281/zenodo.23283885",
+    "venue": "Zenodo (CERN European Organization for Nuclear Research)",
+    "authors": "Academians Publishers",
+    "author_matches_target": false,
+    "title_match": null,
+    "title_word_overlap": 0.333
+   },
+   {
+    "title": "Lived experiences of resource insecurity, weather-related disruptions, and wellbeing among urban refugee youth in Kampala, Uganda: qualitative insights",
+    "year": 2026,
+    "type": "article",
+    "doi": "https://doi.org/10.2166/washdev.2026.037",
+    "venue": "Journal of Water Sanitation and Hygiene for Development",
+    "authors": "Carmen H. Logie, F. Mackenzie, Moses Okumu, Suliat Fehintola Akinwande, Robert Hakiza, Daniel Kibuuka Musoke, Aidah Nakitende, Brenda Katisi, Peter Kyambadde",
+    "author_matches_target": false,
+    "title_match": null,
+    "title_word_overlap": 0.333
+   },
+   {
+    "title": "Leveraging Retrieval Augmented Generation (RAG) for Spatio Temporal Semantic Analysis of Weather Patterns and Accident Hot spots in Kampala City, Uganda",
+    "year": 2026,
+    "type": "article",
+    "doi": "https://doi.org/10.13140/rg.2.2.33230.42568",
+    "venue": null,
+    "authors": "Adaku Charles",
+    "author_matches_target": false,
+    "title_match": null,
+    "title_word_overlap": 0.333
+   }
+  ]
+ },
+ "verdict": {
+  "no_indexed_record": true,
+  "required_indexes_unanswered": [],
+  "queries_with_a_title_match": []
+ },
+ "queries": [
+  {
+   "index": "crossref",
+   "label": "query.bibliographic=Evaluation of Anomaly Detection Techniques Using Uganda Weather Dataset",
+   "url": "https://api.crossref.org/works?query.bibliographic=Evaluation+of+Anomaly+Detection+Techniques+Using+Uganda+Weather+Dataset&rows=6",
+   "http_status": 200,
+   "answered": true,
+   "n_hits": 6,
+   "n_target_matches": 0,
+   "match_levels": [
+    "weak_overlap"
+   ],
+   "records": [
+    {
+     "title": "On evaluation of Network Intrusion Detection Systems: Statistical analysis of CIDDS-001 dataset using Machine Learning Techniques",
+     "year": 2019,
+     "venue": "",
+     "type": "posted-content",
+     "doi": "10.36227/techrxiv.11454276",
+     "authors": "Verma, Ranga",
+     "title_match": "weak_overlap"
+    },
+    {
+     "title": "On evaluation of Network Intrusion Detection Systems: Statistical analysis of CIDDS-001 dataset using Machine Learning Techniques",
+     "year": 2019,
+     "venue": "",
+     "type": "posted-content",
+     "doi": "10.36227/techrxiv.11454276.v1",
+     "authors": "Verma, Ranga",
+     "title_match": "weak_overlap"
+    },
+    {
+     "title": "Anomaly Detection using System Identification Techniques",
+     "year": 2018,
+     "venue": "Proceedings of the 15th International Conference on Informatics in Control, Auto",
+     "type": "proceedings-article",
+     "doi": "10.5220/0006888604820487",
+     "authors": "Sebestyen, Hangan",
+     "title_match": null
+    },
+    {
+     "title": "IoT Dataset Validation Using Machine Learning Techniques for Traffic Anomaly Detection",
+     "year": 2021,
+     "venue": "Electronics",
+     "type": "journal-article",
+     "doi": "10.3390/electronics10222857",
+     "authors": "Vigoya, Fernandez, Carneiro, N\u00f3voa",
+     "title_match": null
+    },
+    {
+     "title": "Using a Small Dataset in Learning for Object Anomaly Detection",
+     "year": 2025,
+     "venue": "International Journal of Current Science Research and Review",
+     "type": "journal-article",
+     "doi": "10.47191/ijcsrr/v8-i8-20",
+     "authors": "?, Tang",
+     "title_match": null
+    },
+    {
+     "title": "Anomaly Detection using Unsupervised Machine Learning Techniques",
+     "year": 2026,
+     "venue": "International Journal of Research Publication and Reviews",
+     "type": "journal-article",
+     "doi": "10.55248/gengpi.07.0426.20827",
+     "authors": "Mitkumar, Chopan",
+     "title_match": null
+    }
+   ]
+  },
+  {
+   "index": "crossref",
+   "label": "query.title=Evaluation of Anomaly Detection Techniques Using Uganda Weather Dataset",
+   "url": "https://api.crossref.org/works?query.title=Evaluation+of+Anomaly+Detection+Techniques+Using+Uganda+Weather+Dataset&rows=6",
+   "http_status": 200,
+   "answered": true,
+   "n_hits": 6,
+   "n_target_matches": 0,
+   "match_levels": [],
+   "records": [
+    {
+     "title": "IoT Dataset Validation Using Machine Learning Techniques for Traffic Anomaly Detection",
+     "year": 2021,
+     "venue": "Electronics",
+     "type": "journal-article",
+     "doi": "10.3390/electronics10222857",
+     "authors": "Vigoya, Fernandez, Carneiro, N\u00f3voa",
+     "title_match": null
+    },
+    {
+     "title": "Dataset Evaluation for Multi Vehicle Detection using Vision Based Techniques",
+     "year": 2021,
+     "venue": "Embedded Selforganising Systems",
+     "type": "journal-article",
+     "doi": "10.14464/ess.v8i2.492",
+     "authors": "Nine, Kishor Anapunje",
+     "title_match": null
+    },
+    {
+     "title": "Anomaly Detection using System Identification Techniques",
+     "year": 2018,
+     "venue": "Proceedings of the 15th International Conference on Informatics in Control, Auto",
+     "type": "proceedings-article",
+     "doi": "10.5220/0006888604820487",
+     "authors": "Sebestyen, Hangan",
+     "title_match": null
+    },
+    {
+     "title": "Anomaly detection using machine learning techniques",
+     "year": 2020,
+     "venue": "Malaya Journal of Matematik",
+     "type": "journal-article",
+     "doi": "10.26637/mjm0804/0139",
+     "authors": "Chellammal Suriyanarayanan, Saranya Kunasekaran",
+     "title_match": null
+    },
+    {
+     "title": "Anomaly Detection using Machine Learning Techniques",
+     "year": 2019,
+     "venue": "2019 IEEE 5th International Conference for Convergence in Technology (I2CT)",
+     "type": "proceedings-article",
+     "doi": "10.1109/i2ct45611.2019.9033532",
+     "authors": "Wankhede",
+     "title_match": null
+    },
+    {
+     "title": "Multivariate weather anomaly detection using DBSCAN clustering algorithm",
+     "year": 2021,
+     "venue": "Journal of Physics: Conference Series",
+     "type": "journal-article",
+     "doi": "10.1088/1742-6596/1869/1/012077",
+     "authors": "Wibisono, Anwar, Supriyanto, Amin",
+     "title_match": null
+    }
+   ]
+  },
+  {
+   "index": "crossref",
+   "label": "query.bibliographic=Uganda weather dataset",
+   "url": "https://api.crossref.org/works?query.bibliographic=Uganda+weather+dataset&query.author=Masaba&rows=6",
+   "http_status": 200,
+   "answered": true,
+   "n_hits": 6,
+   "n_target_matches": 0,
+   "match_levels": [],
+   "records": [
+    {
+     "title": "Bio-Economic Perspective to Fuelwood Policy Options in Uganda: A Demand\u2013Supply Nexus",
+     "year": 2008,
+     "venue": "Jurnal Ilmu Kehutanan",
+     "type": "journal-article",
+     "doi": "10.22146/jik.1535",
+     "authors": "Mukadasi, Sowedi",
+     "title_match": null
+    },
+    {
+     "title": "THE COMMON ANAESTHETIC DRUGS AND THEIR EFFECTS AMONG EYE SURGERY PATIENTS IN JINJA REGIONAL REFFERAL HOSPITAL, JINJA, UGANDA, A CROSS-SECTIONAL STUDY.",
+     "year": null,
+     "venue": "",
+     "type": "dissertation",
+     "doi": "10.70659/gjhib.v2i9.81",
+     "authors": "?, Masaba, Kitanda",
+     "title_match": null
+    },
+    {
+     "title": "Nurses\u2019 knowledge, attitude and practices regarding pain assessment among patients with cancer at Uganda Cancer Institute",
+     "year": 2018,
+     "venue": "Journal of Analytical Research in Clinical Medicine",
+     "type": "journal-article",
+     "doi": "10.15171/jarcm.2018.011",
+     "authors": "Kiwanuka, Masaba",
+     "title_match": null
+    },
+    {
+     "title": "Taxpayer\u2019s attitude and tax compliance among small income businesses in Uganda\u2019s urban councils: case study Kampala Capital City Authority-central division",
+     "year": null,
+     "venue": "",
+     "type": "dissertation",
+     "doi": "10.70850/umu.diss2",
+     "authors": "?, ?, Nangayi Masaba",
+     "title_match": null
+    },
+    {
+     "title": "Behavioural Practices and Procurement Performance in Uganda",
+     "year": 2015,
+     "venue": "International Journal of Social Science and Economics Invention",
+     "type": "journal-article",
+     "doi": "10.23958/ijssei/vol01-i01/06",
+     "authors": "Kutosi, Moses, Eya",
+     "title_match": null
+    },
+    {
+     "title": "Contracting and Behavioural Practices in State Owned Enterprises in Uganda",
+     "year": 2015,
+     "venue": "International Journal of Social Science and Economics Invention",
+     "type": "journal-article",
+     "doi": "10.23958/ijssei/vol01-i01/05",
+     "authors": "Kutosi, Moses, Eya",
+     "title_match": null
+    }
+   ]
+  },
+  {
+   "index": "openalex",
+   "label": "title.search",
+   "url": "https://api.openalex.org/works?filter=title.search%3AEvaluation+of+Anomaly+Detection+Techniques+Using+Uganda+Weather+Dataset&per-page=6&mailto=masabjericho%40gmail.com",
+   "http_status": 200,
+   "answered": true,
+   "n_hits": 0,
+   "n_target_matches": 0,
+   "match_levels": [],
+   "records": []
+  },
+  {
+   "index": "openalex",
+   "label": "free-text search",
+   "url": "https://api.openalex.org/works?search=Evaluation+of+Anomaly+Detection+Techniques+Using+Uganda+Weather+Dataset&per-page=6&mailto=masabjericho%40gmail.com",
+   "http_status": 200,
+   "answered": true,
+   "n_hits": 935,
+   "n_target_matches": 0,
+   "match_levels": [],
+   "records": [
+    {
+     "title": "Analysis of Machine Learning Algorithms for Prediction of Short-Term Rainfall Amounts Using Uganda\u2019s Lake Victoria Basin Weather Dataset",
+     "year": 2024,
+     "venue": "IEEE Access",
+     "type": "article",
+     "doi": "https://doi.org/10.1109/access.2024.3396695",
+     "authors": "Tumusiime Andrew Gahwera, Odongo Steven Eyobu, Mugume Isaac",
+     "title_match": null
+    },
+    {
+     "title": "Recent Climate Change in the Lake Kyoga Basin, Uganda: An Analysis Using Short-Term and Long-Term Data with Standardized Precipitation and Anomaly Indexes",
+     "year": 2021,
+     "venue": "Climate",
+     "type": "article",
+     "doi": "https://doi.org/10.3390/cli9120179",
+     "authors": "John Peter Obubu, Seyoum Mengistou, Tadesse Fetahi, Tena Alamirew, Robinson Odong",
+     "title_match": null
+    },
+    {
+     "title": "Assessing rainfall disaggregation techniques and subdaily rainfall patterns across Uganda\u2019s tropical climatic zones",
+     "year": 2025,
+     "venue": "Discover Atmosphere",
+     "type": "article",
+     "doi": "https://doi.org/10.1007/s44292-025-00058-2",
+     "authors": "Martin Okirya, J A du Plessis",
+     "title_match": null
+    },
+    {
+     "title": "Evaluating Bias Correction Methods Using Annual Maximum Series Rainfall Data from Observed and Remotely Sensed Sources in Gauged and Ungauged Catchments in Ugan",
+     "year": 2025,
+     "venue": "Hydrology",
+     "type": "article",
+     "doi": "https://doi.org/10.3390/hydrology12050113",
+     "authors": "Martin Okirya, J A du Plessis",
+     "title_match": null
+    },
+    {
+     "title": "Dynamical Malaria Forecasts Are Skillful at Regional and Local Scales in Uganda up to 4 Months Ahead",
+     "year": 2019,
+     "venue": "GeoHealth",
+     "type": "article",
+     "doi": "https://doi.org/10.1029/2018gh000157",
+     "authors": "Adrian Mark Tompkins, Felipe J. Col\u00f3n\u2010Gonz\u00e1lez, Francesca Di Giuseppe, Didacus Bambaiha Namanya",
+     "title_match": null
+    },
+    {
+     "title": "Changes in climatic factors and malaria in Uganda",
+     "year": 2014,
+     "venue": "WIDER Working Paper Series",
+     "type": "book",
+     "doi": "https://doi.org/10.35188/unu-wider/2014/832-2",
+     "authors": "Bruno Lule Yawe",
+     "title_match": null
+    }
+   ]
+  },
+  {
+   "index": "openalex",
+   "label": "author search: Jeremiah Masaba",
+   "url": "https://api.openalex.org/authors?search=Jeremiah+Masaba&per-page=6&mailto=masabjericho%40gmail.com",
+   "http_status": 200,
+   "answered": true,
+   "n_hits": 0,
+   "n_target_matches": 0,
+   "match_levels": [],
+   "records": []
+  },
+  {
+   "index": "openalex",
+   "label": "works by raw_author_name=Jeremiah Masaba",
+   "url": "https://api.openalex.org/works?filter=raw_author_name.search%3AJeremiah+Masaba&per-page=100&select=display_name%2Cpublication_year%2Ctype%2Cdoi&mailto=masabjericho%40gmail.com",
+   "http_status": 200,
+   "answered": true,
+   "n_hits": 0,
+   "n_target_matches": 0,
+   "match_levels": [],
+   "records": []
+  },
+  {
+   "index": "arxiv",
+   "label": "title/abstract probe",
+   "url": "http://export.arxiv.org/api/query?search_query=ti%3A%22anomaly%20detection%22%20AND%20abs%3AUganda&max_results=6",
+   "http_status": 200,
+   "answered": true,
+   "n_hits": 0,
+   "n_target_matches": 0,
+   "match_levels": [],
+   "records": []
+  },
+  {
+   "index": "arxiv",
+   "label": "all-field phrase",
+   "url": "http://export.arxiv.org/api/query?search_query=all%3A%22Uganda%20weather%20dataset%22&max_results=6",
+   "http_status": 200,
+   "answered": true,
+   "n_hits": 0,
+   "n_target_matches": 0,
+   "match_levels": [],
+   "records": []
+  },
+  {
+   "index": "semanticscholar",
+   "label": "paper search",
+   "url": "https://api.semanticscholar.org/graph/v1/paper/search?query=Evaluation+of+Anomaly+Detection+Techniques+Using+Uganda+Weather+Dataset&limit=6&fields=title%2Cyear%2Cvenue%2CexternalIds%2Cauthors",
+   "http_status": null,
+   "answered": false,
+   "error": "HTTP 429",
+   "n_hits": 0,
+   "n_target_matches": 0,
+   "records": []
+  }
+ ]
+}

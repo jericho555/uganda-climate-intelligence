@@ -1,7 +1,7 @@
 % =========================================================================
-% References for "A ground-truth-honest climate-anomaly detection system for
-% Uganda: a 24-detector held-out benchmark, district risk nowcasting, and
-% century-scale climatology from three observation substrates"
+% References for "A National Climate Anomaly Intelligence System for Uganda:
+% Ground-Truth Validation, Risk Nowcasting, and Long-Term Climate Change
+% Assessment"
 % Every entry below is either (a) a dataset/software record cited by its
 % public landing page, or (b) a peer-reviewed item whose journal, volume and
 % year were checked against the publisher/indexed record.
@@ -224,6 +224,19 @@
   howpublished = {https://power.larc.nasa.gov},
   year         = {2024},
   note         = {Version 8, daily parameters, accessed 2026. Open licence, no-key JSON endpoint}
+}
+
+@misc{uchacod2020,
+  author       = {{UN Office for the Coordination of Humanitarian Affairs}},
+  title        = {Uganda --- {S}ubnational {A}dministrative {B}oundaries ({COD-AB-UGA})},
+  howpublished = {Humanitarian Data Exchange, https://data.humdata.org/dataset/cod-ab-uga},
+  year         = {2020},
+  note         = {Common Operational Dataset mapped by UNOSAT. Admin-2 layer,
+                  version v01, 135 districts, valid 2020-08-24; HDX record last
+                  modified 2026-09-24. Accessed 27 November 2026. Licence
+                  CC BY-IGO. Archive SHA-256 and simplification record in
+                  \texttt{data/boundaries\_provenance.json} of the code
+                  repository}
 }
 
 @misc{worldbank2024,
@@ -574,11 +587,21 @@
 }
 
 % ---- The refuted baseline study -------------------------------------------
-% NOTE: bibliographic metadata to be completed by the author.
+% Checked 2026-11-27 with src/check_ref_index.py, whose raw output is committed
+% as results/masaba2023_index_check.json: nine queries against Crossref (biblio-
+% graphic, title, author+title), OpenAlex (title.search, free text, author and
+% raw-author work lists) and arXiv (title and all-field probes) returned no
+% record for this title or author; a tenth to Semantic Scholar was rate-limited
+% and is recorded as unanswered, not as a negative result. Cite as an
+% author-held draft, never as a published benchmark.
 
-@misc{masaba2023,
+@unpublished{masaba2023,
   author  = {Masaba, Jeremiah},
   title   = {Evaluation of anomaly detection techniques using {U}ganda weather dataset},
   year    = {2023},
-  note    = {Prior baseline study; full publication details to be supplied by the author}
+  note    = {Unpublished technical draft held by the author. Searched on
+             2026-11-27 in Crossref, OpenAlex and arXiv with no record found
+             (\texttt{results/masaba2023\_index\_check.json}). Cited only as the
+             source of the perfect-score baseline that this paper re-examines
+             against external ground truth}
 }

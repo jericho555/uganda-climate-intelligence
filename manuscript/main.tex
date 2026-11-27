@@ -1,7 +1,7 @@
-%% A ground-truth-honest climate-anomaly detection system for Uganda:
-%% held-out benchmark, district risk nowcasting, century-scale climatology
+%% A National Climate Anomaly Intelligence System for Uganda: Ground-Truth
+%% Validation, Risk Nowcasting, and Long-Term Climate Change Assessment
 %% Target venue: Environmental Modelling & Software (Elsevier)
-%% Running title: Ground-truth-honest climate-anomaly detection in Uganda
+%% Running title: A national climate anomaly intelligence system for Uganda
 %% Class: elsarticle. Compile: pdflatex main; bibtex main; pdflatex x2
 \documentclass[preprint,12pt]{elsarticle}
 
@@ -21,9 +21,9 @@
 
 \begin{frontmatter}
 
-\title{A ground-truth-honest climate-anomaly detection system for Uganda:
-a 24-detector held-out benchmark, district risk nowcasting, and century-scale
-climatology from three observation substrates}
+\title{A National Climate Anomaly Intelligence System for Uganda:
+Ground-Truth Validation, Risk Nowcasting, and Long-Term Climate Change
+Assessment}
 
 \author[inst1]{Jeremiah Masaba\corref{cor1}}
 \ead{masabjericho@gmail.com}
@@ -54,8 +54,8 @@ exceed that mean by at most 22\%. Only two sequence autoencoders, LSTM-AE and
 Transformer-AE, roughly double it (F1 0.13--0.14, precision 0.20--0.22,
 Monte-Carlo $q<0.001$), yet their global ranking stays near chance (ROC-AUC
 0.51--0.53) and they capture under 10\% of disaster days. Apparent event
-coverage of 68.8\% is reproduced by a random null at 100\%. This refutes
-earlier reports of AUC $=1.0$ on the same record.
+coverage of 68.8\% is reproduced by a random null at 100\%. This refutes the
+AUC $=1.0$ reported in our own earlier, unpublished draft of the same analysis.
 
 What is defensible is climatological. A 91-year in-situ series (12 Meteostat
 stations) shows widespread warming (Kampala $T_{max}$ $\tau=0.42$,
@@ -73,8 +73,8 @@ severity index and dashboard are released as reusable building blocks.
 
 \begin{keyword}
 climate intelligence \sep anomaly detection \sep decision support system \sep
-interactive dashboard \sep early warning \sep Uganda \sep ERA5 \sep UCASI \sep
-reproducible evaluation
+interactive dashboard \sep early warning \sep century-scale trends \sep Uganda
+\sep ERA5 \sep UCASI \sep reproducible evaluation
 \end{keyword}
 
 \end{frontmatter}
@@ -96,9 +96,12 @@ arrangements find the detection and dissemination layers still incomplete
 \cite{namwano2024,venning2025}. Because systematically recorded disaster labels
 are scarce, unsupervised anomaly detection is frequently proposed as a low-cost
 substitute: in principle a model can flag abnormal weather without supervision
-\cite{blazquez2021,pang2021}. Some evaluations on African weather records report
-exceptional performance; an earlier study on a Meteoblue Uganda dataset declared
-precision, recall and ROC-AUC all equal to $1.0$ \cite{masaba2023}.
+\cite{blazquez2021,pang2021}. Evaluations on African weather records have
+reported exceptional performance, and our own earlier work on a Meteoblue
+Uganda dataset declared precision, recall and ROC-AUC all equal to $100\%$
+\cite{masaba2023}. That draft was never published or archived anywhere
+retrievable, so this paper treats it as a claim to be re-tested rather than as
+a citable result.
 
 Scores of this kind are diagnostic rather than reassuring. Unsupervised
 detection supplies no label to score against: unless an independent, held-out
@@ -262,10 +265,13 @@ across seven algorithms, with a neural network best, measured against flood
 events derived from the same 1986--2000 gauge record and then read forward to
 describe flooding between 2020 and 2030, a period outside the data
 \cite{hadi2024}. Our own baseline study on a Ugandan weather record reported
-precision, recall and ROC-AUC all equal to 1.0 \cite{masaba2023}. In the last
-two cases the labels used to judge performance come from the same record the
-model was built on, so nothing external could contradict a strong result. The
-gap is one of measurement practice rather than model capability.
+precision, recall and ROC-AUC all equal to 1.0 \cite{masaba2023}; it survives
+only as an unpublished technical draft, which is why this paper states its
+protocol in full instead of pointing a reader to a venue. In both of those
+studies the reported skill had nothing external to contradict it: the Malaysian
+evaluation was scored against events derived from the same gauge record the
+models were trained on, and ours consulted no independent disaster register at
+all. The gap is one of measurement practice rather than model capability.
 
 %----------------------------------------------------------------------------
 \paragraph{Reanalysis products and national warning capacity in East Africa.}
@@ -346,15 +352,25 @@ skill, and no validated decision-support value.
 %============================================================================
 \section{Study area and data}\label{sec:data}
 \subsection{Spatial and temporal scope}
-We analyse 19 (16 successfully retrieved) district/urban centroids covering all
-four Ugandan administrative regions (Central, Eastern, Northern, Western),
-each represented by its WGS84 centroid and mean elevation
-(Table~\ref{tab:data}). The study period is 1 January 2008--31 December 2023.
-Figure~\ref{fig:studyarea} locates the three observation substrates on one
-reference map and shows the orographic range they span: centroids lie between
-1000\,m (Kasese, in the Western rift valley) and 1960\,m (Kabale, on the
-south-western highlands), which is why a single $\sim$25\,km reanalysis grid
-cell cannot be assumed to represent every district identically.
+We analyse 19 sites (16 with a complete ERA5 panel) chosen to span all four
+Ugandan administrative regions (Central, Eastern, Northern, Western), each
+entered by its WGS84 coordinates and mean elevation (Table~\ref{tab:data}). The
+study period is 1 January 2008--31 December 2023. Each site is joined to the
+district that contains it using the OCHA Uganda common operational dataset of
+subnational boundaries \cite{uchacod2020}, which resolves the country into 135
+districts under a CC BY-IGO licence. The join is exact for all 19 sites
+(\texttt{data/district\_lookup.csv}), including the two whose local spelling
+differs from the register (Luweero for Luwero, Fort Portal for Kabarole). The
+panel therefore represents 19 of 135 districts and 13.7\% of the national
+district area, the ERA5 sub-panel 16 districts and 11.0\%
+(\texttt{results/district\_coverage.json}); every map in this paper draws the
+remaining districts as no-data instead of leaving them implicit.
+Figure~\ref{fig:studyarea} shows the district mosaic, the three observation
+substrates and the orographic range they
+span: sites lie between 1000\,m (Kasese, in the Western rift valley) and
+1960\,m (Kabale, on the south-western highlands), which is why a single
+$\sim$25\,km reanalysis grid cell cannot be assumed to represent every district
+identically.
 
 \subsection{Data sources and provenance}
 Daily multivariate weather is drawn from the ERA5 reanalysis
@@ -386,7 +402,7 @@ window. We therefore add a second, \emph{independent} reanalysis: NASA POWER
 \cite{power2024dataset}, which is MERRA-2-based, openly licensed and served as
 plain JSON, and is not subject to the archive-API throttling that blocked our
 ERA5 back-fill.
-For all 19 district centroids we retrieve daily $T_{2m}$, near-surface relative
+For all 19 sites we retrieve daily $T_{2m}$, near-surface relative
 humidity and surface downwelling shortwave radiation over
 1988-01-01 to 2007-12-31 (138{,}795 district-days, 0 missing), which
 \emph{closes the 1990--2007 multivariate gap for temperature, humidity and
@@ -419,6 +435,8 @@ of 0.1115 on the test partition.
 Quantity & Value \\
 \midrule
 Districts analysed & 16 (of 19 configured) \\
+Districts represented & 19 of 135 (13.7\% of district area; ERA5 panel 11.0\%) \\
+Boundary register & OCHA Uganda COD v01 admin-2, valid 2020-08-24, CC BY-IGO \\
 Study period & 2008-01-01 to 2023-12-31 \\
 District-day observations & 93{,}504 \\ 
 Daily variables & 13 \\
@@ -729,12 +747,15 @@ VAE (NumPy)           & 0.112 & 0.050 & 0.069 & 0.501 & 0.111 & 0.000 \\
 \end{tabular}
 \end{table}
 
-The comparison with the original Meteoblue-based study follows directly. That
-study reported precision/recall/ROC-AUC $=1.0$ \cite{masaba2023}. Perfect scores
-of that kind are not credible against independent labels at a 5\% anomaly rate,
-and the difference is explained by protocol rather than by data: the earlier
-evaluation scored self-generated labels against themselves, with no external
-ground truth \cite{schmidl2022}.
+The comparison with our own Meteoblue-based draft follows directly. That draft
+reported precision, recall and ROC-AUC all equal to $1.0$ \cite{masaba2023}.
+Scores that perfect are not attainable against an independent event register at
+any realistic alert budget; they are what an evaluation yields when the
+anomalies it scores are defined by the same record the model ranks
+\cite{schmidl2022}. The difference is therefore protocol rather than data: the
+earlier study had no external ground truth to contradict it. Because the draft
+was never published or archived, we characterise it here only in those terms and
+do not quote a protocol we can no longer show.
 
 \subsection{RQ2: spatial structure, no global clustering but one local hotspot}
 \label{sec:rq2}
@@ -1168,13 +1189,16 @@ order. These are adaptation-relevant products that a national service can defend
 in a budget submission, and they were produced by the same pipeline whose
 detection layer failed. That asymmetry is the paper's most transferable result.
 
-\paragraph{Relation to prior work.} Our verdict contradicts the earlier Meteoblue
-Uganda study \cite{masaba2023}, which reported precision, recall and ROC-AUC of
-$1.0$. The discrepancy is methodological, not a disagreement about weather: that
-evaluation scored self-generated labels against themselves, with no external
-oracle, and a threshold tuned on the same data separates them trivially
-\cite{schmidl2022}. Under a leakage-free protocol with an independent register
-and an equal-budget null, the strongest detector in a panel of 24 reaches
+\paragraph{Relation to prior work.} Our verdict contradicts our own earlier
+Meteoblue Uganda draft \cite{masaba2023}, which reported precision, recall and
+ROC-AUC of $1.0$ and which the nine Crossref, OpenAlex and arXiv queries logged
+in \texttt{results/masaba2023\_index\_check.json} leave unrecorded. The
+discrepancy is methodological, not a disagreement about weather: that evaluation
+had no independent oracle, and where one weather record supplies both the
+definition of an anomaly and the score tested against it, perfect separation is
+automatic rather than informative \cite{schmidl2022}. Under a leakage-free
+protocol with an independent register and an equal-budget null, the strongest
+detector in a panel of 24 reaches
 ROC-AUC 0.532. We consider that number, not the 1.0, the starting point for any
 Ugandan weather-anomaly system. The comparison reviewers will ask for next is
 against the empirical rainfall thresholds that operational landslide warning
@@ -1205,10 +1229,27 @@ than to district polygons, so a district counts as exposed whenever it lies in a
 listed region. This is coarser than any real footprint: it credits districts that
 saw no water with being inside the window. The effect inflates apparent event
 coverage and depresses apparent precision, moving the daily benchmark toward the
-null rather than away from it.
+null rather than away from it. Two further caveats come with the geography
+itself. The boundary register is the 2020 COD vintage, and several districts in
+the 135-district layer were created by split-offs after 2010, so a point value
+is assigned to the district that contains it today, not the one that existed at
+the start of the window. And one regional label in our configuration disagrees
+with that register, which places Masindi in the Western region where we list it
+as Northern. Reassigning it would move the event label on 1{,}036 of 93{,}504
+district-days (6.16\% of the labelled positives), change exposure for 21 of the
+32 events, and shift the count of districts affected by any one event by at most
+one. We report that bound instead of applying it, because every published figure
+here was produced with the labels as configured; the check itself re-derives the
+persisted event labels exactly (100\% agreement on 93{,}504 rows) before
+measuring the difference
+(\texttt{results/region\_label\_sensitivity.json}).
 
-\item \emph{Point sampling and the precipitation gap.} Centroid sampling
-under-represents sub-district extremes. We now validate the substrate against 12
+\item \emph{Point sampling and the precipitation gap.} Every value is measured at
+one point and shaded over the district that contains it, and the panel observes
+19 of 135 districts, so sub-district extremes inside the 116 unobserved
+districts are outside this study by construction. Centroid sampling
+under-represents sub-district extremes even within the districts we do observe.
+We now validate the substrate against 12
 in-situ Meteostat stations over their monthly overlap and find $r\geq0.95$ on mean
 temperature for ten of twelve pairs (Section~\ref{sec:insitu}), but a full per-grid
 residual and bias correction remains future work, as does extending the in-situ
@@ -1296,8 +1337,9 @@ failed.
 
 Future work follows directly from the threats in Section~\ref{sec:threats}: a
 decodable gridded precipitation product such as CHIRPS \cite{funk2015} to close
-the 1990--2007 moisture gap, district polygons instead of centroids so exposure
-can be measured areally rather than at a point, and the addition of soil
+the 1990--2007 moisture gap; district footprints for the 32 registered events,
+now that the geometry exists to draw them, so that exposure can be measured
+areally instead of by region; the addition of soil
 moisture, river stage and exposure covariates to a feature space that is currently
 weather-only. Whether learned atmospheric models change the verdict is an
 empirical question \cite{lam2023}, but nothing in the present result suggests that
@@ -1310,7 +1352,13 @@ All inputs are openly licensed: ERA5 reanalysis via the Open-Meteo Archive API
 (CC-BY 4.0), Meteostat station records (CC-BY 4.0), the NASA POWER / MERRA-2
 gap-fill reanalysis (open, no-key JSON), World Bank / FAOSTAT
 cereal production series (CC BY 4.0), and FAOSTAT green-coffee production
-compiled by Our World in Data (CC BY 4.0). The disaster register is
+compiled by Our World in Data (CC BY 4.0). Administrative boundary geometry is
+the OCHA Uganda common operational dataset \cite{uchacod2020} (CC BY-IGO;
+admin-2 layer, version v01, valid 2020-08-24): the repository ships a simplified
+subset of that layer (135 districts, 10{,}869 vertices, 217\,KB) with the source
+archive's SHA-256, licence and vintage recorded in
+\texttt{data/boundaries\_provenance.json}, and \texttt{fetch\_boundaries.py}
+rebuilds the subset from the public endpoint. The disaster register is
 compiled from public relief records (UN-OCHA/UNMA, EM-DAT, FAO, FEWS NET) with
 per-event citations. The complete pipeline (\texttt{fetch\_era5.py},
 \texttt{fetch\_meteostat.py}, \texttt{preprocess.py}, \texttt{detect.py},
@@ -1320,8 +1368,13 @@ per-event citations. The complete pipeline (\texttt{fetch\_era5.py},
 \texttt{coffee\_linkage.py}, \texttt{figures\_coffee.py},
 \texttt{fetch\_power.py}, \texttt{power\_climate.py}, \texttt{figures\_power.py},
 \texttt{ucasi.py}, \texttt{explain.py}, \texttt{random\_null.py},
-\texttt{figures.py}, \texttt{figures\_maps.py}, \texttt{collect\_results.py})
-reproduces every figure and table via \texttt{python run\_all.py}. Artefacts are
+\texttt{figures.py}, \texttt{figures\_maps.py}, \texttt{collect\_results.py}),
+together with \texttt{fetch\_boundaries.py} for the district geometry and
+coverage figures, \texttt{region\_label\_check.py} for the regional-label
+sensitivity reported in Section~\ref{sec:threats} and
+\texttt{check\_ref_index.py} for the publication check on the prior draft,
+reproduces every figure and table via \texttt{python run\_all.py}.
+Artefacts are
 emitted as CSV/JSON/NPZ, including \texttt{results/random\_null.json}, the
 reference distribution against which every event-level score is compared. Seeds
 are fixed for determinism.
@@ -1352,19 +1405,26 @@ diagonal, PR barely exceeds the base-rate line. (RQ1)}
 \end{figure}
 \begin{figure}[h]\centering
 \includegraphics[width=\linewidth]{figures/fig_hotspot_map.png}
-\caption{Getis--Ord $G_i^*$ district anomaly-rate hotspots; Mbale is the sole
-significant hotspot. (RQ2)}
+\caption{Getis--Ord $G_i^*$ classification drawn as a district choropleth: one
+significant hotspot (Mbale, $z=3.50$), no significant coldspot, 15 districts
+tested and not significant, and 119 districts the ERA5 panel does not observe.
+The $z$-value is printed beside each observation point and thick internal lines
+are the four administrative regions. Geometry: OCHA Uganda COD
+v01 admin-2 (CC BY-IGO). (RQ2)}
 \label{fig:map}
 \end{figure}
 \begin{figure}[h]\centering
 \includegraphics[width=\linewidth]{figures/fig_study_area.png}
-\caption{Reference geometry of the three observation substrates. Left: the 16
-ERA5 district centroids (coloured by administrative region), the 14 Meteostat
-station records (triangles) and the three centroids reachable only through the
-NASA POWER gap-fill (squares). Right: centroid elevation, showing the orographic
-contrast between the northern and south-western sites. Districts are plotted at
-WGS84 administrative centroids; markers are points, not areal units, and no
-boundary geometry is implied. (Data)}
+\caption{Reference geometry of the three observation substrates, drawn on the
+135-district administrative mosaic of the OCHA Uganda COD (CC BY-IGO). Left:
+districts shaded by the region that contains an observation point, with the 16
+ERA5 sites (dots), the Meteostat station network (14 locations, 12 of which
+return data; triangles) and the three sites reachable only through the NASA
+POWER gap-fill (squares); 116 districts carry no observation and are drawn as
+no-data. Right: observation-point elevation over the same mosaic, showing the
+orographic contrast between the northern and south-western sites. Each value is
+measured at a point and shaded over the district that contains it; no areal
+average is implied. (Data)}
 \label{fig:studyarea}
 \end{figure}
 \begin{figure}[h]\centering
@@ -1380,22 +1440,25 @@ methods fall between 0.494 and 0.532. (c) PR-AUC against the random-score null
 \end{figure}
 \begin{figure}[h]\centering
 \includegraphics[width=\linewidth]{figures/fig_risk_maps.png}
-\caption{District risk maps, all drawn from persisted artefacts. (a) Detected
-anomaly rate 2008--2023 against the 5\% target, with the single significant
-Getis--Ord $G_i^*$ hotspot (Mbale, $z=3.50$) ringed. (b) Mann--Kendall
-$\tau$ of monthly precipitation by district, bold edge where $p<0.05$; the
-Mbale drying is the strongest negative coefficient. (c) UCASI district-month
-nowcast for the most recent month in the surface (2023-12), banded by severity.
-Centroid markers, not areal units. (RQ2, RQ4, RQ6)}
+\caption{District risk maps, all drawn from persisted artefacts on the OCHA
+Uganda COD admin-2 geometry (CC BY-IGO). (a) Detected anomaly rate 2008--2023
+against the 5\% target, with the single significant Getis--Ord $G_i^*$ hotspot
+(Mbale, $z=3.50$) outlined in black. (b) Mann--Kendall $\tau$ of monthly
+precipitation by district, hatched where $p\geq0.05$; the Mbale drying is the
+strongest negative coefficient. (c) UCASI district-month nowcast for the most
+recent month in the surface (2023-12), banded by severity. Districts the panel
+does not observe are grey in every panel, never zero. (RQ2, RQ4, RQ6)}
 \label{fig:riskmaps}
 \end{figure}
 \begin{figure}[h]\centering
 \includegraphics[width=\linewidth]{figures/fig_gapfill_maps.png}
-\caption{Independent gap-fill trends mapped. Mann--Kendall $\tau$ over
-1988--2007 from NASA POWER for all 19 district centroids: near-surface
-temperature (left) warms significantly in 19/19 districts, relative humidity
-(right) declines significantly in 15/19. Values are printed to two decimals,
-starred where $p<0.05$. (Novel gap-fill)}
+\caption{Independent gap-fill trends drawn as district choropleths.
+Mann--Kendall $\tau$ over 1988--2007 from NASA POWER at all 19 observation
+points: near-surface temperature (left) warms significantly in 19/19 districts,
+relative humidity (right) declines significantly in 15/19. Values are printed to
+two decimals, starred where $p<0.05$; districts are hatched where the trend is
+not significant, and districts without an observation are grey. Geometry: OCHA
+Uganda COD v01 admin-2 (CC BY-IGO). (Novel gap-fill)}
 \label{fig:gapfillmaps}
 \end{figure}
 \begin{figure}[h]\centering

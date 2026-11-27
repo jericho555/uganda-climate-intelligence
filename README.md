@@ -2,17 +2,19 @@
 
 Reproducible research package behind the manuscript:
 
-> **A ground-truth-honest climate-anomaly detection system for Uganda: a
-> 24-detector held-out benchmark, district risk nowcasting, and century-scale
-> climatology from three observation substrates**
+> **A National Climate Anomaly Intelligence System for Uganda: Ground-Truth
+> Validation, Risk Nowcasting, and Long-Term Climate Change Assessment**
 > Jeremiah Masaba — Department of Computer Science, Makerere University, Kampala, Uganda
 > ([ORCID 0009-0004-5620-996X](https://orcid.org/0009-0004-5620-996X))
 
 This converts the baseline study *"Evaluation of Anomaly Detection Techniques
-Using Uganda Weather Dataset"* from a single-source algorithm comparison into a
-validated detection + spatial-risk + century-climatology + drought-index +
+Using Uganda Weather Dataset"* — an unpublished, author-held technical draft, not
+indexed in Crossref, OpenAlex or arXiv (`src/check_ref_index.py` →
+`results/masaba2023_index_check.json`) — from a single-source algorithm comparison
+into a validated detection + spatial-risk + century-climatology + drought-index +
 impact + severity + nowcasting system with an interactive decision-support
-dashboard.
+dashboard. The draft's perfect-score claim is treated as a hypothesis to re-test,
+not as a citable benchmark.
 
 **Core, deliberately uncomfortable finding:** against real disaster ground-truth,
 *no cross-sectional* unsupervised anomaly detector ranks above chance (held-out ROC-AUC
@@ -39,9 +41,10 @@ documented droughts. Every number in the paper is computed by this pipeline —
 | **NASA POWER** (MERRA-2) | independent gap-fill of the 1990–2007 in-situ reporting collapse: daily T2M / RH / shortwave for 19 districts, 1988–2007 (138,795 district-days) | open (no-key JSON) |
 | **World Bank / FAOSTAT** | 64-year cereal production / area / yield (1961–2024) impact layer | CC BY 4.0 |
 | **Curated disaster register** | 32 documented hydro-meteorological disasters (UNMA, OCHA/ReliefWeb, EM-DAT, FAO/GIEWS, FEWS NET) with onset windows + affected regions | editorial records, cited |
+| **OCHA Uganda COD-AB** via HDX (`cod-ab-uga`) | 135 district polygons (simplified to a 217 KB subset in `data/`) that turn every map into a choropleth; `data/district_lookup.csv` joins the 19 sites to their districts | CC BY-IGO |
 
-> **Note on Meteoblue:** the original study used a Meteoblue archive whose bulk
-> export for non-European locations is a paid `history+` product and is
+> **Note on Meteoblue:** our unpublished baseline draft used a Meteoblue archive
+> whose bulk export for non-European locations is a paid `history+` product and is
 > bot-gated; we rebuild the same variables from ERA5 so every figure is
 > re-downloadable by a reviewer.
 
@@ -86,12 +89,19 @@ artefacts. The dashboard is optional; it is not needed to reproduce the paper.
 
 Stages run in the order declared in `run_all.py`: `fetch_era5` →
 `fetch_meteostat` → `fetch_agriculture` → `fetch_coffee` → `fetch_power` →
-`disaster_register` → `preprocess` → `detect` → `_recover` → `random_null` →
+`fetch_boundaries` → `disaster_register` → `preprocess` → `detect` →
+`region_label_check` → `_recover` → `random_null` →
 `spatial` → `temporal` → `meteostat_instrumental` → `power_climate` →
 `drought_indices` → `ag_linkage` → `coffee_linkage` → `ucasi` → `early_warning` →
 `_typematch` → `_explain_fast` → `figures` → `figures_power` → `figures_maps` →
-`figures_coffee` → `figures_early_warning` → `collect_results`. Each stage caches to
-disk and is idempotent; re-running skips cached fetches.
+`figures_coffee` → `figures_early_warning` → `collect_results` →
+`check_ref_index`. Each stage caches to
+disk and is idempotent; re-running skips cached fetches. `fetch_boundaries`
+rebuilds `data/district_boundaries.geojson` from the public HDX endpoint (a
+37 MB archive; only the 217 KB simplified subset is committed) and
+`check_ref_index` re-runs the reference searches behind
+`results/masaba2023_index_check.json`; both refuse to report success on a
+partial answer rather than writing a convenient negative result.
 
 ## What the pipeline computes
 
@@ -111,6 +121,10 @@ disk and is idempotent; re-running skips cached fetches.
   years, but the national-annual linear link is insignificant (regional droughts
   masked by aggregation).
 * **UCASI** severity index ranks documented disasters; **RQ5** event recall.
+* **Geography** (`fetch_boundaries.py`, `region_label_check.py`): the 19 sites join
+  to 19 of 135 OCHA districts (13.7% of national district area), and the one
+  region label that disagrees with the boundary register is bounded rather than
+  hidden (`results/region_label_sensitivity.json`).
 
 ---
 
@@ -118,7 +132,9 @@ disk and is idempotent; re-running skips cached fetches.
 
 The **source code** is released under the **MIT License** (see `LICENSE`).
 Third-party **data remain under their own terms** (ERA5/Open-Meteo CC-BY 4.0;
-Meteostat CC-BY 4.0; NASA POWER open; World Bank/FAOSTAT CC BY 4.0). Large raw
+Meteostat CC-BY 4.0; NASA POWER open; World Bank/FAOSTAT CC BY 4.0; administrative
+boundaries OCHA COD CC BY-IGO, attribution recorded in
+`data/boundaries_provenance.json`). Large raw
 and derived data files are gitignored because they are regenerated by
 `run_all.py`; the small curated register and all result tables/JSONs (the paper's
 actual numbers) are committed so a reviewer can inspect them without running

@@ -1,0 +1,239 @@
+{
+  "rows_total": 93504,
+  "labelled_positive_config": 10813,
+  "labelled_positive_cod": 10517,
+  "rows_whose_label_would_change": 1036,
+  "positives_lost": 666,
+  "positives_gained": 370,
+  "share_of_current_positives_lost": 0.06159,
+  "max_shift_in_districts_affected": 1,
+  "agreement_with_persisted_label_event": 1.0,
+  "sites_whose_region_label_differs": [
+    {
+      "location": "Masindi",
+      "config_region": "Northern",
+      "cod_region": "Western"
+    }
+  ],
+  "events_with_changed_exposure": [
+    {
+      "event_id": "UG-003",
+      "regions_config": [
+        "Northern"
+      ],
+      "days_config": 848,
+      "days_cod": 636,
+      "affected_config": 4,
+      "affected_cod": 3
+    },
+    {
+      "event_id": "UG-004",
+      "regions_config": [
+        "Central",
+        "Western"
+      ],
+      "days_config": 427,
+      "days_cod": 488,
+      "affected_config": 0,
+      "affected_cod": 0
+    },
+    {
+      "event_id": "UG-005",
+      "regions_config": [
+        "Western"
+      ],
+      "days_config": 12,
+      "days_cod": 18,
+      "affected_config": 0,
+      "affected_cod": 0
+    },
+    {
+      "event_id": "UG-006",
+      "regions_config": [
+        "Eastern",
+        "Northern"
+      ],
+      "days_config": 279,
+      "days_cod": 248,
+      "affected_config": 1,
+      "affected_cod": 1
+    },
+    {
+      "event_id": "UG-010",
+      "regions_config": [
+        "Central",
+        "Western"
+      ],
+      "days_config": 427,
+      "days_cod": 488,
+      "affected_config": 6,
+      "affected_cod": 6
+    },
+    {
+      "event_id": "UG-011",
+      "regions_config": [
+        "Central",
+        "Western"
+      ],
+      "days_config": 427,
+      "days_cod": 488,
+      "affected_config": 2,
+      "affected_cod": 2
+    },
+    {
+      "event_id": "UG-013",
+      "regions_config": [
+        "Northern"
+      ],
+      "days_config": 976,
+      "days_cod": 732,
+      "affected_config": 3,
+      "affected_cod": 2
+    },
+    {
+      "event_id": "UG-014",
+      "regions_config": [
+        "Western"
+      ],
+      "days_config": 122,
+      "days_cod": 183,
+      "affected_config": 0,
+      "affected_cod": 0
+    },
+    {
+      "event_id": "UG-015",
+      "regions_config": [
+        "Eastern",
+        "Northern"
+      ],
+      "days_config": 1629,
+      "days_cod": 1448,
+      "affected_config": 9,
+      "affected_cod": 8
+    },
+    {
+      "event_id": "UG-016",
+      "regions_config": [
+        "Eastern",
+        "Western"
+      ],
+      "days_config": 644,
+      "days_cod": 736,
+      "affected_config": 5,
+      "affected_cod": 6
+    },
+    {
+      "event_id": "UG-017",
+      "regions_config": [
+        "Central",
+        "Western"
+      ],
+      "days_config": 105,
+      "days_cod": 120,
+      "affected_config": 1,
+      "affected_cod": 1
+    },
+    {
+      "event_id": "UG-019",
+      "regions_config": [
+        "Western"
+      ],
+      "days_config": 122,
+      "days_cod": 183,
+      "affected_config": 1,
+      "affected_cod": 2
+    },
+    {
+      "event_id": "UG-020",
+      "regions_config": [
+        "Western"
+      ],
+      "days_config": 62,
+      "days_cod": 93,
+      "affected_config": 1,
+      "affected_cod": 1
+    },
+    {
+      "event_id": "UG-021",
+      "regions_config": [
+        "Central",
+        "Western"
+      ],
+      "days_config": 217,
+      "days_cod": 248,
+      "affected_config": 0,
+      "affected_cod": 0
+    },
+    {
+      "event_id": "UG-022",
+      "regions_config": [
+        "Northern"
+      ],
+      "days_config": 728,
+      "days_cod": 546,
+      "affected_config": 1,
+      "affected_cod": 1
+    },
+    {
+      "event_id": "UG-025",
+      "regions_config": [
+        "Western"
+      ],
+      "days_config": 60,
+      "days_cod": 90,
+      "affected_config": 2,
+      "affected_cod": 2
+    },
+    {
+      "event_id": "UG-026",
+      "regions_config": [
+        "Western"
+      ],
+      "days_config": 62,
+      "days_cod": 93,
+      "affected_config": 2,
+      "affected_cod": 2
+    },
+    {
+      "event_id": "UG-028",
+      "regions_config": [
+        "Western"
+      ],
+      "days_config": 60,
+      "days_cod": 90,
+      "affected_config": 1,
+      "affected_cod": 1
+    },
+    {
+      "event_id": "UG-029",
+      "regions_config": [
+        "Western"
+      ],
+      "days_config": 16,
+      "days_cod": 24,
+      "affected_config": 0,
+      "affected_cod": 0
+    },
+    {
+      "event_id": "UG-031",
+      "regions_config": [
+        "Northern"
+      ],
+      "days_config": 120,
+      "days_cod": 90,
+      "affected_config": 4,
+      "affected_cod": 3
+    },
+    {
+      "event_id": "UG-032",
+      "regions_config": [
+        "Western"
+      ],
+      "days_config": 22,
+      "days_cod": 33,
+      "affected_config": 0,
+      "affected_cod": 0
+    }
+  ],
+  "note": "Measured on persisted artefacts only. No committed result was re-derived: the published numbers were produced with the region labels as registered in src/config.py."
+}

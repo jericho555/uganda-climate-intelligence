@@ -1,19 +1,24 @@
-"""District reference maps and spatial risk maps for the manuscript.
+"""District maps for the manuscript: choropleths over Uganda's 135 districts.
 
 Every quantity plotted here is read from an artefact already written by the
 pipeline; nothing is re-derived, re-thresholded or re-fitted in this file:
 
-  results/tables/district_anomaly.csv    16 analysed districts: rate, Gi*, cluster
+  data/district_boundaries.geojson   135 districts (OCHA COD v01, CC BY-IGO)
+  data/region_boundaries.geojson     4 regional outlines, drawn as context
+  data/district_lookup.csv           observation point -> district + PCODE
+  results/district_coverage.json     areal coverage of the analysed panel
+  results/tables/district_anomaly.csv    16 districts: rate, Gi*, cluster
   results/tables/temporal_trends.csv     Mann-Kendall tau per district x variable
   results/tables/risk_district_month.csv UCASI district-month nowcast surface
   results/tables/power_trends.csv        POWER 1988-2007 trends, 19 districts
-  results/benchmark.csv                  held-out detector scores
   data/meteostat_stations.csv            in-situ stations (lon/lat)
-  src/config.py                          district centroids (single source)
+  src/config.py                          observation points (single source)
 
-Districts are drawn at their WGS84 administrative centroids: markers are points,
-not areal units, and no boundary geometry is implied.
+Each value is measured at a point (an ERA5 grid extraction or a station) and is
+drawn over the district that contains that point, per data/district_lookup.csv.
+Districts the pipeline does not observe are rendered as no-data, never as zero.
 """
+import json
 import shutil
 import sys
 import warnings
@@ -31,40 +36,130 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import patches as mp
+from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 
 plt.rcParams.update({"figure.dpi": 200, "font.size": 8, "axes.grid": True,
                      "grid.alpha": 0.25, "axes.spines.top": False,
                      "axes.spines.right": False, "savefig.bbox": "tight"})
 
-REGION_COLOR = {"Central": "#7b3294", "Eastern": "#005f73",
-                "Northern": "#8a5a00", "Western": "#1b7837"}
+REGION_COLOR = {"Central": "#b6a3cf", "Eastern": "#8fc4cd",
+                "Northern": "#d9bd85", "Western": "#9dc9a5"}
 BAND_COLOR = {"Low": "#4575b4", "Moderate": "#fee090",
               "High": "#fdae61", "Extreme": "#d7301f"}
 DIV = LinearSegmentedColormap.from_list("tau", ["#2166ac", "#f7f7f7", "#b2182b"])
+NODATA = "#e9e9e6"
+CLS_COLOR = {"hotspot": "#d7301f", "coldspot": "#4575b4", "ns": "#c8c8c1"}
+UNOBSERVED = "#f5f5f2"
 
-# Uganda spans roughly 29.6-33.9E and -1.5-4.4N for these centroids; the extra
-# margin on the right and left is label space, not data range.
-LON_LIM, LAT_LIM = (28.6, 36.4), (-2.2, 3.8)
+# Uganda's true extent (29.5-35.0E, 1.5S-4.0N) plus a margin for labels.
+LON_LIM, LAT_LIM = (29.1, 35.5), (-2.1, 4.4)
 COORDS = {name: (lon, lat) for _, name, lat, lon, _e in C.LOCATIONS}
 
 # Manual label offsets (points) so the dense Central and Eastern clusters stay
 # readable. The geometry is fixed by the data; only text placement is chosen.
 LABEL_OFF = {
-    "Arua": (0, 8, "center"), "Gulu": (8, 2, "left"), "Lira": (8, 1, "left"),
-    "Masindi": (-8, 4, "right"), "FortPortal": (-4, 8, "center"),
-    "Mbarara": (0, -12, "center"), "Kasese": (-8, -9, "right"),
-    "Hoima": (-8, 3, "right"), "Kabale": (0, -12, "center"),
-    "Kampala": (0, -14, "center"), "Wakiso": (-8, 6, "right"),
-    "Mukono": (9, -6, "left"), "Mityana": (-8, -9, "right"),
-    "Luweero": (0, 9, "center"), "Jinja": (-9, 6, "right"),
-    "Soroti": (0, 9, "center"), "Kumi": (9, 3, "left"),
-    "Mbale": (9, -3, "left"), "Tororo": (9, -8, "left"),
-    "Lira": (-8, 4, "right"),
+    "Arua": (0, 9, "center"), "Gulu": (9, 2, "left"), "Lira": (9, 1, "left"),
+    "Masindi": (-9, 5, "right"), "FortPortal": (-6, 9, "center"),
+    "Mbarara": (0, -12, "center"), "Kasese": (0, -13, "center"),
+    "Hoima": (-9, 3, "right"), "Kabale": (0, -12, "center"),
+    "Kampala": (0, -15, "center"), "Wakiso": (-9, 7, "right"),
+    "Mukono": (10, -8, "left"), "Mityana": (-9, -11, "right"),
+    "Luweero": (0, 11, "center"), "Jinja": (10, 4, "left"),
+    "Soroti": (0, 10, "center"), "Kumi": (10, 3, "left"),
+    "Mbale": (10, -3, "left"), "Tororo": (10, -9, "left"),
 }
 
+_DISTRICTS = _REGIONS = _LOOKUP = None
 
-def _map_axes(ax):
+
+def geometry():
+    """Load the district/region polygons and the point-to-district lookup."""
+    global _DISTRICTS, _REGIONS, _LOOKUP
+    if _DISTRICTS is None:
+        p = DATA / "district_boundaries.geojson"
+        if not p.exists():
+            raise SystemExit("missing %s: run python src/fetch_boundaries.py"
+                             % p.relative_to(C.ROOT))
+        _DISTRICTS = json.loads(p.read_text(encoding="utf-8"))["features"]
+        rp = DATA / "region_boundaries.geojson"
+        _REGIONS = (json.loads(rp.read_text(encoding="utf-8"))["features"]
+                    if rp.exists() else [])
+        _LOOKUP = pd.read_csv(DATA / "district_lookup.csv")
+    return _DISTRICTS, _REGIONS, _LOOKUP
+
+
+def district_of(loc):
+    """Config name -> COD district name (Luweero->Luwero, FortPortal->Kabarole)."""
+    _, _, lk = geometry()
+    return dict(zip(lk.location, lk.adm2_name)).get(loc)
+
+
+def values_by_district(table, column, key="location"):
+    """Re-key a per-location table onto COD district names."""
+    feats, _, lk = geometry()
+    m = dict(zip(lk.location, lk.adm2_name))
+    return {m[r[key]]: r[column] for _, r in table.iterrows() if r[key] in m}
+
+
+def coverage_note():
+    """One-line areal coverage statement taken from the committed artefact."""
+    p = RESULTS / "district_coverage.json"
+    if not p.exists():
+        return ""
+    cv = json.loads(p.read_text())
+    return ("%d of %d districts, %.1f%% of the national district area"
+            % (cv["districts_analysed"], cv["districts_total"],
+               100 * cv["analysed_area_share"]))
+
+
+def _rings(geom):
+    """Exterior rings of a Polygon/MultiPolygon as (N, 2) arrays."""
+    groups = (geom["coordinates"] if geom["type"] == "MultiPolygon"
+              else [geom["coordinates"]])
+    for poly in groups:
+        if len(poly) and len(poly[0]) > 3:
+            yield np.asarray(poly[0], dtype=float)[:, :2]
+
+
+def _outline(ax, feats, color="#8c8c8c", lw=0.35, zorder=4, alpha=1.0):
+    for f in feats:
+        for ring in _rings(f["geometry"]):
+            ax.add_patch(mp.Polygon(ring, closed=True, fill=False,
+                                    edgecolor=color, linewidth=lw, zorder=zorder,
+                                    joinstyle="round", alpha=alpha))
+
+
+def fill(ax, values=None, cmap=None, vmin=None, vmax=None, colors=None,
+         default=NODATA, edge="#4a4a4a", lw=0.4, zorder=1):
+    """Draw every district. Numeric mode masks absent values to the bad colour."""
+    feats, _, _ = geometry()
+    patches, keys = [], []
+    for f in feats:
+        name = f["properties"]["adm2_name"]
+        for ring in _rings(f["geometry"]):
+            patches.append(mp.Polygon(ring, closed=True))
+            keys.append(name)
+    if colors is not None:
+        fc = [colors.get(k, default) for k in keys]
+        coll = PatchCollection(patches, facecolor=fc, edgecolor=edge,
+                               linewidth=lw, zorder=zorder, match_original=False)
+        ax.add_collection(coll)
+        return coll
+    cm = (matplotlib.colormaps[cmap].copy() if isinstance(cmap, str)
+          else cmap.copy())
+    cm.set_bad(NODATA)
+    arr = np.array([values.get(k, np.nan) for k in keys], dtype=float)
+    coll = PatchCollection(patches, edgecolor=edge, linewidth=lw, zorder=zorder,
+                           match_original=False)
+    coll.set_array(arr)
+    coll.set_cmap(cm)
+    coll.set_norm(Normalize(vmin=vmin, vmax=vmax))
+    ax.add_collection(coll)
+    return coll
+
+
+def _frame(ax):
     ax.set_xlim(*LON_LIM)
     ax.set_ylim(*LAT_LIM)
     ax.set_xlabel("longitude (\u00b0E)")
@@ -74,10 +169,19 @@ def _map_axes(ax):
     ax.set_aspect("equal")
 
 
+def _map_axes(ax, regions=True):
+    """Grey district mosaic plus regional outlines: the national frame."""
+    feats, regs, _ = geometry()
+    _outline(ax, feats, color="#b9b9b4", lw=0.3, zorder=2)
+    if regions and regs:
+        _outline(ax, regs, color="#5a5a5a", lw=0.9, zorder=3, alpha=0.9)
+    _frame(ax)
+
+
 def _label(ax, lon, lat, text):
     dx, dy, ha = LABEL_OFF.get(text.split()[0], (6, 4, "left"))
     ax.annotate(text, (lon, lat), fontsize=6.2, xytext=(dx, dy), ha=ha,
-                textcoords="offset points",
+                textcoords="offset points", zorder=9,
                 bbox=dict(boxstyle="round,pad=0.1", fc="white", ec="none",
                           alpha=0.78))
 
@@ -90,60 +194,126 @@ def _save(fig, name):
     print("wrote", name)
 
 
+def _select(names):
+    """District features whose COD name is in `names`."""
+    feats, _, _ = geometry()
+    return [f for f in feats if f["properties"]["adm2_name"] in set(names)]
+
+
+def _hatch(ax, names, hatch="////", color="#5f5f5f", zorder=5):
+    """Mark districts whose trend is not significant, instead of shrinking them."""
+    patches = [mp.Polygon(r, closed=True)
+               for f in _select(names) for r in _rings(f["geometry"])]
+    if not patches:
+        return
+    ax.add_collection(PatchCollection(patches, facecolor="none",
+                                      edgecolor=color, linewidth=0.0,
+                                      hatch=hatch, zorder=zorder, alpha=0.8))
+
+
 # --------------------------------------------------------------------------
 def fig_study_area():
-    """Where the observations actually are: districts, stations, topography."""
+    """Where the observations actually are: the district mosaic, and topography."""
     da = pd.read_csv(RESULTS / "tables/district_anomaly.csv")
     st = pd.read_csv(DATA / "meteostat_stations.csv")
     power = pd.read_csv(RESULTS / "tables/power_trends.csv")
-    n_power = power.location.nunique()
     power_only = sorted(set(power.location) - set(da.location))
-    norm = lambda s: s.replace(" ", "").lower()
-    district_keys = {norm(n) for n in da.location}
+    feats, regs, lk = geometry()
+    colors = {adm: REGION_COLOR.get(str(reg), "#cfcfca")
+              for adm, reg in zip(lk.adm2_name, lk.adm1_name)}
+    n_unobserved = len(feats) - len(colors)
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.4, 5.4))
+    fig, axes = plt.subplots(1, 2, figsize=(11.8, 6.0))
 
     ax = axes[0]
-    _map_axes(ax)
-    for region, grp in da.groupby("region"):
-        ax.scatter(grp.lon, grp.lat, s=34, marker="o",
-                   color=REGION_COLOR[region], edgecolor="k", linewidth=0.4,
-                   label=f"ERA5 district ({region})", zorder=3)
-        for _, r in grp.iterrows():
-            _label(ax, r.lon, r.lat, r.location)
-    ax.scatter(st.lon, st.lat, s=34, marker="^", facecolor="none",
-               edgecolor="#c0392b", linewidth=1.0,
-               label=f"Meteostat station (n={len(st)})", zorder=4)
-    for _, r in st.iterrows():
-        if norm(r["name"]) not in district_keys:
-            _label(ax, r.lon, r.lat, r["name"])
+    _frame(ax)
+    fill(ax, colors=colors, default=NODATA, edge="#4a4a4a", lw=0.35, zorder=1)
+    _outline(ax, regs, color="#3f3f3f", lw=0.9, zorder=3)
+    for _, r in da.iterrows():
+        ax.scatter([r.lon], [r.lat], s=13, marker="o", color="#1a1a1a", zorder=6)
     for name in power_only:
         lon, lat = COORDS[name]
         ax.scatter([lon], [lat], s=34, marker="s", facecolor="none",
-                   edgecolor="#555555", linewidth=1.0, zorder=4)
-        _label(ax, lon, lat, name)
-    ax.legend(fontsize=6.2, loc="lower right", framealpha=0.9)
-    ax.set_title(f"(a) Observing geometry: {len(da)} ERA5 districts, "
-                 f"{len(st)} stations,\n{n_power} POWER gap-fill centroids",
-                 fontsize=8.5)
+                   edgecolor="#555555", linewidth=1.0, zorder=6)
+    ax.scatter(st.lon, st.lat, s=44, marker="^", facecolor="none",
+               edgecolor="#c0392b", linewidth=1.0, zorder=7)
+    handles = [mp.Patch(facecolor=REGION_COLOR[r], edgecolor="#4a4a4a",
+                        label="%s (observed)" % r) for r in
+               ("Central", "Eastern", "Northern", "Western")]
+    handles += [mp.Patch(facecolor=NODATA, edgecolor="#9a9a9a",
+                         label="district, no data (n=%d)" % n_unobserved),
+                plt.Line2D([], [], marker="^", ls="none", mec="#c0392b",
+                           mfc="none", label="Meteostat station (n=%d)" % len(st)),
+                plt.Line2D([], [], marker="s", ls="none", mec="#555555",
+                           mfc="none", label="gap-fill only (n=%d)" % len(power_only))]
+    ax.legend(handles=handles, fontsize=5.9, loc="lower left", ncol=2,
+              framealpha=0.92)
+    ax.set_title(f"(a) Uganda's {len(feats)} districts, {len(colors)} observed\n"
+                 f"{coverage_note()}", fontsize=8.5)
 
     ax = axes[1]
     _map_axes(ax)
     elev = pd.Series({name: e for _, name, _lat, _lon, e in C.LOCATIONS})
     pts = np.array([COORDS[n] for n in elev.index])
-    sc = ax.scatter(pts[:, 0], pts[:, 1], s=90, c=elev.values, cmap="terrain",
-                    vmin=elev.min(), vmax=elev.max(), edgecolor="k", linewidth=0.4)
+    sc = ax.scatter(pts[:, 0], pts[:, 1], s=95, c=elev.values, cmap="terrain",
+                    vmin=elev.min(), vmax=elev.max(), edgecolor="k", linewidth=0.4,
+                    zorder=6)
     for name, (lon, lat) in COORDS.items():
         _label(ax, lon, lat, f"{name} {int(elev[name])} m")
     cb = fig.colorbar(sc, ax=ax, pad=0.03)
-    cb.set_label("centroid elevation (m a.s.l.)", fontsize=7.5)
+    cb.set_label("observation-point elevation (m a.s.l.)", fontsize=7.5)
     cb.ax.tick_params(labelsize=6.5)
     erange = f"{int(elev.min())}\u2013{int(elev.max())}"
-    ax.set_title(f"(b) Centroid elevation {erange} m: the orographic contrast\n"
-                 "between the north and the southwest highlands", fontsize=8.5)
+    ax.set_title(f"(b) Point elevation over the district mosaic, {erange} m:\n"
+                 "the orographic contrast between north and southwest",
+                 fontsize=8.5)
 
-    fig.tight_layout()
+    fig.text(0.5, 0.004, "Every value is measured at a point and drawn over the "
+             "district that contains it. Geometry: OCHA Uganda COD v01 admin-2 "
+             "(CC BY-IGO).", ha="center", fontsize=6.4, style="italic")
+    fig.tight_layout(rect=(0, 0.025, 1, 1))
     _save(fig, "fig_study_area")
+
+
+# --------------------------------------------------------------------------
+def fig_hotspot_map():
+    """Getis--Ord classification drawn as district categories, not bubble radii."""
+    da = pd.read_csv(RESULTS / "tables/district_anomaly.csv")
+    feats, regs, _ = geometry()
+    hot = [district_of(n) for n in da.loc[da.cluster == "hotspot", "location"]]
+    cold = [district_of(n) for n in da.loc[da.cluster == "coldspot", "location"]]
+    colors = {k: CLS_COLOR.get(str(v), UNOBSERVED)
+              for k, v in values_by_district(da, "cluster").items()}
+
+    fig, ax = plt.subplots(figsize=(7.0, 6.4))
+    _frame(ax)
+    fill(ax, colors=colors, default=UNOBSERVED, edge="#9a9a9a", lw=0.3)
+    _outline(ax, regs, color="#3f3f3f", lw=0.9, zorder=3)
+    _outline(ax, _select(hot + cold), color="#1a1a1a", lw=2.2, zorder=5)
+    for _, r in da.iterrows():
+        ax.scatter([r.lon], [r.lat], s=8, marker="o", color="#1a1a1a", zorder=7)
+        _label(ax, r.lon, r.lat, f"{r.location} {r.Gi_star_z:+.1f}")
+    handles = [mp.Patch(facecolor=CLS_COLOR["hotspot"], edgecolor="#4a4a4a",
+                        label="hot spot ($p<0.05$, n=%d)" % len(hot)),
+               mp.Patch(facecolor=CLS_COLOR["coldspot"], edgecolor="#4a4a4a",
+                        label="cold spot ($p<0.05$, n=%d)" % len(cold)),
+               mp.Patch(facecolor=CLS_COLOR["ns"], edgecolor="#4a4a4a",
+                        label="tested, not significant (n=%d)"
+                              % int((da.cluster == "ns").sum())),
+               mp.Patch(facecolor=UNOBSERVED, edgecolor="#9a9a9a",
+                        label="district, no ERA5 panel (n=%d)"
+                              % (len(feats) - len(colors)))]
+    ax.legend(handles=handles, fontsize=6.2, loc="lower left", ncol=1,
+              framealpha=0.92)
+    ax.set_title("Getis--Ord $G_i^*$ classification by district, "
+                 "2008\u20132023\n"
+                 "z-values below each site; the national pattern is one hotspot",
+                 fontsize=8.5)
+    fig.text(0.5, 0.004, "One district, one class. Geometry: OCHA Uganda COD "
+             "v01 admin-2 (CC BY-IGO).", ha="center", fontsize=6.4,
+             style="italic")
+    fig.tight_layout(rect=(0, 0.028, 1, 1))
+    _save(fig, "fig_hotspot_map")
 
 
 # --------------------------------------------------------------------------
@@ -156,77 +326,80 @@ def fig_risk_maps():
                      parse_dates=False)
     rm["ym"] = rm.year.astype(int) * 100 + rm.month.astype(int)
     latest = rm[rm.ym == rm.ym.max()].copy()
+    hot = [district_of(n) for n in da.loc[da.cluster == "hotspot", "location"]]
+    nonsig = [district_of(r.location) for _, r in tr.iterrows()
+              if r.p_value >= 0.05]
     stamp = f"{int(latest.year.iloc[0])}-{int(latest.month.iloc[0]):02d}"
 
-    fig, axes = plt.subplots(1, 3, figsize=(13.6, 5.4))
+    fig, axes = plt.subplots(1, 3, figsize=(14.6, 5.9))
 
-    # (a) detection rate with the Getis-Ord classification
+    # (a) detection rate as a district choropleth, hotspots outlined
     ax = axes[0]
-    _map_axes(ax)
-    norm = Normalize(vmin=0, vmax=da.anomaly_rate.max())
-    ax.scatter(da.lon, da.lat, s=25 + 190 * norm(da.anomaly_rate),
-               c=da.anomaly_rate, cmap="YlOrRd", vmin=0,
-               vmax=da.anomaly_rate.max(), edgecolor="k", linewidth=0.4, zorder=3)
+    _frame(ax)
+    rates = values_by_district(da, "anomaly_rate")
+    coll = fill(ax, values=rates, cmap="YlOrRd", vmin=0,
+                vmax=da.anomaly_rate.max())
+    _outline(ax, _select(hot), color="#1a1a1a", lw=2.2, zorder=5)
     for _, r in da.iterrows():
+        ax.scatter([r.lon], [r.lat], s=8, marker="o", color="#1a1a1a", zorder=7)
         _label(ax, r.lon, r.lat, f"{r.location} {100*r.anomaly_rate:.1f}%")
-    hot = da[da.cluster == "hotspot"]
-    for _, r in hot.iterrows():
-        ax.add_patch(mp.Circle((r.lon, r.lat), 0.22, fill=False,
-                               edgecolor="#b2182b", linewidth=1.6, zorder=4))
-    txt = "; ".join(f"{r.location} $z$={r.Gi_star_z:.2f}" for _, r in hot.iterrows())
-    ax.text(0.02, 0.03, f"significant $G_i^*$ hotspot (\u03b1=0.05): {txt}",
-            transform=ax.transAxes, fontsize=6.6, color="#b2182b")
-    cb = fig.colorbar(ax.collections[0], ax=ax, pad=0.03)
+    txt = "; ".join(f"{r.location} $z$={r.Gi_star_z:.2f}"
+                    for _, r in da[da.cluster == "hotspot"].iterrows())
+    ax.text(0.02, 0.03, f"significant $G_i^*$ hotspot (\u03b1=0.05, thick edge): "
+            f"{txt}", transform=ax.transAxes, fontsize=6.6, color="#b2182b")
+    cb = fig.colorbar(coll, ax=ax, pad=0.03)
     cb.set_label("flagged district-days (fraction)", fontsize=7)
     cb.ax.tick_params(labelsize=6.5)
-    ax.set_title(f"(a) Detected anomaly rate, 2008-2023\n(target 5%; "
-                 f"circle = $G_i^*$ hotspot)", fontsize=8.5)
+    ax.set_title(f"(a) Detected anomaly rate by district, 2008-2023\n"
+                 f"(target 5%; thick edge = $G_i^*$ hotspot)", fontsize=8.5)
 
-    # (b) precipitation Mann-Kendall tau
+    # (b) precipitation Mann-Kendall tau; non-significant districts hatched
     ax = axes[1]
-    _map_axes(ax)
+    _frame(ax)
     lim = max(abs(tr.tau.min()), abs(tr.tau.max()))
-    sc = ax.scatter([COORDS[n][0] for n in tr.location],
-                    [COORDS[n][1] for n in tr.location], s=45, c=tr.tau,
-                    cmap=DIV, vmin=-lim, vmax=lim,
-                    edgecolor=["k" if p < 0.05 else "#bbbbbb" for p in tr.p_value],
-                    linewidth=[1.1 if p < 0.05 else 0.4 for p in tr.p_value],
-                    zorder=3)
+    taus = values_by_district(tr, "tau")
+    coll = fill(ax, values=taus, cmap=DIV, vmin=-lim, vmax=lim)
+    _hatch(ax, nonsig)
     for _, r in tr.iterrows():
         lon, lat = COORDS[r.location]
+        ax.scatter([lon], [lat], s=8, marker="o", color="#1a1a1a", zorder=7)
         sig = "*" if r.p_value < 0.05 else ""
         _label(ax, lon, lat, f"{r.location} {r.tau:+.2f}{sig}")
-    cb = fig.colorbar(sc, ax=ax, pad=0.03)
+    cb = fig.colorbar(coll, ax=ax, pad=0.03)
     cb.set_label("Mann-Kendall $\\tau$ (precipitation, monthly)", fontsize=7)
     cb.ax.tick_params(labelsize=6.5)
-    ax.set_title(f"(b) Precipitation trend, 2008-2023\n"
+    ax.set_title(f"(b) Precipitation trend by district, 2008-2023\n"
                  f"{int((tr.p_value < 0.05).sum())}/{len(tr)} significant "
-                 f"($p<0.05$, bold edge)", fontsize=8.5)
+                 f"($p<0.05$; hatch = not significant)", fontsize=8.5)
 
-    # (c) forward risk nowcast, most recent month
+    # (c) forward risk nowcast, most recent month, as a banded choropleth
     ax = axes[2]
-    _map_axes(ax)
-    latest["c"] = latest.band.map(BAND_COLOR)
-    ax.scatter([COORDS[n][0] for n in latest.location],
-               [COORDS[n][1] for n in latest.location],
-               s=25 + 3.2 * latest.risk, c=latest["c"], edgecolor="k",
-               linewidth=0.5, zorder=3)
+    _frame(ax)
+    bandc = {k: BAND_COLOR.get(str(v), NODATA)
+             for k, v in values_by_district(latest, "band").items()}
+    fill(ax, colors=bandc, default=NODATA)
     for _, r in latest.iterrows():
         lon, lat = COORDS[r.location]
+        ax.scatter([lon], [lat], s=8, marker="o", color="#1a1a1a", zorder=7)
         _label(ax, lon, lat, f"{r.location} {r.risk:.0f}")
-    handles = [mp.Patch(color=v, label=k) for k, v in BAND_COLOR.items()]
+    handles = [mp.Patch(color=v, edgecolor="#4a4a4a", label=k)
+               for k, v in BAND_COLOR.items()]
+    handles.append(mp.Patch(facecolor=NODATA, edgecolor="#9a9a9a",
+                            label="district, no nowcast"))
     ax.legend(handles=handles, fontsize=6.2, loc="lower left", ncol=2,
-              framealpha=0.9, title="UCASI band", title_fontsize=6.5)
+              framealpha=0.92, title="UCASI band", title_fontsize=6.5)
     top = latest.sort_values("risk", ascending=False).head(3)
     ax.set_title("(c) UCASI district-month nowcast, "
                  f"{stamp}\ntop: " + ", ".join(f"{r.location} {r.risk:.0f}"
                                                for _, r in top.iterrows()),
                  fontsize=8.5)
 
-    fig.text(0.5, 0.005, "Districts plotted at WGS84 administrative centroids; "
-             "markers are points, not areal units.", ha="center", fontsize=6.5,
-             style="italic")
-    fig.tight_layout(rect=(0, 0.02, 1, 1))
+    fig.text(0.5, 0.004, "Each value is measured at a point (ERA5 grid cell or "
+             "station) and shaded over the district that contains it; districts "
+             "the pipeline does not observe are grey, never zero. "
+             "Geometry: OCHA Uganda COD v01 admin-2 (CC BY-IGO).",
+             ha="center", fontsize=6.4, style="italic")
+    fig.tight_layout(rect=(0, 0.028, 1, 1))
     _save(fig, "fig_risk_maps")
 
 
@@ -237,34 +410,35 @@ def fig_gapfill_maps():
     warm = pw[(pw.variable == "t2m") & (pw.source == "POWER")]
     dry = pw[(pw.variable == "rh2m") & (pw.source == "POWER")]
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.0, 5.4))
+    fig, axes = plt.subplots(1, 2, figsize=(11.8, 6.0))
     for i, (ax, tab, lab) in enumerate(
             ((axes[0], warm, "$T_{2m}$"),
              (axes[1], dry, "near-surface RH"))):
-        _map_axes(ax)
+        _frame(ax)
         lim = max(abs(tab.tau.min()), abs(tab.tau.max()))
-        sc = ax.scatter([COORDS[n][0] for n in tab.location],
-                        [COORDS[n][1] for n in tab.location], s=55, c=tab.tau,
-                        cmap=DIV, vmin=-lim, vmax=lim,
-                        edgecolor=["k" if p < 0.05 else "#bbbbbb"
-                                   for p in tab.p_value],
-                        linewidth=[1.1 if p < 0.05 else 0.4 for p in tab.p_value],
-                        zorder=3)
+        coll = fill(ax, values=values_by_district(tab, "tau"), cmap=DIV,
+                    vmin=-lim, vmax=lim)
+        _hatch(ax, [district_of(r.location) for _, r in tab.iterrows()
+                    if r.p_value >= 0.05])
         for _, r in tab.iterrows():
             lon, lat = COORDS[r.location]
+            ax.scatter([lon], [lat], s=8, marker="o", color="#1a1a1a", zorder=7)
             sig = "*" if r.p_value < 0.05 else ""
             _label(ax, lon, lat, f"{r.location} {r.tau:+.2f}{sig}")
-        cb = fig.colorbar(sc, ax=ax, pad=0.03)
+        cb = fig.colorbar(coll, ax=ax, pad=0.03)
         cb.set_label("Mann-Kendall $\\tau$, 1988-2007", fontsize=7)
         cb.ax.tick_params(labelsize=6.5)
         nsig = int((tab.p_value < 0.05).sum())
-        ax.set_title(f"({chr(ord('a') + i)}) POWER {lab}, 1988\u20132007\n"
+        ax.set_title(f"({chr(ord('a') + i)}) POWER {lab} by district, "
+                     "1988\u20132007\n"
                      f"{nsig}/{len(tab)} districts significant "
-                     "($p<0.05$)", fontsize=8.5)
-    fig.text(0.5, 0.005, "NASA POWER (MERRA-2 based) monthly series, "
-             "1988-01 to 2007-12; centroids as in Table 1.", ha="center",
-             fontsize=6.5, style="italic")
-    fig.tight_layout(rect=(0, 0.02, 1, 1))
+                     "($p<0.05$; hatch = not significant)", fontsize=8.5)
+    fig.text(0.5, 0.004, "NASA POWER (MERRA-2 based) monthly series, "
+             "1988-01 to 2007-12, measured at the 19 observation points and "
+             "shaded over the containing district. "
+             "Geometry: OCHA Uganda COD v01 admin-2 (CC BY-IGO).",
+             ha="center", fontsize=6.4, style="italic")
+    fig.tight_layout(rect=(0, 0.028, 1, 1))
     _save(fig, "fig_gapfill_maps")
 
 
@@ -334,6 +508,7 @@ def fig_null_comparison():
 
 def main():
     fig_study_area()
+    fig_hotspot_map()
     fig_risk_maps()
     fig_gapfill_maps()
     fig_null_comparison()

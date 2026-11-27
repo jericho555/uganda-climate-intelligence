@@ -15,7 +15,6 @@ from config import DATA, RESULTS, FIGURES
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
 from sklearn.metrics import roc_curve, precision_recall_curve, auc
 
 plt.rcParams.update({"figure.dpi": 150, "font.size": 9, "axes.grid": True,
@@ -67,24 +66,13 @@ def fig_curves():
 
 
 def fig_map():
-    da = pd.read_csv(RESULTS / "tables/district_anomaly.csv")
-    fig, ax = plt.subplots(figsize=(6, 6))
-    vmax = da.anomaly_rate.max()
-    for _, r in da.iterrows():
-        c = "#d7301f" if r.cluster == "hotspot" else ("#4575b4" if r.cluster == "coldspot" else "#999999")
-        ax.add_patch(Circle((r.lon, r.lat), radius=vmax * 0.9, color=c,
-                            alpha=0.35 + 0.5 * r.anomaly_rate / vmax))
-        ax.plot(r.lon, r.lat, "o", ms=6 + 22 * r.anomaly_rate / vmax,
-                color=c, mec="k", mew=0.4)
-        ax.annotate(r.location, (r.lon, r.lat), fontsize=7, xytext=(3, 3), textcoords="offset points")
-    ax.set_xlabel("Longitude"); ax.set_ylabel("Latitude")
-    ax.set_title("Uganda district anomaly-rate hotspots (Getis-Ord Gi*)")
-    import matplotlib.patches as mp
-    handles = [plt.Line2D([], [], marker="o", ls="", color="#d7301f", label="hot spot (p<.05)"),
-               plt.Line2D([], [], marker="o", ls="", color="#4575b4", label="cold spot"),
-               plt.Line2D([], [], marker="o", ls="", color="#999999", label="not significant")]
-    ax.legend(handles=handles, fontsize=8, loc="lower right")
-    fig.savefig(FIGURES / "fig_hotspot_map.png"); plt.close(fig)
+    """District Getis-Ord classification, drawn as a district choropleth.
+
+    Rendering lives in figures_maps so that every map in the paper shares one
+    geometry layer (data/district_boundaries.geojson) and one no-data rule.
+    """
+    from figures_maps import fig_hotspot_map
+    fig_hotspot_map()
 
 
 def fig_ucasi():

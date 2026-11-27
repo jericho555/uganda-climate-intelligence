@@ -5,6 +5,31 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
 ## [Unreleased]
 
 ### Added
+- **District geometry (`src/fetch_boundaries.py`):** the study area is now
+  resolved into real polygons from the OCHA Uganda Common Operational Dataset
+  (`cod-ab-uga`, 135 admin-2 districts, licence CC BY-IGO, archive pinned by
+  sha256). Committed artefacts: `data/district_boundaries.geojson` (217 KB
+  topology-preserving subset, 434,427 → 10,869 vertices),
+  `data/region_boundaries.geojson`, `data/district_lookup.csv` (all 19 sites fall
+  inside exactly one district; Luweero→Luwero, FortPortal→Kabarole) and
+  `data/boundaries_provenance.json`. `results/district_coverage.json` quantifies
+  what the panel represents: 19 of 135 districts, 13.7% of national district area
+  (ERA5 sub-panel 16 districts, 11.0%).
+- **Region-label sensitivity (`src/region_label_check.py`):** the boundary
+  register places Masindi in the Western region while `src/config.py` registers
+  it as Northern. Because event exposure is defined by region
+  (`preprocess.add_labels`), the effect is measured on persisted artefacts rather
+  than argued: 1,036 of 93,504 district-days would change label (6.16% of the
+  current positives), 21 of 32 events change exposure, and the count of districts
+  affected by any one event shifts by at most one. Committed as
+  `results/region_label_sensitivity.json`. No published number was re-derived.
+- **Reference-index check (`src/check_ref_index.py`):** the refuted baseline
+  draft is now cited as what it is — an author-held unpublished technical draft.
+  Nine answered queries to Crossref, OpenAlex and arXiv (plus one rate-limited
+  Semantic Scholar attempt, recorded as unanswered) find no record of it;
+  `results/masaba2023_index_check.json` also lists the closest indexed Ugandan
+  weather records and their authors as a positive control. The script exits
+  rather than emit a negative verdict when a required index does not answer.
 - **Torch sequence detectors (RQ1, benchmark now 24):** a CPU-only `torch 2.4.1`
   distribution is now vendored into the workspace (`pip --target=._torchpkgs`),
   enabling a genuine LSTM encoder–decoder autoencoder and a Transformer encoder
@@ -20,13 +45,34 @@ All notable changes to the Uganda Climate Intelligence Framework (UCIF).
 - **Map figures (`src/figures_maps.py`):** study-area reference map, district
   risk map panel (anomaly rate with Gi* hotspot, precipitation trend, UCASI
   nowcast), gap-fill trend maps and a null-comparison panel. All are drawn from
-  persisted artefacts and plot district centroids as points, not areal units.
+  persisted artefacts.
 - **Interactive dashboard:** a Streamlit app (`dashboard/`) exposing the
   benchmark, daily anomaly stream, spatial hotspots, UCASI severity, trends and
   risk nowcast, bound to the persisted artefacts. Launched via
   `python dashboard/run_dashboard.py` with a vendored `._webpkgs` install.
 
 ### Changed
+- **Title:** now *A National Climate Anomaly Intelligence System for Uganda:
+  Ground-Truth Validation, Risk Nowcasting, and Long-Term Climate Change
+  Assessment*, naming the three things the paper actually delivers and the
+  system-level claim the evidence supports. The subtitle no longer enumerates
+  method counts (24 detectors, three substrates), which read as a capability
+  list; "ground-truth-honest" is retained in the prose where the argument is
+  made. Updated in `main.tex` (title and running title), `COVER_LETTER.md`,
+  `README.md`, `references.bib`, `CITATION.cff` and `.zenodo.json`.
+- **Every map is now a choropleth:** `fig_study_area`, `fig_hotspot_map`,
+  `fig_risk_maps` and `fig_gapfill_maps` shade district polygons instead of
+  plotting circles, with an explicit no-data class (116 districts the pipeline
+  never observes are grey, never zero), hatching for non-significant districts
+  and a thick outline for the one Gi* hotspot. `figures.py:fig_map` delegates to
+  the shared geometry layer so no figure in the package implies a radius of
+  influence. Figure footers carry the boundary attribution.
+- **`masaba2023` reclassified in `references.bib`** from `@misc` with a
+  "details to be supplied by the author" placeholder to `@unpublished`, and the
+  Abstract, Introduction, Related work, Results and Discussion now identify it as
+  our own unpublished draft instead of implying a citable prior benchmark. The
+  cover letter's unverifiable "most cited such result for Uganda" claim was
+  removed; the Highlights bullet now says whose baseline is being refuted.
 - **Related work rebuilt around the threads that carried no evidence:** the
   section grew from 763 to about 1,490 words and gained four new paragraphs
   (operational warning practice and the missing verification standard, applied
